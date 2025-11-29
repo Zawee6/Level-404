@@ -1,0 +1,163 @@
+/* 設定全域滾動行為，讓 Lenis 接管 */
+html {
+    /* 確保瀏覽器原生平滑滾動被關閉 */
+    scroll-behavior: auto; 
+}
+
+body {
+    margin: 0;
+    font-family: 'Helvetica Neue', sans-serif;
+    background-color: #111; /* 深色背景 */
+    color: #fff;
+    line-height: 1.6;
+}
+
+/* 內容區塊基礎樣式 */
+.section {
+    padding: 100px 50px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 20; /* 讓內容在視覺上方 */
+    /* 內容背景增加微弱透明度，讓視覺能若隱若現 */
+    background-color: rgba(17, 17, 17, 0.9); 
+}
+
+/* 專輯概念區塊需要很長，才能有足夠的滾動距離觸發變化 */
+.concept-section {
+    min-height: 200vh; /* 確保這個區塊有兩倍視窗的高度 */
+    background-color: rgba(30, 30, 30, 0.95);
+}
+
+/* 🌟 主視覺容器：固定在畫面上，這是實現效果的關鍵 CSS */
+#visual-container {
+    position: fixed; /* 固定在視窗上 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* 讓使用者可以點擊到後面的內容 */
+    z-index: 10; /* 讓主視覺位於內容下方 (z-index 20) */
+}
+
+#album-visual {
+    width: 500px; /* 基礎大小 */
+    height: auto;
+    max-width: 80%;
+    /* 滾動動畫是即時變化的，不需要 CSS transition */
+    transition: none; 
+}
+
+/* MV 嵌入樣式 */
+.mv-embed {
+    margin-top: 30px;
+    max-width: 100%;
+}
+.mv-embed iframe {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* 其他基本樣式 */
+a.call-to-action {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 25px;
+    background-color: #ff4500; /* 醒目的顏色 */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+a.call-to-action:hover {
+    background-color: #e63900;
+}
+/* --- 周邊商品區塊樣式 --- */
+
+.merch-section {
+    background-color: #222; /* 讓商品區塊顏色略有不同 */
+}
+
+.subtitle {
+    font-size: 1.1em;
+    color: #aaa;
+    margin-bottom: 40px;
+}
+
+/* 🌟 核心：CSS Grid 網格佈局 🌟 */
+.merch-grid {
+    display: grid;
+    /* 建立三欄，每欄寬度均分 (1fr) */
+    grid-template-columns: repeat(3, 1fr); 
+    /* 欄間距和行間距 */
+    gap: 30px; 
+    max-width: 1200px; /* 限制網格最大寬度 */
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* 商品卡片樣式 */
+.merch-item {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.merch-item:hover {
+    transform: translateY(-5px); /* 鼠標懸停時輕微上浮 */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.merch-image {
+    width: 100%;
+    height: auto;
+    max-height: 250px; /* 限制圖片最大高度 */
+    object-fit: cover; /* 確保圖片覆蓋容器，不被拉伸 */
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.merch-item h3 {
+    margin: 10px 0;
+    color: #ff4500; /* 使用品牌醒目色 */
+}
+
+.price {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.buy-button {
+    display: block;
+    padding: 10px;
+    background-color: #ff4500;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.buy-button:hover {
+    background-color: #e63900;
+}
+
+/* 響應式設計：小螢幕變為單欄 */
+@media (max-width: 768px) {
+    .merch-grid {
+        /* 在小螢幕上，只顯示一欄 */
+        grid-template-columns: 1fr; 
+    }
+}

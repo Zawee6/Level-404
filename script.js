@@ -1,63 +1,65 @@
 /**
- * 1. 初始化 Lenis 平滑滾動
- * 2. 監聽滾動事件，將滾動百分比對應到視覺變化
+ * 核心目標：將 Lenis 的平滑滾動事件，導入給 GSAP 的 ScrollTrigger 使用。
  */
 
-// 1. 初始化 Lenis
+// 1. 初始化 Lenis 平滑滾動
 const lenis = new Lenis({
-    duration: 1.2,    // 滾動時間，數值越大越慢越平滑
-    easing: (t) => Math.min(1, 1 - Math.pow(1 - t, 4)), // 自定義緩動函數
-    direction: 'vertical', // 垂直滾動
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1 - Math.pow(1 - t, 4)),
+    direction: 'vertical',
     smooth: true,
-    smoothTouch: false, // 關閉觸摸設備上的平滑滾動，以保持原生體驗
+    smoothTouch: false,
     touchMultiplier: 2,
 });
 
-// Lenis 必須在瀏覽器的 requestAnimationFrame 循環中運行
+// 2. 關鍵整合：將 Lenis 綁定到 ScrollTrigger
+// 每次 Lenis 產生滾動事件時，都要通知 ScrollTrigger 更新位置
+lenis.on('scroll', ScrollTrigger.update);
+
+// 註冊 ScrollTrigger 插件 (確保 GSAP 知道這個插件存在)
+gsap.registerPlugin(ScrollTrigger);
+
+// 讓 ScrollTrigger 知道它必須使用 Lenis 提供的滾動事件，而不是原生的滾動
+gsap.defaults({
+    ease: "power2.inOut" // 設定一個預設的動畫緩動曲線
+});
+
+// Lenis 的滾動循環 (保持不變)
 function raf(time) {
     lenis.raf(time);
     requestAnimationFrame(raf);
 }
-
 requestAnimationFrame(raf);
 
-// --- 核心滾動邏輯 ---
 
-const visualElement = document.getElementById('album-visual');
+// --- 範例：使用 ScrollTrigger 實現滾動動畫 ---
+
+// 假設您的第二個區塊 (專輯概念區塊) 是 .concept-section
 const conceptSection = document.querySelector('.concept-section');
 
-// 2. 監聽 Lenis 的滾動事件
-lenis.on('scroll', () => {
-    // 取得概念區塊相對於視窗頂部的資訊
-    const conceptRect = conceptSection.getBoundingClientRect();
+if (conceptSection) {
+    // 取得需要動畫的元素 (假設我們在概念區塊新增一個 h3)
+    const title = conceptSection.querySelector('h2'); 
     
-    // 計算概念區塊的滾動進度 (0 到 1)
-    
-    // startOffset: 當概念區塊的底部進入視窗時開始計算
-    const startOffset = window.innerHeight; 
-    
-    // 總滾動距離：概念區塊的高度
-    const totalScroll = conceptSection.offsetHeight; 
-    
-    // 計算滾動進度：從區塊底部剛進入視窗 (conceptRect.bottom = startOffset) 開始
-    let conceptProgress = (startOffset - conceptRect.top) / totalScroll;
-    
-    // 將進度鎖定在 0 到 1 之間
-    conceptProgress = Math.max(0, Math.min(1, conceptProgress)); 
-
-    // --- 實作視覺變化：圖片縮放和旋轉 ---
-
-    // 1. 圖片縮放：從 100% 縮小到 80%
-    // 當 progress 為 0 時 scale=1.0；當 progress 為 1 時 scale=0.8
-    const scaleValue = 1 - (conceptProgress * 0.2); 
-    
-    // 2. 圖片旋轉：從 0 度旋轉到 360 度
-    const rotateValue = conceptProgress * 360; 
-
-    // 3. 圖片透明度：從 100% 變為 60%
-    const opacityValue = 1 - (conceptProgress * 0.4); 
-
-    // 應用樣式變化
-    visualElement.style.transform = `scale(${scaleValue}) rotate(${rotateValue}deg)`;
-    visualElement.style.opacity = opacityValue;
-});
+    // 創建 ScrollTrigger 實例
+    gsap.to(title, {
+        // 動畫目標屬性：從左邊移動 500px 到它原有的位置
+        x: 0, 
+        opacity: 1,
+        
+        // ScrollTrigger 配置
+        scrollTrigger: {
+            trigger: conceptSection, // 當這個區塊進入視窗時觸發動畫
+            start: "top 80%",       // 當區塊頂部到達視窗 80% 高度時開始
+            end: "top 20%",         // 當區塊頂部到達視窗 20% 高度時結束
+            scrub: true,            // 將動畫與滾動條連結 (數值越大越平滑)
+            
+            // markers: true,        // (測試用) 顯示起始點和結束點標記，方便調試
+        },
+        
+        // 初始狀態 (從哪裡開始動畫)
+        x: -500, // 從左邊 -500px 處開始
+        opacity: 0,
+        duration: 1, // GSAP 的持續時間，但因為有 scrub，所以會被滾動進度覆蓋
+    });
+}

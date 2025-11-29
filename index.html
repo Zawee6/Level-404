@@ -6,14 +6,11 @@
     <title>Level 404 - [Vendel]</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.27/dist/lenis.min.js"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="visual-container">
-        <img id="album-visual" src="album-cover-initial.jpg" alt="專輯主視覺"> 
-    </div>
+    <div id="three-container"></div> 
 
     <section class="section" style="height: 100vh;">
         <h1>Level 404</h1>
@@ -23,10 +20,10 @@
         <a href="[您的募資連結]" target="_blank" class="call-to-action">前往募資支持！</a>
     </section>
 
-    <section class="section concept-section" style="height: 200vh;">
+    <section class="section concept-section" style="height: 300vh;">
         <h2>專輯概念：[Level 404]</h2>
         <p>這裡會詳細介紹專輯的概念、設計和靈感。</p>
-        <p>請持續向下滾動，感受視覺的變化...</p>
+        <p>請持續向下滾動，感受 3D 視覺的變化...</p>
         
         <div class="mv-embed">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/bqKh9CmwLug?si=o7Xy2pbcRhHJH5oi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -38,31 +35,22 @@
         <p class="subtitle">將您的音樂概念穿戴在身上！</p>
 
         <div class="merch-grid">
-        
             <div class="merch-item">
                 <img src="merch-tshirt.jpg" alt="[專輯名稱] T恤" class="merch-image">
                 <h3>概念 T-Shirt</h3>
                 <p class="price">NT$ 980</p>
-                <a href="[https://shopee.tw/Apple-iPhone-17-Pro-256GB-%E6%89%8B%E6%A9%9F-%E7%8F%BE%E8%B2%A8%E3%80%90Apple-%E7%94%A2%E5%93%81%E6%97%97%E8%89%A6%E9%A4%A8%E3%80%91-i.188277742.43968123553?extraParams=%7B%22display_model_id%22%3A296491431377%7D]" target="_blank" class="buy-button">立即購買</a>
+                <a href="https://shopee.tw/Apple-iPhone-17-Pro-256GB-%E6%89%8B%E6%A9%9F-%E7%8F%BE%E8%B2%A8%E3%80%90Apple-%E7%94%A2%E5%93%81%E6%97%97%E8%89%A6%E9%A4%A8%E3%80%91-i.188277742.43968123553?extraParams=%7B%22display_model_id%22%3A296491431377%7D" target="_blank" class="buy-button">立即購買</a>
             </div>
 
-            <div class="merch-item">
-                <img src="merch-vinyl.jpg" alt="[專輯名稱] 黑膠唱片" class="merch-image">
-                <h3>限量黑膠唱片</h3>
-                <p class="price">NT$ 1,500</p>
-                <a href="[https://shopee.tw/Apple-iPhone-17-Pro-256GB-%E6%89%8B%E6%A9%9F-%E7%8F%BE%E8%B2%A8%E3%80%90Apple-%E7%94%A2%E5%93%81%E6%97%97%E8%89%A6%E9%A4%A8%E3%80%91-i.188277742.43968123553?extraParams=%7B%22display_model_id%22%3A296491431377%7D]" target="_blank" class="buy-button">立即購買</a>
-            </div>
-
-            <div class="merch-item">
-                <img src="merch-poster.jpg" alt="巡演紀念海報" class="merch-image">
-                <h3>巡演紀念海報</h3>
-                <p class="price">NT$ 450</p>
-                <a href="[https://shopee.tw/Apple-iPhone-17-Pro-256GB-%E6%89%8B%E6%A9%9F-%E7%8F%BE%E8%B2%A8%E3%80%90Apple-%E7%94%A2%E5%93%81%E6%97%97%E8%89%A6%E9%A4%A8%E3%80%91-i.188277742.43968123553?extraParams=%7B%22display_model_id%22%3A296491431377%7D]" target="_blank" class="buy-button">立即購買</a>
-            </div>
-            
             </div>
     </section>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
     <script src="script.js"></script>
 </body>
 </html>

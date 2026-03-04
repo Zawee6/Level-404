@@ -1,65 +1,107 @@
-/**
- * 核心目標：將 Lenis 的平滑滾動事件，導入給 GSAP 的 ScrollTrigger 使用。
- */
-
 // 1. 初始化 Lenis 平滑滾動
 const lenis = new Lenis({
     duration: 1.2,
     easing: (t) => Math.min(1, 1 - Math.pow(1 - t, 4)),
     direction: 'vertical',
-    smooth: true,
-    smoothTouch: false,
-    touchMultiplier: 2,
+    smooth: true
 });
 
-// 2. 關鍵整合：將 Lenis 綁定到 ScrollTrigger
-// 每次 Lenis 產生滾動事件時，都要通知 ScrollTrigger 更新位置
-lenis.on('scroll', ScrollTrigger.update);
-
-// 註冊 ScrollTrigger 插件 (確保 GSAP 知道這個插件存在)
+// 2. 註冊 GSAP ScrollTrigger 並與 Lenis 綁定
 gsap.registerPlugin(ScrollTrigger);
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+gsap.ticker.lagSmoothing(0);
 
-// 讓 ScrollTrigger 知道它必須使用 Lenis 提供的滾動事件，而不是原生的滾動
-gsap.defaults({
-    ease: "power2.inOut" // 設定一個預設的動畫緩動曲線
+// 3. Three.js 初始化設定
+const container = document.getElementById('three-container');
+let scene, camera, renderer, model;
+
+scene = new THREE.Scene();
+scene.background = null; // 設定透明背景，才不會擋住後面的網頁
+
+// 設定相機 (視角、長寬比、近裁切面、遠裁切面)
+camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5; // 相機距離模型的距離
+
+// 設定渲染器
+renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+// 💡 打光 (非常重要！沒有光模型會是一片黑)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // 環境光
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 平行光
+directionalLight.position.set(5, 5, 5);
+scene.add(directionalLight);
+
+// 確保視窗縮放時，3D 畫布也會跟著縮放
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Lenis 的滾動循環 (保持不變)
+// 4. 載入 3D 模型
+const loader = new THREE.GLTFLoader();
+
+// 🚨🚨🚨 請將下面引號內的文字，換成您剛剛放進資料夾的模型檔案名稱！ 🚨🚨🚨
+const MODEL_PATH = 'level404路牌.glb'; 
+
+loader.load(MODEL_PATH, (gltf) => {
+    model = gltf.scene;
+    
+    // 您可以在這裡調整模型的初始大小和位置
+    model.scale.set(1, 1, 1); 
+    model.position.set(0, 0, 0);
+    
+    scene.add(model);
+    console.log('模型載入成功！');
+
+    // 模型載入完成後，設定滾動動畫
+    setupScrollAnimation();
+}, undefined, (error) => {
+    console.error('模型載入失敗：', error);
+});
+
+// 5. 設定 GSAP 滾動動畫
+function setupScrollAnimation() {
+    const conceptSection = document.querySelector('.concept-section');
+
+    if (model && conceptSection) {
+        // 動畫一：讓模型在滾動經過「專輯概念區塊」時，優雅地旋轉
+        gsap.to(model.rotation, {
+            y: Math.PI * 4, // Y軸旋轉兩圈 (720度)
+            x: Math.PI / 4, // X軸稍微傾斜
+            ease: "none",
+            scrollTrigger: {
+                trigger: conceptSection,
+                start: "top bottom", // 區塊頂部碰到視窗底部時開始動畫
+                end: "bottom top",   // 區塊底部離開視窗頂部時結束動畫
+                scrub: 1 // 讓動畫平滑跟隨滑鼠滾動
+            }
+        });
+        
+        // 動畫二：讓模型稍微靠近相機 (放大效果)
+        gsap.to(model.position, {
+            z: 2.5, 
+            ease: "none",
+            scrollTrigger: {
+                trigger: conceptSection,
+                start: "top center",
+                end: "bottom top",
+                scrub: 1
+            }
+        });
+    }
+}
+
+// 6. 渲染迴圈 (讓 Three.js 持續繪製畫面)
 function raf(time) {
-    lenis.raf(time);
+    if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+    }
     requestAnimationFrame(raf);
 }
 requestAnimationFrame(raf);
-
-
-// --- 範例：使用 ScrollTrigger 實現滾動動畫 ---
-
-// 假設您的第二個區塊 (專輯概念區塊) 是 .concept-section
-const conceptSection = document.querySelector('.concept-section');
-
-if (conceptSection) {
-    // 取得需要動畫的元素 (假設我們在概念區塊新增一個 h3)
-    const title = conceptSection.querySelector('h2'); 
-    
-    // 創建 ScrollTrigger 實例
-    gsap.to(title, {
-        // 動畫目標屬性：從左邊移動 500px 到它原有的位置
-        x: 0, 
-        opacity: 1,
-        
-        // ScrollTrigger 配置
-        scrollTrigger: {
-            trigger: conceptSection, // 當這個區塊進入視窗時觸發動畫
-            start: "top 80%",       // 當區塊頂部到達視窗 80% 高度時開始
-            end: "top 20%",         // 當區塊頂部到達視窗 20% 高度時結束
-            scrub: true,            // 將動畫與滾動條連結 (數值越大越平滑)
-            
-            // markers: true,        // (測試用) 顯示起始點和結束點標記，方便調試
-        },
-        
-        // 初始狀態 (從哪裡開始動畫)
-        x: -500, // 從左邊 -500px 處開始
-        opacity: 0,
-        duration: 1, // GSAP 的持續時間，但因為有 scrub，所以會被滾動進度覆蓋
-    });
-}

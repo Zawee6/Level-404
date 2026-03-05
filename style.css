@@ -34,8 +34,8 @@ body {
 #three-container {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 100%;
+    left: 50;
+    width: 200%;
     height: 100vh;
     pointer-events: none; /* 讓滑鼠可以點擊穿透到後面的按鈕 */
     z-index: 20; /* 💡 設定為最高層級，保證浮在最上面不被蓋住 */

@@ -22,7 +22,7 @@ body {
     text-align: center;
     position: relative;
     z-index: 30; 
-    background-color: rgba(17, 17, 17, 0.9); 
+    background-color: rgba(17, 17, 17, 0.5); 
 }
 
 .concept-section {
@@ -38,7 +38,7 @@ body {
     width: 100%;
     height: 100vh;
     pointer-events: none; /* 讓滑鼠可以點擊穿透到後面的按鈕 */
-    z-index: 30; /* 💡 設定為最高層級，保證浮在最上面不被蓋住 */
+    z-index: 50; /* 💡 設定為最高層級，保證浮在最上面不被蓋住 */
 }
 
 /* MV 嵌入樣式 */

@@ -27,7 +27,7 @@ scene.add(light);
 const loader = new THREE.GLTFLoader();
 let model;
 
-loader.load('level404-sign.glb', (gltf) => {
+loader.load('level404_sign.glb', (gltf) => {
     model = gltf.scene;
     
     // 💡 保險機制：自動計算模型的尺寸並將其置中，避免模型太小或太大看不見

@@ -31,7 +31,7 @@ scene.add(directionalLight);
 const loader = new THREE.GLTFLoader();
 
 // 🌟 這裡已經幫您填好您的專屬檔名了！
-const MODEL_PATH = 'level404路牌.glb'; 
+const MODEL_PATH = 'level404-sign.glb'; 
 
 let model;
 loader.load(MODEL_PATH, (gltf) => {

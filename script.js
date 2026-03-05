@@ -1,68 +1,55 @@
-// 1. 初始化 Lenis 平滑滾動
-const lenis = new Lenis({
-    duration: 1.2,
-    easing: (t) => Math.min(1, 1 - Math.pow(1 - t, 4)),
-    direction: 'vertical',
-    smooth: true
-});
-
-// 2. 註冊 GSAP ScrollTrigger
-gsap.registerPlugin(ScrollTrigger);
-lenis.on('scroll', ScrollTrigger.update);
-gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-gsap.ticker.lagSmoothing(0);
-
-// 3. Three.js 初始化
-const container = document.getElementById('three-container');
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
-let renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-container.appendChild(renderer.domElement);
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
-scene.add(ambientLight);
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight.position.set(5, 5, 5);
-scene.add(directionalLight);
-
-// 4. 載入模型
-const loader = new THREE.GLTFLoader();
-
-// 🌟 這裡使用您改好的純英文檔名
-const MODEL_PATH = 'level404-sign.glb'; 
-
-let model;
-loader.load(MODEL_PATH, (gltf) => {
-    model = gltf.scene;
-    model.scale.set(0.1, 0.1, 0.1);
-    scene.add(model);
-    console.log("模型載入成功！");
-    setupScrollAnimation();
-}, undefined, (error) => {
-    console.error("模型載入失敗，請檢查檔名或路徑：", error);
-});
-
-// 5. 設定滾動動畫
-function setupScrollAnimation() {
-    const conceptSection = document.querySelector('.concept-section');
-    if (model && conceptSection) {
-        gsap.to(model.rotation, {
-            y: Math.PI * 4, // 滾動時轉兩圈
-            scrollTrigger: {
-                trigger: conceptSection,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: 1
-            }
-        });
-    }
-}
-
-// 6. 渲染迴圈
+// 1. 初始化 Lenis (保留平滑滾動讓網頁好滑)
+const lenis = new Lenis();
 function raf(time) {
-    if (renderer && scene && camera) renderer.render(scene, camera);
+    lenis.raf(time);
     requestAnimationFrame(raf);
 }
 requestAnimationFrame(raf);
+
+// 2. Three.js 基礎設定
+const container = document.getElementById('three-container');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+// 3. 燈光 (確保模型不是黑色的)
+scene.add(new THREE.AmbientLight(0xffffff, 1));
+const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+dirLight.position.set(5, 5, 5);
+scene.add(dirLight);
+
+// 4. 載入模型
+const loader = new THREE.GLTFLoader();
+let model;
+
+loader.load('level404-sign.glb', (gltf) => {
+    model = gltf.scene;
+    // 強制把模型放在畫面正中心
+    model.position.set(0, 0, 0);
+    // 稍微調整大小（如果不見了，試著把 1 改成 5 或 0.1）
+    model.scale.set(1, 1, 1); 
+    scene.add(model);
+    console.log("模型已載入");
+}, undefined, (e) => console.error(e));
+
+// 5. 簡單的渲染循環 (讓模型原地自轉，確認它存在)
+function animate() {
+    requestAnimationFrame(animate);
+    if (model) {
+        model.rotation.y += 0.01; // 每幀轉一點點
+    }
+    renderer.render(scene, camera);
+}
+animate();
+
+// 視窗縮放調整
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});

@@ -21,7 +21,7 @@ body {
     align-items: center;
     text-align: center;
     position: relative;
-    z-index: 20; 
+    z-index: 30; 
     background-color: rgba(17, 17, 17, 0.9); 
 }
 

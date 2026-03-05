@@ -1,4 +1,4 @@
-// 1. 初始化 Lenis
+// 1. 初始化 Lenis 平滑捲動
 const lenis = new Lenis();
 function raf(time) {
     lenis.raf(time);
@@ -10,48 +10,59 @@ requestAnimationFrame(raf);
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 0, 10); // 將相機稍微拉遠
+camera.position.set(0, 0, 10); 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-// 3. 強力燈光
+// 3. 燈光
 scene.add(new THREE.AmbientLight(0xffffff, 2)); 
 const light = new THREE.DirectionalLight(0xffffff, 2);
 light.position.set(10, 10, 10);
 scene.add(light);
 
-// 4. 載入模型並自動調整大小
+// 4. 載入模型與動畫
 const loader = new THREE.GLTFLoader();
 let model;
 
+// 🌟 注意：這裡已修正為您的實體檔名 level404_sign.glb
 loader.load('level404_sign.glb', (gltf) => {
     model = gltf.scene;
     
-    // 💡 保險機制：自動計算模型的尺寸並將其置中，避免模型太小或太大看不見
+    // 自動置中與初始縮放
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-    
     const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 5 / maxDim; // 強制將模型縮放到適合的大小
-    model.scale.set(scale, scale, scale);
-    model.position.sub(center.multiplyScalar(scale)); 
+    const initialScale = 3 / maxDim; // 初始大小
+    
+    model.scale.set(initialScale, initialScale, initialScale);
+    model.position.sub(center.multiplyScalar(initialScale)); 
     
     scene.add(model);
-    console.log("✅ 模型載入成功並自動調整比例");
+    
+    // 🌟 核心：隨著滑動放大的動畫 🌟
+    gsap.to(model.scale, {
+        x: initialScale * 8, // 放大 8 倍
+        y: initialScale * 8,
+        z: initialScale * 8,
+        scrollTrigger: {
+            trigger: ".concept-section", // 以「專輯概念」區塊作為觸發點
+            start: "top bottom",        // 當區塊頂部進入視窗底部時開始
+            end: "bottom top",          // 當區塊底部離開視窗頂部時結束
+            scrub: 1,                   // 讓動畫跟隨手指捲動的速度
+        }
+    });
+
 }, undefined, (error) => {
-    console.error("❌ 模型載入失敗，錯誤訊息：", error);
+    console.error("❌ 模型載入失敗：", error);
 });
 
-// 5. 渲染與原地旋轉 (測試用)
+// 5. 渲染循環
 function animate() {
     requestAnimationFrame(animate);
-    if (model) {
-        model.rotation.y += 0.0; // 讓它自轉，確認它活著
-    }
     renderer.render(scene, camera);
 }
 animate();

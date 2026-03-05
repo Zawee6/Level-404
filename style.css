@@ -33,26 +33,15 @@ body {
     background-color: rgba(30, 30, 30, 0.95);
 }
 
-/* 🌟 主視覺容器：固定在畫面上，這是實現效果的關鍵 CSS */
-#visual-container {
-    position: fixed; /* 固定在視窗上 */
+/* 🌟 3D 主視覺容器：固定在畫面上 🌟 */
+#three-container {
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none; /* 讓使用者可以點擊到後面的內容 */
-    z-index: 10; /* 讓主視覺位於內容下方 (z-index 20) */
-}
-
-#album-visual {
-    width: 500px; /* 基礎大小 */
-    height: auto;
-    max-width: 80%;
-    /* 滾動動畫是即時變化的，不需要 CSS transition */
-    transition: none; 
+    pointer-events: none; /* 讓滑鼠可以點擊穿透到後面的按鈕 */
+    z-index: 10; /* 讓它墊在文字的下方 */
 }
 
 /* MV 嵌入樣式 */

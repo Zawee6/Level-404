@@ -36,6 +36,7 @@ const MODEL_PATH = 'level404-sign.glb';
 let model;
 loader.load(MODEL_PATH, (gltf) => {
     model = gltf.scene;
+    model.scale.set(0.1, 0.1, 0.1);
     scene.add(model);
     console.log("模型載入成功！");
     setupScrollAnimation();

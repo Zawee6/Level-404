@@ -30,13 +30,12 @@ scene.add(directionalLight);
 // 4. 載入模型
 const loader = new THREE.GLTFLoader();
 
-// 🌟 確認這裡已經是純英文檔名
+// 🌟 這裡使用您改好的純英文檔名
 const MODEL_PATH = 'level404-sign.glb'; 
 
 let model;
 loader.load(MODEL_PATH, (gltf) => {
     model = gltf.scene;
-    model.scale.set(5, 5, 5);
     scene.add(model);
     console.log("模型載入成功！");
     setupScrollAnimation();

@@ -21,7 +21,7 @@ body {
     align-items: center;
     text-align: center;
     position: relative;
-    z-index: 10; 
+    z-index: 20; 
     background-color: rgba(17, 17, 17, 0.4); 
 }
 
@@ -38,7 +38,7 @@ body {
     width: 200%;
     height: 100vh;
     pointer-events: none; /* 讓滑鼠可以點擊穿透到後面的按鈕 */
-    z-index: 20; /* 💡 設定為最高層級，保證浮在最上面不被蓋住 */
+    z-index: 10; /* 💡 設定為最高層級，保證浮在最上面不被蓋住 */
 }
 
 /* MV 嵌入樣式 */

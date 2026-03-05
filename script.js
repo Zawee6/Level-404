@@ -50,7 +50,7 @@ loader.load('level404_sign.glb', (gltf) => {
 function animate() {
     requestAnimationFrame(animate);
     if (model) {
-        model.rotation.y += 0.01; // 讓它自轉，確認它活著
+        model.rotation.y += 0.0; // 讓它自轉，確認它活著
     }
     renderer.render(scene, camera);
 }

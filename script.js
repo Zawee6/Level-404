@@ -30,7 +30,7 @@ scene.add(directionalLight);
 // 4. 載入模型
 const loader = new THREE.GLTFLoader();
 
-// 🚨🚨🚨 請把下面這行的引號內，換成您放在資料夾裡的模型檔名！ 🚨🚨🚨
+// 🌟 這裡已經幫您填好您的專屬檔名了！
 const MODEL_PATH = 'level404路牌.glb'; 
 
 let model;
@@ -39,6 +39,8 @@ loader.load(MODEL_PATH, (gltf) => {
     scene.add(model);
     console.log("模型載入成功！");
     setupScrollAnimation();
+}, undefined, (error) => {
+    console.error("模型載入失敗，請檢查檔名或路徑：", error);
 });
 
 // 5. 設定滾動動畫

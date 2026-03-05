@@ -1,4 +1,4 @@
-// 1. 初始化 Lenis (保留平滑滾動讓網頁好滑)
+// 1. 初始化 Lenis
 const lenis = new Lenis();
 function raf(time) {
     lenis.raf(time);
@@ -6,48 +6,56 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
-// 2. Three.js 基礎設定
+// 2. Three.js 基礎環境
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+camera.position.set(0, 0, 10); // 將相機稍微拉遠
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-// 3. 燈光 (確保模型不是黑色的)
-scene.add(new THREE.AmbientLight(0xffffff, 1));
-const dirLight = new THREE.DirectionalLight(0xffffff, 2);
-dirLight.position.set(5, 5, 5);
-scene.add(dirLight);
+// 3. 強力燈光
+scene.add(new THREE.AmbientLight(0xffffff, 2)); 
+const light = new THREE.DirectionalLight(0xffffff, 2);
+light.position.set(10, 10, 10);
+scene.add(light);
 
-// 4. 載入模型
+// 4. 載入模型並自動調整大小
 const loader = new THREE.GLTFLoader();
 let model;
 
 loader.load('level404-sign.glb', (gltf) => {
     model = gltf.scene;
-    // 強制把模型放在畫面正中心
-    model.position.set(0, 0, 0);
-    // 稍微調整大小（如果不見了，試著把 1 改成 5 或 0.1）
-    model.scale.set(1, 1, 1); 
+    
+    // 💡 保險機制：自動計算模型的尺寸並將其置中，避免模型太小或太大看不見
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 5 / maxDim; // 強制將模型縮放到適合的大小
+    model.scale.set(scale, scale, scale);
+    model.position.sub(center.multiplyScalar(scale)); 
+    
     scene.add(model);
-    console.log("模型已載入");
-}, undefined, (e) => console.error(e));
+    console.log("✅ 模型載入成功並自動調整比例");
+}, undefined, (error) => {
+    console.error("❌ 模型載入失敗，錯誤訊息：", error);
+});
 
-// 5. 簡單的渲染循環 (讓模型原地自轉，確認它存在)
+// 5. 渲染與原地旋轉 (測試用)
 function animate() {
     requestAnimationFrame(animate);
     if (model) {
-        model.rotation.y += 0.01; // 每幀轉一點點
+        model.rotation.y += 0.01; // 讓它自轉，確認它活著
     }
     renderer.render(scene, camera);
 }
 animate();
 
-// 視窗縮放調整
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();

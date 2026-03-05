@@ -24,7 +24,7 @@ body {
     position: relative;
     z-index: 20; /* 讓內容在視覺上方 */
     /* 內容背景增加微弱透明度，讓視覺能若隱若現 */
-    background-color: rgba(17, 17, 17, 0.9); 
+    background-color: rgba(17, 17, 17, 0.4); 
 }
 
 /* 專輯概念區塊需要很長，才能有足夠的滾動距離觸發變化 */
@@ -41,7 +41,7 @@ body {
     width: 100%;
     height: 100vh;
     pointer-events: none; /* 讓滑鼠可以點擊穿透到後面的按鈕 */
-    z-index: 10; /* 讓它墊在文字的下方 */
+    z-index: -1; /* 讓它墊在文字的下方 */
 }
 
 /* MV 嵌入樣式 */

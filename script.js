@@ -30,7 +30,7 @@ scene.add(directionalLight);
 // 4. 載入模型
 const loader = new THREE.GLTFLoader();
 
-// 🌟 這裡已經幫您填好您的專屬檔名了！
+// 🌟 確認這裡已經是純英文檔名
 const MODEL_PATH = 'level404-sign.glb'; 
 
 let model;

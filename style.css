@@ -1,25 +1,37 @@
-/* 設定全域滾動行為，讓 Lenis 接管 */
+/* =========================================
+   1. 全域設定與預設樣式 (手機版視角)
+========================================= */
 html {
     scroll-behavior: auto; 
 }
 
-/* 全域文字放大 */
 body {
     margin: 0;
     font-family: 'Helvetica Neue', sans-serif;
     background-color: #111; 
     color: #fff;
     line-height: 1.6;
-    font-size: 20px; /* 💡 將基礎字體從預設的 16px 提升到 20px */
+    font-size: 16px; /* 📱 手機版：維持正常的 16px */
 }
 
-h1 { font-size: 4rem; } /* 巨型標題 */
-h2 { font-size: 3rem; margin-bottom: 30px; } /* 區域標題放大 */
-p { font-size: 1.4rem; color: #ccc; } /* 段落文字放大 */
+h1 { font-size: 2.5rem; } 
+h2 { font-size: 2rem; margin-bottom: 20px; } 
+p { font-size: 1rem; color: #ccc; } 
 
-/* 內容區塊基礎樣式 */
+/* 🌟 3D 主視覺容器 🌟 */
+#three-container {
+    position: fixed;
+    top: 0;
+    left: 0;        
+    width: 100%;     
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10;     
+}
+
+/* 內容區塊 */
 .section {
-    padding: 150px 10%;     /* 💡 增加上下間距，左右留白 10% */
+    padding: 80px 20px; /* 📱 手機版：縮小左右留白，讓畫面不會太擠 */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -36,63 +48,49 @@ p { font-size: 1.4rem; color: #ccc; } /* 段落文字放大 */
     background-color: rgba(30, 30, 30, 0.5);
 }
 
-/* 🌟 新的 3D 主視覺容器：固定在畫面上 🌟 */
-#three-container {
-    position: fixed;
-    top: 0;
-    left: 0;        /* 💡 改回 0，讓舞台靠左對齊 */
-    width: 100%;     /* 💡 改回 100%，讓它剛好填滿螢幕 */
-    height: 100vh;
-    pointer-events: none;
-    z-index: 10;     /* 💡 如果希望模型在文字後面，設為 10 是對的 */
-}
-
-/* 1. 確保影片容器內的元件（影片與按鈕）垂直堆疊並置中 */
-/* 影片區塊容器 */
+/* =========================================
+   2. 影片與按鈕區域 (預設為手機版大小)
+========================================= */
 .mv-embed {
     margin-top: 40px;
-    margin-bottom: 60px;    /* 💡 增加區塊間距，避免影片疊在一起 */
+    margin-bottom: 60px;    
     width: 100%;
-    display: flex;          /* 啟用彈性佈局 */
-    flex-direction: column; /* 強制垂直排列：影片在上，按鈕在下 */
-    align-items: center;    /* 水平居中對齊 */
+    display: flex;          
+    flex-direction: column; 
+    align-items: center;    
 }
 
-/* 2. 調整按鈕與影片之間的距離 */
-/* 空心按鈕 */
+.mv-embed iframe {
+    width: 95%;             
+    max-width: 600px;       /* 📱 手機版：最大寬度限制 */
+    aspect-ratio: 16 / 9;   
+    height: auto;           
+    border-radius: 8px;    
+    border: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); 
+}
+
 .watch-btn {
     display: inline-block;
-    margin-top: 35px;       
-    padding: 15px 50px;     /* 增加按鈕內距 */
+    margin-top: 20px;       
+    padding: 10px 30px;     
     background-color: transparent; 
-    border: 3px solid #ff4500; /* 邊框加粗 */
+    border: 2px solid #ff4500; 
     color: #ff4500;                
     text-decoration: none;
     font-weight: bold;
-    font-size: 1.2rem;      /* 💡 按鈕文字放大 */
-    letter-spacing: 4px;    /* 字距更有氣勢 */
+    font-size: 0.9rem;      /* 📱 手機版：精緻小字體 */
+    letter-spacing: 2px;    
     transition: all 0.4s ease;
     border-radius: 0px;
 }
 
-/* 3. 滑鼠懸停效果保持不變 */
 .watch-btn:hover {
     background-color: #ff4500;     
     color: #fff;                   
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
 }
 
-.mv-embed iframe {
-    width: 95%;             
-    max-width: 1200px;      /* 💡 將原本的 900px 提升到 1200px，讓大螢幕更有衝擊力 */
-    aspect-ratio: 16 / 9;   
-    height: auto;           
-    border-radius: 15px;    
-    border: none;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); 
-}
-
-/* 其他基本樣式 */
 a.call-to-action {
     display: inline-block;
     margin-top: 20px;
@@ -107,20 +105,15 @@ a.call-to-action:hover {
     background-color: #e63900;
 }
 
-/* --- 周邊商品區塊樣式 --- */
-.merch-section {
-    background-color: #222; 
-}
-
-.subtitle {
-    font-size: 1.1em;
-    color: #aaa;
-    margin-bottom: 40px;
-}
+/* =========================================
+   3. 周邊商品區塊
+========================================= */
+.merch-section { background-color: #222; }
+.subtitle { font-size: 1.1em; color: #aaa; margin-bottom: 40px; }
 
 .merch-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); 
+    grid-template-columns: 1fr; /* 📱 手機版：預設單欄排列 */
     gap: 30px; 
     max-width: 1200px; 
     width: 100%;
@@ -150,17 +143,8 @@ a.call-to-action:hover {
     margin-bottom: 15px;
 }
 
-.merch-item h3 {
-    margin: 10px 0;
-    color: #ff4500; 
-}
-
-.price {
-    font-size: 1.4em;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 15px;
-}
+.merch-item h3 { margin: 10px 0; color: #ff4500; }
+.price { font-size: 1.4em; font-weight: bold; color: #fff; margin-bottom: 15px; }
 
 .buy-button {
     display: block;
@@ -171,14 +155,40 @@ a.call-to-action:hover {
     border-radius: 4px;
     transition: background-color 0.3s;
 }
+.buy-button:hover { background-color: #e63900; }
 
-.buy-button:hover {
-    background-color: #e63900;
-}
 
-@media (max-width: 768px) {
+/* =========================================
+   🔥 4. 電腦大螢幕強化版 (螢幕 > 768px 時觸發) 🔥
+========================================= */
+@media (min-width: 769px) {
+    /* 字體與間距全面升級 */
+    body { font-size: 20px; }
+    h1 { font-size: 4rem; } 
+    h2 { font-size: 3rem; margin-bottom: 30px; } 
+    p { font-size: 1.4rem; } 
+
+    .section {
+        padding: 150px 10%; /* 增加大螢幕的呼吸空間 */
+    }
+
+    /* 影片與按鈕巨大化 */
+    .mv-embed iframe {
+        max-width: 1200px;  /* 💻 電腦版：巨型影片框 */
+        border-radius: 15px;    
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); 
+    }
+
+    .watch-btn {
+        margin-top: 35px;       
+        padding: 15px 50px;     
+        border-width: 3px;      /* 邊框加粗 */
+        font-size: 1.2rem;      /* 文字變大 */
+        letter-spacing: 4px;    
+    }
+
+    /* 周邊商品變回三欄 */
     .merch-grid {
-        grid-template-columns: 1fr; 
+        grid-template-columns: repeat(3, 1fr); 
     }
 }
-

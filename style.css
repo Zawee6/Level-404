@@ -43,29 +43,27 @@ body {
 
 /* 1. 確保影片容器內的元件（影片與按鈕）垂直堆疊並置中 */
 .mv-embed {
-    margin-top: 50px;       /* 影片上方的間距 */
-    width: 100%;            /* 寬度撐滿容器 */
-    display: flex;          /* 啟動彈性佈局 */
+    margin-top: 40px;
+    margin-bottom: 60px;    /* 💡 增加區塊間距，避免影片疊在一起 */
+    width: 100%;
+    display: flex;          /* 啟用彈性佈局 */
     flex-direction: column; /* 強制垂直排列：影片在上，按鈕在下 */
-    align-items: center;    /* 水平置中對齊 */
+    align-items: center;    /* 水平居中對齊 */
 }
 
 /* 2. 調整按鈕與影片之間的距離 */
 .watch-btn {
     display: inline-block;
-    margin-top: 25px;       /* 💡 調整這個數值來增加按鈕與影片的距離 */
+    margin-top: 25px;       /* 💡 調整與影片的距離 */
     padding: 12px 35px;
-    
-    background-color: transparent; 
-    border: 2px solid #ff4500;     
-    color: #ff4500;                
-    
+    background-color: transparent;
+    border: 2px solid #ff4500;
+    color: #ff4500;
     text-decoration: none;
     font-weight: bold;
-    font-size: 0.9em;
-    letter-spacing: 3px;           
-    transition: all 0.4s ease;     
-    border-radius: 0px;            
+    letter-spacing: 3px;
+    transition: all 0.4s ease;
+    border-radius: 0px;
 }
 
 /* 3. 滑鼠懸停效果保持不變 */
@@ -76,9 +74,10 @@ body {
 }
 
 .mv-embed iframe {
-    max-width: 100%;
+    max-width: 90%;         /* 在手機上自動縮小 */
+    aspect-ratio: 16 / 9;   /* 保持 16:9 比例 */
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 /* 其他基本樣式 */

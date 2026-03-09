@@ -13,7 +13,7 @@ body {
 
 /* 內容區塊基礎樣式 */
 .section {
-    padding: 100px 50px;
+    padding: 100px 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

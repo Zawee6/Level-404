@@ -75,12 +75,10 @@ body {
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
 }
 
-/* 影片本體 */
 .mv-embed iframe {
-    max-width: 90%;         /* 在手機上自動縮小 */
-    aspect-ratio: 16 / 9;   /* 保持 16:9 比例 */
+    max-width: 100%;
     border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 /* 其他基本樣式 */

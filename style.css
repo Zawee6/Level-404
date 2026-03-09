@@ -42,34 +42,30 @@ body {
 }
 
 /* 1. 確保影片容器內的元件（影片與按鈕）垂直堆疊並置中 */
-.featured-video, .mv-embed {
+/* 影片區塊容器 */
+.mv-embed {
+    margin-top: 40px;
+    margin-bottom: 60px;    /* 💡 增加區塊間距，避免影片疊在一起 */
     width: 100%;
-    max-width: 775px;        /* 💡 參考原始碼的寬度限制 */
-    margin: 0 auto 60px auto; /* 區塊之間的間距 */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex;          /* 啟用彈性佈局 */
+    flex-direction: column; /* 強制垂直排列：影片在上，按鈕在下 */
+    align-items: center;    /* 水平居中對齊 */
 }
 
 /* 2. 調整按鈕與影片之間的距離 */
+/* 空心按鈕 */
 .watch-btn {
-    display: block;          /* 💡 改為 block */
-    text-decoration: none;
-    padding: 10px 16px;
-    color: #000;
+    display: inline-block;
+    margin-top: 25px;       /* 💡 調整與影片的距離 */
+    padding: 12px 35px;
     background-color: transparent;
-    border: solid 1px #000;  /* 💡 1px 細邊框 */
-    width: 60%;              /* 💡 參考原始碼的寬度比例 */
-    max-width: 330px;
-    margin: 20px auto 0 auto; /* 💡 確保與上方影片有 20px 間距並置中 */
-    
-    font-family: rift-soft, sans-serif; /* 如果您有對應字體 */
-    font-weight: 700;
-    text-transform: uppercase; /* 💡 強制大寫 */
-    text-align: center;
-    letter-spacing: 1px;
-    font-size: 1.2em;
-    transition: ease-in 270ms;
+    border: 2px solid #ff4500;
+    color: #ff4500;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: 3px;
+    transition: all 0.4s ease;
+    border-radius: 0px;
 }
 
 /* 3. 滑鼠懸停效果保持不變 */
@@ -79,11 +75,12 @@ body {
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
 }
 
+/* 影片本體 */
 .mv-embed iframe {
-    width: 90%;
-    max-width: 775px;
-    border: solid 1px #000;  /* 💡 參考站使用的 1px 黑邊 */
-    box-shadow: none;        /* 移除陰影以符合極簡風格 */
+    max-width: 90%;         /* 在手機上自動縮小 */
+    aspect-ratio: 16 / 9;   /* 保持 16:9 比例 */
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 /* 其他基本樣式 */

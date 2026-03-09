@@ -56,14 +56,14 @@ body {
 /* 空心按鈕 */
 .watch-btn {
     display: inline-block;
-    margin-top: 25px;       /* 💡 調整與影片的距離 */
-    padding: 12px 35px;
-    background-color: transparent;
-    border: 2px solid #ff4500;
-    color: #ff4500;
+    margin-top: 30px;       /* 增加按鈕與影片的距離 */
+    padding: 12px 40px;
+    background-color: transparent; 
+    border: 2px solid #ff4500;     
+    color: #ff4500;                
     text-decoration: none;
     font-weight: bold;
-    letter-spacing: 3px;
+    letter-spacing: 3px;           
     transition: all 0.4s ease;
     border-radius: 0px;
 }
@@ -76,9 +76,14 @@ body {
 }
 
 .mv-embed iframe {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    width: 95%;             /* 💡 讓影片寬度佔螢幕的 95% (原本可能較小) */
+    max-width: 900px;       /* 💡 設定最大寬度，防止在電腦大螢幕上過大 */
+    aspect-ratio: 16 / 9;   /* 💡 核心：強制保持 16:9 比例 */
+    height: auto;           /* 高度會根據寬度自動計算 */
+    
+    border-radius: 12px;    /* 稍微增加圓角更有質感 */
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* 增加陰影深邃感 */
 }
 
 /* 其他基本樣式 */

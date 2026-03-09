@@ -53,9 +53,9 @@ loader.load('level404_sign.glb', (gltf) => {
 
     // 🌟 步驟 D：設定隨著滑動放大的動畫 🌟
     gsap.to(pivotGroup.scale, {
-        x: initialScale * 15, // 放大倍數，可根據需求調整
-        y: initialScale * 15,
-        z: initialScale * 15,
+        x: initialScale * 10, // 放大倍數，可根據需求調整
+        y: initialScale * 10,
+        z: initialScale * 10,
         scrollTrigger: {
             trigger: ".concept-section", 
             start: "top bottom",        

@@ -3,17 +3,23 @@ html {
     scroll-behavior: auto; 
 }
 
+/* 全域文字放大 */
 body {
     margin: 0;
     font-family: 'Helvetica Neue', sans-serif;
     background-color: #111; 
     color: #fff;
     line-height: 1.6;
+    font-size: 20px; /* 💡 將基礎字體從預設的 16px 提升到 20px */
 }
+
+h1 { font-size: 4rem; } /* 巨型標題 */
+h2 { font-size: 3rem; margin-bottom: 30px; } /* 區域標題放大 */
+p { font-size: 1.4rem; color: #ccc; } /* 段落文字放大 */
 
 /* 內容區塊基礎樣式 */
 .section {
-    padding: 100px 20px;
+    padding: 150px 10%;     /* 💡 增加上下間距，左右留白 10% */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -56,14 +62,15 @@ body {
 /* 空心按鈕 */
 .watch-btn {
     display: inline-block;
-    margin-top: 30px;       /* 增加按鈕與影片的距離 */
-    padding: 12px 40px;
+    margin-top: 35px;       
+    padding: 15px 50px;     /* 增加按鈕內距 */
     background-color: transparent; 
-    border: 2px solid #ff4500;     
+    border: 3px solid #ff4500; /* 邊框加粗 */
     color: #ff4500;                
     text-decoration: none;
     font-weight: bold;
-    letter-spacing: 3px;           
+    font-size: 1.2rem;      /* 💡 按鈕文字放大 */
+    letter-spacing: 4px;    /* 字距更有氣勢 */
     transition: all 0.4s ease;
     border-radius: 0px;
 }
@@ -76,14 +83,13 @@ body {
 }
 
 .mv-embed iframe {
-    width: 95%;             /* 💡 讓影片寬度佔螢幕的 95% (原本可能較小) */
-    max-width: 900px;       /* 💡 設定最大寬度，防止在電腦大螢幕上過大 */
-    aspect-ratio: 16 / 9;   /* 💡 核心：強制保持 16:9 比例 */
-    height: auto;           /* 高度會根據寬度自動計算 */
-    
-    border-radius: 12px;    /* 稍微增加圓角更有質感 */
+    width: 95%;             
+    max-width: 1200px;      /* 💡 將原本的 900px 提升到 1200px，讓大螢幕更有衝擊力 */
+    aspect-ratio: 16 / 9;   
+    height: auto;           
+    border-radius: 15px;    
     border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* 增加陰影深邃感 */
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); 
 }
 
 /* 其他基本樣式 */

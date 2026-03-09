@@ -147,24 +147,29 @@ a.call-to-action:hover {
     }
 }
 
-/* 影片按鈕樣式 */
+/* 影片按鈕樣式 - 空心框設計 */
 .watch-btn {
     display: inline-block;
     margin-top: 20px;
-    padding: 12px 30px;
-    background-color: #ff4500; /* 使用你原本設定的品牌橘紅色 */
-    color: #fff;
+    padding: 12px 35px;
+    
+    /* 核心空心設定 */
+    background-color: transparent; /* 背景透明 */
+    border: 2px solid #ff4500;     /* 橘紅色邊框 */
+    color: #ff4500;                /* 文字顏色與邊框一致 */
+    
     text-decoration: none;
     font-weight: bold;
-    letter-spacing: 2px; /* 增加字距，讓它看起來更有質感 */
-    border: 2px solid #ff4500;
-    transition: all 0.3s ease;
-    border-radius: 0px; /* 設為 0 確保它是硬邊方的框 */
+    font-size: 0.9em;
+    letter-spacing: 3px;           /* 稍微拉大字距，更有質感 */
+    transition: all 0.4s ease;     /* 讓過渡效果更平滑 */
+    border-radius: 0px;            /* 保持硬邊方框 */
+    box-sizing: border-box;
 }
 
-/* 滑鼠經過時的變色效果 */
+/* 滑鼠經過時的填滿效果 */
 .watch-btn:hover {
-    background-color: transparent; /* 背景變透明 */
-    color: #ff4500; /* 文字變橘紅色 */
-    transform: scale(1.05); /* 輕微放大 */
+    background-color: #ff4500;     /* 滑過時背景填滿橘紅 */
+    color: #fff;                   /* 文字變回白色 */
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.4); /* 加入微弱的發光感 */
 }

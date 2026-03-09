@@ -41,15 +41,45 @@ body {
     z-index: 10; /* 💡 設定為最高層級，保證浮在最上面不被蓋住 */
 }
 
-/* MV 嵌入樣式 */
+/* 修改影片容器，讓內部元件垂直排列並居中 */
 .mv-embed {
     margin-top: 30px;
     max-width: 100%;
+    display: flex;          /* 啟用彈性佈局 */
+    flex-direction: column; /* 強制垂直堆疊 */
+    align-items: center;    /* 水平居中 */
 }
 .mv-embed iframe {
     max-width: 100%;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* 影片按鈕樣式 - 空心框設計 */
+.watch-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 35px;
+    
+    /* 核心空心設定 */
+    background-color: transparent; /* 背景透明 */
+    border: 2px solid #ff4500;     /* 橘紅色邊框 */
+    color: #ff4500;                /* 文字顏色與邊框一致 */
+    
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9em;
+    letter-spacing: 3px;           /* 稍微拉大字距，更有質感 */
+    transition: all 0.4s ease;     /* 讓過渡效果更平滑 */
+    border-radius: 0px;            /* 保持硬邊方框 */
+    box-sizing: border-box;
+}
+
+/* 滑鼠經過時的填滿效果 */
+.watch-btn:hover {
+    background-color: #ff4500;     /* 滑過時背景填滿橘紅 */
+    color: #fff;                   /* 文字變回白色 */
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.4); /* 加入微弱的發光感 */
 }
 
 /* 其他基本樣式 */
@@ -147,29 +177,3 @@ a.call-to-action:hover {
     }
 }
 
-/* 影片按鈕樣式 - 空心框設計 */
-.watch-btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 12px 35px;
-    
-    /* 核心空心設定 */
-    background-color: transparent; /* 背景透明 */
-    border: 2px solid #ff4500;     /* 橘紅色邊框 */
-    color: #ff4500;                /* 文字顏色與邊框一致 */
-    
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.9em;
-    letter-spacing: 3px;           /* 稍微拉大字距，更有質感 */
-    transition: all 0.4s ease;     /* 讓過渡效果更平滑 */
-    border-radius: 0px;            /* 保持硬邊方框 */
-    box-sizing: border-box;
-}
-
-/* 滑鼠經過時的填滿效果 */
-.watch-btn:hover {
-    background-color: #ff4500;     /* 滑過時背景填滿橘紅 */
-    color: #fff;                   /* 文字變回白色 */
-    box-shadow: 0 0 15px rgba(255, 69, 0, 0.4); /* 加入微弱的發光感 */
-}

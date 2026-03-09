@@ -146,3 +146,25 @@ a.call-to-action:hover {
         grid-template-columns: 1fr; 
     }
 }
+
+/* 影片按鈕樣式 */
+.watch-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 30px;
+    background-color: #ff4500; /* 使用你原本設定的品牌橘紅色 */
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: 2px; /* 增加字距，讓它看起來更有質感 */
+    border: 2px solid #ff4500;
+    transition: all 0.3s ease;
+    border-radius: 0px; /* 設為 0 確保它是硬邊方的框 */
+}
+
+/* 滑鼠經過時的變色效果 */
+.watch-btn:hover {
+    background-color: transparent; /* 背景變透明 */
+    color: #ff4500; /* 文字變橘紅色 */
+    transform: scale(1.05); /* 輕微放大 */
+}

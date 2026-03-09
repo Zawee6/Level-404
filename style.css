@@ -27,59 +27,58 @@ body {
 
 .concept-section {
     min-height: 200vh; 
-    background-color: rgba(30, 30, 30, 0.95);
+    background-color: rgba(30, 30, 30, 0.5);
 }
 
 /* 🌟 新的 3D 主視覺容器：固定在畫面上 🌟 */
 #three-container {
     position: fixed;
     top: 0;
-    left: 50;
-    width: 200%;
+    left: 0;        /* 💡 改回 0，讓舞台靠左對齊 */
+    width: 100%;     /* 💡 改回 100%，讓它剛好填滿螢幕 */
     height: 100vh;
-    pointer-events: none; /* 讓滑鼠可以點擊穿透到後面的按鈕 */
-    z-index: 10; /* 💡 設定為最高層級，保證浮在最上面不被蓋住 */
+    pointer-events: none;
+    z-index: 10;     /* 💡 如果希望模型在文字後面，設為 10 是對的 */
 }
 
-/* 修改影片容器，讓內部元件垂直排列並居中 */
+/* 1. 確保影片容器內的元件（影片與按鈕）垂直堆疊並置中 */
 .mv-embed {
-    margin-top: 30px;
-    max-width: 100%;
-    display: flex;          /* 啟用彈性佈局 */
-    flex-direction: column; /* 強制垂直堆疊 */
-    align-items: center;    /* 水平居中 */
-}
-.mv-embed iframe {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    margin-top: 50px;       /* 影片上方的間距 */
+    width: 100%;            /* 寬度撐滿容器 */
+    display: flex;          /* 啟動彈性佈局 */
+    flex-direction: column; /* 強制垂直排列：影片在上，按鈕在下 */
+    align-items: center;    /* 水平置中對齊 */
 }
 
-/* 影片按鈕樣式 - 空心框設計 */
+/* 2. 調整按鈕與影片之間的距離 */
 .watch-btn {
     display: inline-block;
-    margin-top: 20px;
+    margin-top: 25px;       /* 💡 調整這個數值來增加按鈕與影片的距離 */
     padding: 12px 35px;
     
-    /* 核心空心設定 */
-    background-color: transparent; /* 背景透明 */
-    border: 2px solid #ff4500;     /* 橘紅色邊框 */
-    color: #ff4500;                /* 文字顏色與邊框一致 */
+    background-color: transparent; 
+    border: 2px solid #ff4500;     
+    color: #ff4500;                
     
     text-decoration: none;
     font-weight: bold;
     font-size: 0.9em;
-    letter-spacing: 3px;           /* 稍微拉大字距，更有質感 */
-    transition: all 0.4s ease;     /* 讓過渡效果更平滑 */
-    border-radius: 0px;            /* 保持硬邊方框 */
-    box-sizing: border-box;
+    letter-spacing: 3px;           
+    transition: all 0.4s ease;     
+    border-radius: 0px;            
 }
 
-/* 滑鼠經過時的填滿效果 */
+/* 3. 滑鼠懸停效果保持不變 */
 .watch-btn:hover {
-    background-color: #ff4500;     /* 滑過時背景填滿橘紅 */
-    color: #fff;                   /* 文字變回白色 */
-    box-shadow: 0 0 15px rgba(255, 69, 0, 0.4); /* 加入微弱的發光感 */
+    background-color: #ff4500;     
+    color: #fff;                   
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
+}
+
+.mv-embed iframe {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 /* 其他基本樣式 */
@@ -129,11 +128,6 @@ a.call-to-action:hover {
 .merch-item:hover {
     transform: translateY(-5px); 
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-}
-
-.concept-section {
-    min-height: 300vh; 
-    background-color: rgba(30, 30, 30, 0.5);
 }
 
 .merch-image {

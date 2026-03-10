@@ -127,7 +127,7 @@ loader.load('grasscopy.glb', (gltf) => {
     floorModel.position.y = -10; 
     
     // 4. (選用) 如果地板不夠寬，可以單獨把地板拉寬一點
-    floorModel.scale.set(1.5, 1, 1.5); 
+    floorModel.scale.set(1.5, 1.5, 1.5); 
     
     // 5. 將地板加入與建築物同一個背景容器 (bgGroup)
     bgGroup.add(floorModel);

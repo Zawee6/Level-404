@@ -1,24 +1,23 @@
 // ==========================================
 // 🌟 設定頭部模型的互動變數 🌟
 // ==========================================
-let headPivot; // 用來控制頭部旋轉與位置的容器
+let headPivot; 
 let targetMouse = { x: 0, y: 0 };
 let currentMouse = { x: 0, y: 0 };
 let isMouseActive = false;
 let mouseTimeout;
 let idleTime = 0;
 
-// 監聽滑鼠移動事件
+// 監聽滑鼠移動事件 (💡 已補回右上角的偏移量修正)
 window.addEventListener('mousemove', (event) => {
-
-    // 1. 將滑鼠螢幕座標轉換為 -1 到 1 的 3D 空間座標
-    targetMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    targetMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    const headXOffset = 0.8; // 偏右
+    const headYOffset = 0.2; // 偏上
     
-    // 2. 標記滑鼠正在移動
+    targetMouse.x = (event.clientX / window.innerWidth - headXOffset) * 2;
+    targetMouse.y = -(event.clientY / window.innerHeight - headYOffset) * 2;
+    
     isMouseActive = true;
     
-    // 3. 如果滑鼠停下超過 0.5 秒，就切換回「閒置狀態」
     clearTimeout(mouseTimeout);
     mouseTimeout = setTimeout(() => {
         isMouseActive = false;
@@ -50,50 +49,58 @@ const light = new THREE.DirectionalLight(0xffffff, 2);
 light.position.set(5, 5, 5);
 scene.add(light);
 
-// 4. 載入模型並設定「置中容器」
-const loader = new THREE.GLTFLoader();
-let pivotGroup = new THREE.Group(); // 🌟 建立一個置中容器
+// ==========================================
+// 🌟 核心容器宣告 (💡 修正：必須在載入模型前統一宣告)
+// ==========================================
+let pivotGroup = new THREE.Group(); // 路牌的容器
 scene.add(pivotGroup);
 
+let bgGroup = new THREE.Group(); // 背景封面(建築、草地、頭)的容器
+// 先設定背景的深度和縮放比例
+bgGroup.position.z = -30; 
+// 這裡預設先給個基礎縮放，等建築物載入後會自動覆蓋精確數值
+scene.add(bgGroup);
+
+// ==========================================
+// 4. 載入模型區域
+// ==========================================
+
+// 載入路牌
+const loader = new THREE.GLTFLoader();
 loader.load('level404_sign.glb', (gltf) => {
     const model = gltf.scene;
     
-    // 💡 步驟 A：計算模型的原始幾何中心
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     
-    // 💡 步驟 B：將模型內部的內容往反方向移動，使其中心點剛好落在 (0,0,0)
     model.position.x = -center.x;
     model.position.y = -center.y;
     model.position.z = -center.z;
     
-    // 💡 步驟 C：把模型放進容器中，後續只對容器做縮放
     pivotGroup.add(model);
     
-    // 設定初始縮放比例
     const maxDim = Math.max(size.x, size.y, size.z);
     const initialScale = 5 / maxDim; 
     pivotGroup.scale.set(initialScale, initialScale, initialScale);
     
-    console.log("✅ 模型已精準置中");
+    console.log("✅ 路牌模型已精準置中");
 
     // ==========================================
-    // 🌟 步驟 D：全新 GSAP 滾動特效 (封面滾走 + 路牌定格與上移)
+    // 🌟 GSAP 滾動特效 (💡 確認 bgGroup 已宣告後才執行)
     // ==========================================
-
-    // 💡 動畫 1：讓背景 (建築、草地、頭) 當作封面，往下滑時往上移出畫面
+    // 動畫 1：背景當作封面，往上移出畫面
     gsap.to(bgGroup.position, {
-        y: 40, // 往上移動 40 單位 (移出鏡頭上方)
+        y: 50, 
         scrollTrigger: {
-            trigger: ".concept-section", // 當滑到第二區塊時觸發
-            start: "top bottom",         // 畫面一開始往下滑就啟動
-            end: "top top",              // 當第二區塊頂部碰到螢幕最上方時結束
+            trigger: ".concept-section", 
+            start: "top bottom",         
+            end: "top top",              
             scrub: 1,
         }
     });
 
-    // 💡 動畫 2：讓路牌放大，並在第二區塊「停止」放大
+    // 動畫 2：路牌放大，在第二區塊定格
     gsap.to(pivotGroup.scale, {
         x: initialScale * 10,
         y: initialScale * 10,
@@ -101,16 +108,16 @@ loader.load('level404_sign.glb', (gltf) => {
         scrollTrigger: {
             trigger: ".concept-section",
             start: "top bottom",
-            end: "top top",              // 👈 關鍵：改成 top top 讓它提早在 section 停住
+            end: "top top",              
             scrub: 1,
         }
     });
 
-    // 💡 動畫 3：繼續往下滑到商品區塊時，讓路牌也跟著往上移出畫面
+    // 動畫 3：路牌在商品區塊跟著滾走
     gsap.to(pivotGroup.position, {
-        y: 30, // 讓路牌也往上移出鏡頭
+        y: 30, 
         scrollTrigger: {
-            trigger: ".merch-section",   // 當滑到周邊商品區塊時觸發
+            trigger: ".merch-section",   
             start: "top bottom",         
             end: "top top",
             scrub: 1,
@@ -118,21 +125,13 @@ loader.load('level404_sign.glb', (gltf) => {
     });
 
 }, undefined, (error) => {
-    console.error("❌ 載入錯誤：", error);
+    console.error("❌ 路牌載入錯誤：", error);
 });
 
-
-// ==========================================
-// 🌟 載入第二個背景模型 (修正區塊) 🌟
-// ==========================================
-// 💡 修正：必須先建立 bgGroup 並加入場景中！
-let bgGroup = new THREE.Group();
-scene.add(bgGroup);
-
+// 載入建築
 loader.load('buildingcopy.glb', (gltf) => {
     const bgModel = gltf.scene;
     
-    // 1. 計算幾何中心並強制置中
     const box = new THREE.Box3().setFromObject(bgModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
@@ -140,111 +139,76 @@ loader.load('buildingcopy.glb', (gltf) => {
     
     bgGroup.add(bgModel);
     
-    // ==========================================
-    // 💡 調整重點在這裡 👇
-    // ==========================================
-    
-    // 2. 往後推得更深：從 -20 改成 -80 (數字越負，離我們越遠)
-    bgGroup.position.z = -30; 
-    
-    // 3. 縮小模型倍數：把原本的 100 改成 15 或 20
     const maxDim = Math.max(size.x, size.y, size.z);
-    const bgScale = 80 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
+    const bgScale = 80 / maxDim; 
     bgGroup.scale.set(bgScale, bgScale, bgScale);
     
-    console.log("✅ 背景圖層模型已載入");
-
-}, undefined, (error) => {
-    console.error("❌ 背景模型載入失敗：", error);
+    console.log("✅ 建築模型已載入");
 });
 
-// ==========================================
-// 🌟 載入第三個模型：同圖層的地板 (回到最初設定)
-// ==========================================
+// 載入地板
 loader.load('grasscopy.glb', (gltf) => {
     const floorModel = gltf.scene;
     
-    // 1. 計算幾何中心並強制置中
     const box = new THREE.Box3().setFromObject(floorModel);
     const center = box.getCenter(new THREE.Vector3());
     
-    // 2. 將地板置中
     floorModel.position.set(-center.x, -center.y, -center.z);
     
-    // 3. 簡單的高度微調 (往下墊在建築物下方)
     floorModel.position.y -= 10; 
     floorModel.position.z += 15;
     
-    // 4. 回復最初的簡單放大倍數 (長、寬、高都等比例放大)
     floorModel.scale.set(25, 25, 25); 
     
-    // 5. 乖乖加回與建築物同一個背景容器 (bgGroup) 中
-    bgGroup.add(floorModel);
+    bgGroup.add(floorModel); // 💡 放進背景大紙箱，滾動時才會一起往上！
     
-    console.log("✅ 地板模型已回到最初的設定");
-
-}, undefined, (error) => {
-    console.error("❌ 地板模型載入失敗：", error);
+    console.log("✅ 地板模型已回到最初設定並加入背景");
 });
 
-// ==========================================
-// 🌟 載入第四個模型：互動頭部
-// ==========================================
+// 載入頭部
 loader.load('headcopy.glb', (gltf) => {
     const headModel = gltf.scene;
     
-    // 1. 計算幾何中心並取得這顆頭的「原始大小」
     const box = new THREE.Box3().setFromObject(headModel);
     const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3()); // 💡 取得模型原始尺寸
+    const size = box.getSize(new THREE.Vector3()); 
     
-    // 2. 建立頭部的控制容器
     headPivot = new THREE.Group();
     
-    // 💡 修正 1：把頭轉正！(如果發現它用後腦勺看你，就把這行改成 -Math.PI / 2)
     headModel.rotation.y = -Math.PI/2; 
 
     headModel.position.set(-center.x, -center.y, -center.z);
     headPivot.add(headModel);
     
-    // 3. 💡 設定位置到「右上角」
-    // (數值可以等大小正常後再來微調)
     headPivot.position.set(40, 15, 0); 
     
-    // 4. 💡 關鍵修正：抵銷雙重放大，精準設定大小！
     const maxDim = Math.max(size.x, size.y, size.z);
-    const headScale = 10 / maxDim; // 👈 這裡設定頭部的最終大小！現在設定為 2。
+    const headScale = 10 / maxDim; 
     headPivot.scale.set(headScale, headScale, headScale); 
     
-    // 5. 將頭部加入與建築物同一個背景圖層 (bgGroup)
-    bgGroup.add(headPivot);
+    bgGroup.add(headPivot); // 💡 頭也是背景封面的一部分！
     
-    console.log("✅ 頭部模型已載入並修正大小");
-
-}, undefined, (error) => {
-    console.error("❌ 頭部模型載入失敗：", error);
+    console.log("✅ 頭部模型已載入");
 });
 
 // 5. 渲染與視窗縮放
 function animate() {
     requestAnimationFrame(animate);
-    // 💡 頭部的互動邏輯 💡
+    
+    // 💡 頭部的互動邏輯
     if (headPivot) {
         if (isMouseActive) {
-            // === 狀態 1：滑鼠移動中 (盯著滑鼠) ===
             currentMouse.x += (targetMouse.x - currentMouse.x) * 0.1;
             currentMouse.y += (targetMouse.y - currentMouse.y) * 0.1;
             
-            // 💡 修正 2：縮小旋轉幅度！並修正上下相反
-            headPivot.rotation.y = currentMouse.x * Math.PI * 0.25;  // 左右看 (幅度變小)
-            headPivot.rotation.x = currentMouse.y * Math.PI * 0.15; // 上下看 (加了負號且幅度變小)
-            headPivot.rotation.z = 0; // 回正頭部的傾斜
+            headPivot.rotation.y = currentMouse.x * Math.PI * 0.25;  
+            // 💡 修正 3：補上負號，解決上下相反的問題！
+            headPivot.rotation.x = -currentMouse.y * Math.PI * 0.15; 
+            headPivot.rotation.z = 0; 
             
         } else {
-            // === 狀態 2：閒置中 (隨機旋轉) ===
             idleTime += 0.01; 
             
-            // 💡 修正 3：把閒置亂轉的幅度也縮小，才不會發呆時也變鬼頭
             const randomRotY = Math.sin(idleTime) * Math.PI * 0.15;      
             const randomRotX = Math.cos(idleTime * 0.7) * 0.1;    
             const randomRotZ = Math.sin(idleTime * 0.5) * 0.05;    
@@ -254,7 +218,7 @@ function animate() {
             headPivot.rotation.z += (randomRotZ - headPivot.rotation.z) * 0.02;
         }
     }
-    // 渲染場景
+    
     renderer.render(scene, camera);
 }
 animate();

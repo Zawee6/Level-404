@@ -64,8 +64,9 @@ scene.add(bgGroup);
 // ==========================================
 
 // 動畫 1：整個背景(建築+草地+頭) 當作封面，往上滑出畫面
+// 💡 猛藥：把 y 從 50 改成 150，把深厚的草地徹底拉出畫面！
 gsap.to(bgGroup.position, {
-    y: 50, 
+    y: 150, 
     scrollTrigger: {
         trigger: ".concept-section", 
         start: "top bottom",         
@@ -74,16 +75,6 @@ gsap.to(bgGroup.position, {
     }
 });
 
-// 動畫 2：讓路牌在 Level 404 出來「之前」就往上滑走！
-gsap.to(pivotGroup.position, {
-    y: 30, // 往上移動並移出鏡頭
-    scrollTrigger: {
-        trigger: ".concept-section", 
-        start: "top bottom",         // 只要一開始滑動就觸發
-        end: "top center",           // 👈 提早在區塊到達畫面中間前就跑走
-        scrub: 1,
-    }
-});
 
 // ==========================================
 // 4. 載入模型區域
@@ -106,17 +97,29 @@ loader.load('level404_sign.glb', (gltf) => {
     
     console.log("✅ 路牌模型已載入");
     
-    // 讓路牌往上滑走的同時，微微放大一點點(增加飛過去的立體感)
-    gsap.to(pivotGroup.scale, {
-        x: initialScale * 2,
-        y: initialScale * 2,
-        z: initialScale * 2,
+    // ==========================================
+    // 💡 修正：使用時間軸 (Timeline) 讓動作「排隊」！先放大，再上滑
+    // ==========================================
+    let signTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".concept-section",
             start: "top bottom",
-            end: "top center",
+            end: "top 10%",       // 提早結束，確保在 404 區塊出來前就滑走
             scrub: 1,
         }
+    });
+
+    // 排隊動作 1：路牌先放大 (佔用前半段進度)
+    signTl.to(pivotGroup.scale, {
+        x: initialScale * 10,
+        y: initialScale * 10,
+        z: initialScale * 10,
+        duration: 1
+    })
+    // 排隊動作 2：接著往上滑走 (佔用後半段進度)
+    .to(pivotGroup.position, {
+        y: 40, 
+        duration: 1
     });
 });
 

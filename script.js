@@ -55,7 +55,7 @@ scene.add(walkmanGroup);
 
 // 3. 延伸白竿子的出發點 (固定在畫面最頂端，鏡頭外)
 let polePivot = new THREE.Group(); 
-polePivot.position.set(0, 15, -0.1); // y:15 確保從螢幕上面長下來
+polePivot.position.set(0, 15, 0.1); // y:15 確保從螢幕上面長下來
 polePivot.visible = false; // 初始隱形
 scene.add(polePivot);
 
@@ -68,13 +68,17 @@ scene.add(bgGroup);
 // 🌟 建立生長竿子 🌟
 // ==========================================
 // 從頂部(15) 長到底部(-6)，總長度為 21
-const poleLength = 15; 
-const cylinderGeo = new THREE.CylinderGeometry(0.3, 0.3, poleLength, 16); // 粗細設為 0.08
-cylinderGeo.translate(0, -poleLength / 2, 0); // 確保單向往下生長
-const cylinderMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.1 });
+const poleLength = 20; 
+const cylinderGeo = new THREE.CylinderGeometry(0.7, 0.7, poleLength, 16); 
+
+const cylinderMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.5, metalness: 0.1 });
 const poleMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
-poleMesh.scale.y = 0.001; // 初始長度趨近於 0
+
+// 💡 關鍵修改：直接設為 1 (全滿狀態)，不要設為 0.001
+poleMesh.scale.y = 1; 
 polePivot.add(poleMesh);
+
+polePivot.position.set(-0.1, 0, 0);
 
 // ==========================================
 // 🌟 核心動畫控制 (完美接力時間軸) 🌟
@@ -90,29 +94,23 @@ gsap.to(bgGroup.position, {
 ScrollTrigger.create({
     trigger: ".concept-section",
     // 💡 數字調大 = 提早出現 (例如 60% 或 70%)
-    start: "top 90%", 
+    start: "top 68%", 
     onEnter: () => { polePivot.visible = true; },
     onLeaveBack: () => { polePivot.visible = false; }
 });
 
-// 動畫 2-B：Walkman 的顯示時機 (精準綁定在 22 影片區塊)
+// 動畫 2-B：Walkman 的顯示時機 (改為綁定 albumdemo 圖片)
 ScrollTrigger.create({
-    trigger: "#video-22", // 💡 瞄準我們剛剛在 HTML 插的旗子
-    start: "top 10%",     // 當 "22" 標題進入螢幕下方 80% 處時，Walkman 瞬間出現
+    trigger: ".concept-image", // 💡 直接瞄準 albumdemo 圖片的 class
+    start: "top 50%",          // 當圖片頂部進入螢幕下方 80% 時，Walkman 瞬間出現
     onEnter: () => { walkmanGroup.visible = true; },
     onLeaveBack: () => { walkmanGroup.visible = false; }
 });
 
-// 動畫 3：黑竿子往下生長 (生長速度配合 22 的位置)
-gsap.to(poleMesh.scale, {
-    y: 1, 
-    scrollTrigger: {
-        trigger: ".concept-section",
-        start: "top 60%",        // 竿子在區塊一開始就先慢慢長
-        endTrigger: "#video-22", // 💡 關鍵魔法：把生長「結束」的目標綁定在 22 標題！
-        end: "top 60%",          // 當 "22" 標題到達對應位置時，竿子剛好長完、完美對接！
-        scrub: 1
-    }
+// 動畫 3：整個組合一起往上飛走 (前往周邊商品頁)
+gsap.to([walkmanGroup.position, polePivot.position], {
+    y: "+=40", 
+    scrollTrigger: { trigger: ".merch-section", start: "top bottom", end: "top top", scrub: 1 }
 });
 
 // 動畫 4：整個組合一起往上飛走 (前往周邊商品頁)
@@ -136,7 +134,7 @@ loader.load('level404_sign.glb', (gltf) => {
     
     signpostGroup.add(model);
     
-    const initialScale = 5 / Math.max(size.x, size.y, size.z); 
+    const initialScale = 10 / Math.max(size.x, size.y, size.z); 
     signpostGroup.scale.set(initialScale, initialScale, initialScale);
     
     // 🎬 動作 1-A：告示牌放大 (剛滑動時)
@@ -162,14 +160,14 @@ loader.load('walkmancopy.glb', (gltf) => {
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     
     // 🎯 完美套用您的微調座標 (把竿子推到正中央)
-    walkmanModel.position.x = 1.8; 
-    walkmanModel.position.y = -1.5; 
-    walkmanModel.position.z = 5; 
+    walkmanModel.position.x = 1.784; 
+    walkmanModel.position.y = -1.6; 
+    walkmanModel.position.z = 8.55; 
     walkmanModel.rotation.z = Math.PI; // 上下顛倒
     
     walkmanGroup.add(walkmanModel); 
 
-    const targetScale = 50 / Math.max(size.x, size.y, size.z); 
+    const targetScale = 24 / Math.max(size.x, size.y, size.z); 
     walkmanGroup.scale.set(targetScale, targetScale, targetScale); 
 });
 

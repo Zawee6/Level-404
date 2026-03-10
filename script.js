@@ -136,7 +136,7 @@ loader.load('level404_sign.glb', (gltf) => {
     // 💡 關鍵修正：放到 signpostGroup 裡！
     signpostGroup.add(model);
     
-    const initialScale = 5 / Math.max(size.x, size.y, size.z); 
+    const initialScale = 3 / Math.max(size.x, size.y, size.z); 
     signpostGroup.scale.set(initialScale, initialScale, initialScale);
     
     // 告示牌放大動畫 (佔據網頁剛滑到第二區塊的前半段)
@@ -184,7 +184,7 @@ loader.load('walkmancopy.glb', (gltf) => {
     // ==========================================
     // 1. 左右對齊 (最重要)：把 Walkman 的竿子推到對齊白色延長線
     // 如果它在畫面偏右，我們就把它往左推 (試著把 0 改成 1.5 或 -1.5)
-    walkmanModel.position.x += 1.5; 
+    walkmanModel.position.x += 0; 
     
     // 2. 上下縫隙修補：如果白色竿子跟 Walkman 的竿子沒有緊密接合，或者吃進去太多
     walkmanModel.position.y += 0.5; // 調大(如1)會往上貼合，調小(如-0.5)會往下降

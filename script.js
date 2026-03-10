@@ -187,7 +187,7 @@ loader.load('headcopy.glb', (gltf) => {
     headPivot = new THREE.Group();
     
     // 💡 修正 1：把頭轉正！(如果發現它用後腦勺看你，就把這行改成 -Math.PI / 2)
-    headModel.rotation.y = -Math.PI / 2; 
+    headModel.rotation.y = Math.PI; 
 
     headModel.position.set(-center.x, -center.y, -center.z);
     headPivot.add(headModel);

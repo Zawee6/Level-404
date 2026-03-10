@@ -235,8 +235,10 @@ loader.load('walkmancopy.glb', (gltf) => {
     // 調整大小：讓它看起來比路牌小一點或適中
     // 既然要「放大 5 倍」，我們用路牌的邏輯來精準控制
     const maxDim = Math.max(size.x, size.y, size.z);
-    const walkmanScale = 3 / maxDim; // 👈 數字 1.5 可微調，覺得太小就改大
+    const walkmanScale = 5 / maxDim; // 👈 數字 1.5 可微調，覺得太小就改大
     walkmanModel.scale.set(walkmanScale, walkmanScale, walkmanScale);
+    walkmanModel.position.y -= 1.5; 
+    walkmanModel.position.z += 3;
 
     console.log("✅ Walkman 已加入路牌圖層並轉向");
 

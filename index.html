@@ -4,46 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Level 404 - [Vendel]</title>
+    <meta name="description" content="Level 404 - [Vendel] 概念音樂頁面，結合 3D 視覺與沉浸式音效。">
+    <meta property="og:title" content="Level 404 - [Vendel]">
+    <meta property="og:description" content="致我深愛的殘缺。">
+    <meta property="og:type" content="website">
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- 載入畫面 -->
+    <div id="loading-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p>Loading Level 404... <span id="loading-progress">0</span>%</p>
+        </div>
+    </div>
+
     <audio id="bg-music" loop>
         <source src="secretplace.mp3" type="audio/mpeg">
         您的瀏覽器不支援音訊元素。
     </audio>
 
-    <button id="music-toggle" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(0,0,0,0.5); color: white; border: 1px white solid; padding: 10px; cursor: pointer;">
-    🔇 靜音
-    </button>
+    <button id="music-toggle" class="music-btn">🔇 MUTE</button>
 
     <div id="three-container"></div> 
 
-    <section class="section" style="height: 100vh;">
-        
+    <section class="section hero-section">
         <h2>致我深愛的殘缺</h2>
-        
-        
         <a href="https://www.youtube.com/@vacantmendel" target="_blank" class="call-to-action">SUPPORT US</a>
     </section>
 
-    <section class="section concept-section" style="height: 300vh;">
+    <section class="section concept-section">
         <h2>Level 404</h2>
         <img src="albumdemo.jpg" alt="Album Demo" class="concept-image">
         <h2>MUSIC VIDEO</h2>
 
-        <h2>離邦</h2>
-         <div class="mv-embed" style="margin-top: 50px;">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/ncQ4-xw7vgQ?si=6K0zm93Vlfdzagkb" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <a href="https://www.youtube.com/watch?v=ncQ4-xw7vgQ" target="_blank" class="watch-btn">WATCH NOW</a>
+        <div class="mv-block">
+            <h2>離邦</h2>
+            <div class="mv-embed">
+                <iframe src="https://www.youtube.com/embed/ncQ4-xw7vgQ?si=6K0zm93Vlfdzagkb" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <a href="https://www.youtube.com/watch?v=ncQ4-xw7vgQ" target="_blank" class="watch-btn">WATCH NOW</a>
+            </div>
         </div>
 
-        <h2 id="video-22">22</h2>
-        <div class="mv-embed">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/bqKh9CmwLug?si=o7Xy2pbcRhHJH5oi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <a href="https://www.youtube.com/watch?v=bqKh9CmwLug" target="_blank" class="watch-btn">WATCH NOW</a>
+        <div class="mv-block">
+            <h2 id="video-22">22</h2>
+            <div class="mv-embed">
+                <iframe src="https://www.youtube.com/embed/bqKh9CmwLug?si=o7Xy2pbcRhHJH5oi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <a href="https://www.youtube.com/watch?v=bqKh9CmwLug" target="_blank" class="watch-btn">WATCH NOW</a>
+            </div>
         </div>
-
     </section>
 
     <section class="section merch-section">

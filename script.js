@@ -147,6 +147,7 @@ loader.load('grasscopy.glb', (gltf) => {
     
     // 3. 簡單的高度微調 (往下墊在建築物下方)
     floorModel.position.y -= 10; 
+    bgGroup.position.z = -20; 
     
     // 4. 回復最初的簡單放大倍數 (長、寬、高都等比例放大)
     floorModel.scale.set(25, 25, 25); 

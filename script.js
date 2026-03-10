@@ -159,7 +159,7 @@ loader.load('grasscopy.glb', (gltf) => {
     // 💡 關鍵 2：不受建築物干擾的「暴力放大」
     // 因為它獨立了，現在放大 100 倍就是真正的 100 倍！
     // ==========================================
-    floorModel.scale.set(100, 1, 150); 
+    floorModel.scale.set(10, 1, 15); 
     
     // 將草地放入獨立容器，然後【直接加入場景 scene】
     floorContainer.add(floorModel);

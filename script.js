@@ -169,30 +169,44 @@ loader.load('level404_sign.glb', (gltf) => {
 // 🌟 載入 Walkman 與背景模型 (不變) 🌟
 // ==========================================
 
-// 2. 載入 Walkman
+// 2. 載入 Walkman (精準對位版)
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     const box = new THREE.Box3().setFromObject(walkmanModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     
+    // 基本置中 (此時會以整個大機器的中心點為主)
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     
-    // 💡 維持上下顛倒
+    // ==========================================
+    // 🎯 銜接對位控制器 (在這裡微調數字！)
+    // ==========================================
+    // 1. 左右對齊 (最重要)：把 Walkman 的竿子推到對齊白色延長線
+    // 如果它在畫面偏右，我們就把它往左推 (試著把 0 改成 1.5 或 -1.5)
+    walkmanModel.position.x += 1.5; 
+    
+    // 2. 上下縫隙修補：如果白色竿子跟 Walkman 的竿子沒有緊密接合，或者吃進去太多
+    walkmanModel.position.y += 0.5; // 調大(如1)會往上貼合，調小(如-0.5)會往下降
+    
+    // 3. 前後厚度對齊：如果兩根竿子看起來一前一後穿模了
+    walkmanModel.position.z += 0; 
+    // ==========================================
+
+    // 上下顛倒
     walkmanModel.rotation.z = Math.PI; 
     
-    // 💡 加入 Walkman 箱子
     walkmanGroup.add(walkmanModel); 
 
+    // 🎯 大小微調控制器
     const maxDim = Math.max(size.x, size.y, size.z);
-    // 💡 這裡設定 Walkman 的最終大小倍率
-    const targetScale = 5 / maxDim; 
+    const targetScale = 6 / maxDim; // 👈 如果覺得 Walkman 不夠霸氣，把 6 改成 7 或 8
     walkmanGroup.scale.set(targetScale, targetScale, targetScale); 
     
-    // 💡 初始 Z 軸往前凸出一點 (在竿子前面)，Y 軸初始在竿子最頂端(-2.5)
-    walkmanGroup.position.set(0, -2.5, 0);
+    // 💡 確保 Walkman 群組的出發點，跟白色天線的起點完全重疊
+    walkmanGroup.position.set(0, -2.5, -0.1);
     
-    console.log("✅ Walkman 已預備好連接生長");
+    console.log("✅ Walkman 已預備好，請在代碼中微調 X 軸對齊");
 });
 
 // 3. 載入建築

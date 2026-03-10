@@ -133,7 +133,7 @@ loader.load('buildingcopy.glb', (gltf) => {
 });
 
 // ==========================================
-// 🌟 載入第三個模型：獨立圖層的地板
+// 🌟 載入第三個模型：同圖層的地板 (回到最初設定)
 // ==========================================
 loader.load('grasscopy.glb', (gltf) => {
     const floorModel = gltf.scene;
@@ -145,25 +145,16 @@ loader.load('grasscopy.glb', (gltf) => {
     // 2. 將地板置中
     floorModel.position.set(-center.x, -center.y, -center.z);
     
-    // ==========================================
-    // 💡 關鍵 1：把它放在跟建築物一樣深的背景 (-30)
-    // 並且稍微往下沉，墊在建築物下方 (例如 -15，可微調)
-    // ==========================================
-    let floorContainer = new THREE.Group();
-    floorContainer.position.z = -28; 
-    floorContainer.position.y = -12; // 👈 如果草地太高或太低，調這個數字！
+    // 3. 簡單的高度微調 (往下墊在建築物下方)
+    floorModel.position.y -= 10; 
     
-    // ==========================================
-    // 💡 關鍵 2：不受建築物干擾的「暴力放大」
-    // 因為它獨立了，現在放大 100 倍就是真正的 100 倍！
-    // ==========================================
-    floorModel.scale.set(40, 1, 50); 
+    // 4. 回復最初的簡單放大倍數 (長、寬、高都等比例放大)
+    floorModel.scale.set(15, 15, 15); 
     
-    // 將草地放入獨立容器，然後【直接加入場景 scene】
-    floorContainer.add(floorModel);
-    scene.add(floorContainer); // 👈 關鍵：不再是 bgGroup.add() 了！
+    // 5. 乖乖加回與建築物同一個背景容器 (bgGroup) 中
+    bgGroup.add(floorModel);
     
-    console.log("✅ 地板模型已獨立載入並延伸");
+    console.log("✅ 地板模型已回到最初的設定");
 
 }, undefined, (error) => {
     console.error("❌ 地板模型載入失敗：", error);

@@ -137,7 +137,7 @@ loader.load('buildingcopy.glb', (gltf) => {
 // 🌟 載入第三個模型：同圖層的地板
 // ==========================================
 // 🚨 請把 'YOUR_FLOOR_MODEL.glb' 換成您的地板模型檔名
-loader.load('YOUR_FLOOR_MODEL.glb', (gltf) => {
+loader.load('grasscopy.glb', (gltf) => {
     const floorModel = gltf.scene;
     
     // 1. 計算幾何中心並強制置中

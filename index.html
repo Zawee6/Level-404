@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <audio id="bg-music" loop>
+        <source src="secretplace.mp3" type="audio/mpeg">
+        您的瀏覽器不支援音訊元素。
+    </audio>
+
+    <button id="music-toggle" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(0,0,0,0.5); color: white; border: 1px white solid; padding: 10px; cursor: pointer;">
+    🔇 靜音
+    </button>
 
     <div id="three-container"></div> 
 
@@ -30,7 +38,7 @@
             <a href="https://www.youtube.com/watch?v=ncQ4-xw7vgQ" target="_blank" class="watch-btn">WATCH NOW</a>
         </div>
 
-        <h2>22</h2>
+        <h2 id="video-22">22</h2>
         <div class="mv-embed">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/bqKh9CmwLug?si=o7Xy2pbcRhHJH5oi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             <a href="https://www.youtube.com/watch?v=bqKh9CmwLug" target="_blank" class="watch-btn">WATCH NOW</a>

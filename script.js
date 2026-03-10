@@ -89,7 +89,7 @@ loader.load('buildingcopy.glb', (gltf) => {
     
     // 2. 💡 關鍵：把它往後推，放在路牌的後面
     // 數字越小 (例如 -20, -50) 代表離相機越遠、越在圖層底層
-    bgGroup.position.z = -60; 
+    bgGroup.position.z = -200; 
 
     // 💡 2. (選用) 如果你想讓建築物稍微往下沉，不要擋住中間，可以調整 Y 軸
     bgGroup.position.y = -5;

@@ -200,67 +200,48 @@ loader.load('headcopy.glb', (gltf) => {
     console.log("✅ 頭部模型已載入");
 });
 
-// ==========================================
-// 🌟 載入第五個模型：Walkman (上下顛倒，在 Section 2 出現)
+/// ==========================================
+// 🌟 載入第五個模型：Walkman (與路牌同圖層)
 // ==========================================
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     
-    // 1. 計算幾何中心並強制置中
+    // 1. 計算幾何中心並置中
     const box = new THREE.Box3().setFromObject(walkmanModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     
+    // 將模型內部的內容移到中心
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     
     // ==========================================
-    // 💡 關鍵 1：上下顛倒！(旋轉 180 度 = Math.PI)
+    // 💡 關鍵 1：上下顛倒 (旋轉 180 度)
     // ==========================================
-    // 使用 Z 軸旋轉可以讓它保持正面面對鏡頭，但上下翻轉
     walkmanModel.rotation.z = Math.PI; 
     
-    // 如果您發現它是用側面看您，可以加上 Y 軸轉正 (視模型原始方向而定)
-    // walkmanModel.rotation.y = Math.PI / 2; 
-
-    walkmanGroup.add(walkmanModel);
+    // ==========================================
+    // 💡 關鍵 2：加入與告示牌相同的圖層 (pivotGroup)
+    // ==========================================
+    // 這樣它會跟著告示牌一起放大、一起滑動
+    pivotGroup.add(walkmanModel);
     
     // ==========================================
-    // 💡 關鍵 2：精準放大 5 倍！
+    // 💡 關鍵 3：調整位置與大小
     // ==========================================
-    // 先算出它的基準大小，再強制設定為 5 倍大
+    // 因為在 pivotGroup 裡面，我們設定它在路牌的「下方」或「旁邊」
+    // 這裡設 y: -2 會讓它出現在路牌下面一點點
+    walkmanModel.position.y -= 2; 
+
+    // 調整大小：讓它看起來比路牌小一點或適中
+    // 既然要「放大 5 倍」，我們用路牌的邏輯來精準控制
     const maxDim = Math.max(size.x, size.y, size.z);
-    const finalScale = 1 / maxDim; 
-    walkmanGroup.scale.set(finalScale, finalScale, finalScale);
-    
-    console.log("✅ Walkman 模型已載入、顛倒並放大 5 倍");
+    const walkmanScale = 1.5 / maxDim; // 👈 數字 1.5 可微調，覺得太小就改大
+    walkmanModel.scale.set(walkmanScale, walkmanScale, walkmanScale);
 
-    // ==========================================
-    // 💡 關鍵 3：讓它在第二區塊升上來的 GSAP 動畫
-    // ==========================================
-    // 當進入 concept-section 時，從下方 (-30) 升到畫面中間 (0)
-    gsap.to(walkmanGroup.position, {
-        y: 0, 
-        scrollTrigger: {
-            trigger: ".concept-section",
-            start: "top bottom",     // 當區塊剛出現時開始升起
-            end: "top 20%",          // 區塊快到畫面頂端時，它剛好就位在正中央
-            scrub: 1,
-        }
-    });
-
-    // (加碼) 當繼續往下滑到周邊商品區塊時，讓它也跟著往上滑走
-    gsap.to(walkmanGroup.position, {
-        y: 40, // 往上飛出鏡頭
-        scrollTrigger: {
-            trigger: ".merch-section",
-            start: "top bottom",
-            end: "top top",
-            scrub: 1,
-        }
-    });
+    console.log("✅ Walkman 已加入路牌圖層並轉向");
 
 }, undefined, (error) => {
-    console.error("❌ Walkman 模型載入失敗：", error);
+    console.error("❌ Walkman 載入失敗：", error);
 });
 
 // 5. 渲染與視窗縮放

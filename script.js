@@ -92,11 +92,11 @@ loader.load('buildingcopy.glb', (gltf) => {
     // ==========================================
     
     // 2. 往後推得更深：從 -20 改成 -80 (數字越負，離我們越遠)
-    bgGroup.position.z = -80; 
+    bgGroup.position.z = -200; 
     
     // 3. 縮小模型倍數：把原本的 100 改成 15 或 20
     const maxDim = Math.max(size.x, size.y, size.z);
-    const bgScale = 15 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
+    const bgScale = 10 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
     bgGroup.scale.set(bgScale, bgScale, bgScale);
     
     console.log("✅ 背景圖層模型已載入");

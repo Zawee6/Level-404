@@ -2,7 +2,7 @@
 gsap.registerPlugin(ScrollTrigger);
 
 // ==========================================
-// 🌟 基礎變數設定 🌟
+// 🌟 基礎變數與環境 🌟
 // ==========================================
 let headPivot; 
 let targetMouse = { x: 0, y: 0 };
@@ -21,12 +21,10 @@ window.addEventListener('mousemove', (event) => {
     mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1000);
 });
 
-// 初始化 Lenis 捲動
 const lenis = new Lenis();
 function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
 requestAnimationFrame(raf);
 
-// Three.js 基礎環境
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -43,17 +41,18 @@ light.position.set(5, 5, 5);
 scene.add(light);
 
 // ==========================================
-// 🌟 容器宣告 (全部獨立) 🌟
+// 🌟 容器宣告 🌟
 // ==========================================
-let pivotGroup = new THREE.Group(); // 告示牌專用
+let pivotGroup = new THREE.Group(); // 告示牌
 scene.add(pivotGroup);
 
-let bgGroup = new THREE.Group();    // 背景(建築+頭)專用
+let bgGroup = new THREE.Group();    // 背景 (建築+地板+頭)
 bgGroup.position.z = -30; 
 scene.add(bgGroup);
 
 let walkmanGroup = new THREE.Group(); // 🌟 Walkman 專用容器
-walkmanGroup.position.y = -30;         // 一開始藏在螢幕下方
+// 💡 修正：初始位置改為 -15，縮短升起所需的捲動距離
+walkmanGroup.position.set(0, -15, 2); 
 scene.add(walkmanGroup);
 
 // ==========================================
@@ -71,27 +70,22 @@ gsap.to(bgGroup.position, {
     }
 });
 
-// 2. Walkman 升起動畫 (獨立控制)
-gsap.to(walkmanGroup.position, {
-    y: -5, // 升起到螢幕中間偏下，避開標題文字
+// 💡 修正：使用 Timeline 統一管理 Walkman 動作，避免動畫衝突
+let walkmanTl = gsap.timeline({
     scrollTrigger: {
         trigger: ".concept-section",
         start: "top bottom", 
-        end: "top 20%", 
+        end: "bottom top", 
         scrub: 1
     }
 });
 
-// 3. Walkman 跟著路牌一起滑走
-gsap.to(walkmanGroup.position, {
-    y: 50, 
-    scrollTrigger: {
-        trigger: ".concept-section",
-        start: "top 40%", 
-        end: "top top", 
-        scrub: 1
-    }
-});
+// 🎬 動作 A：從下方升起到中間 (進度 0% - 30%)
+walkmanTl.to(walkmanGroup.position, { y: -5, duration: 3 });
+// 🎬 動作 B：停留在中間 (進度 30% - 70%)
+walkmanTl.to(walkmanGroup.position, { y: -5, duration: 4 });
+// 🎬 動作 C：最後跟著網頁一起飛走 (進度 70% - 100%)
+walkmanTl.to(walkmanGroup.position, { y: 60, duration: 3 });
 
 // ==========================================
 // 🌟 載入模型區域 🌟
@@ -110,20 +104,18 @@ loader.load('level404_sign.glb', (gltf) => {
     const initialScale = 5 / Math.max(size.x, size.y, size.z); 
     pivotGroup.scale.set(initialScale, initialScale, initialScale);
     
-    // 路牌放大
     gsap.to(pivotGroup.scale, {
         x: initialScale * 10, y: initialScale * 10, z: initialScale * 10,
         scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 40%", scrub: 1 }
     });
 
-    // 路牌滑走
     gsap.to(pivotGroup.position, {
         y: 40, 
         scrollTrigger: { trigger: ".concept-section", start: "top 40%", end: "top top", scrub: 1 }
     });
 });
 
-// 2. 載入 Walkman (獨立、放大 5 倍、顛倒)
+// 2. 載入 Walkman
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     const box = new THREE.Box3().setFromObject(walkmanModel);
@@ -135,9 +127,8 @@ loader.load('walkmancopy.glb', (gltf) => {
     
     walkmanGroup.add(walkmanModel); 
 
-    // 精準放大 5 倍的邏輯
     const maxDim = Math.max(size.x, size.y, size.z);
-    const targetScale = 5 / maxDim; // 💡 這裡直接設定為 5 倍大
+    const targetScale = 5 / maxDim; // 5 倍大
     walkmanGroup.scale.set(targetScale, targetScale, targetScale); 
     
     console.log("✅ Walkman 獨立載入成功");

@@ -183,10 +183,10 @@ loader.load('headcopy.glb', (gltf) => {
     
     // 3. 💡 設定位置到「右上角」
     // 因為在 bgGroup 裡面，數字代表相對於背景的位置，您可微調 X(左右) 與 Y(上下)
-    headPivot.position.set(10, 10, 0); 
+    headPivot.position.set(30, 20, 0); 
     
     // 4. 💡 設定頭部大小 (您可以依據需求放大縮小)
-    headPivot.scale.set(10, 10, 10); 
+    headPivot.scale.set(1, 1, 1); 
     
     // 5. 將頭部加入與建築物同一個背景圖層 (bgGroup)
     bgGroup.add(headPivot);

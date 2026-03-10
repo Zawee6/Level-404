@@ -179,6 +179,10 @@ loader.load('headcopy.glb', (gltf) => {
     
     // 2. 建立頭部的控制容器
     headPivot = new THREE.Group();
+    
+    // 💡 修正 1：把頭轉正！(如果發現它用後腦勺看你，就把這行改成 -Math.PI / 2)
+    headModel.rotation.y = Math.PI / 2; 
+
     headModel.position.set(-center.x, -center.y, -center.z);
     headPivot.add(headModel);
     
@@ -207,31 +211,28 @@ function animate() {
     if (headPivot) {
         if (isMouseActive) {
             // === 狀態 1：滑鼠移動中 (盯著滑鼠) ===
-            // 讓當前角度平滑過渡到目標角度 (Lerp)
             currentMouse.x += (targetMouse.x - currentMouse.x) * 0.1;
             currentMouse.y += (targetMouse.y - currentMouse.y) * 0.1;
             
-            // 計算看向滑鼠的旋轉角度 (乘以 Math.PI 控制轉頭幅度)
-            headPivot.rotation.y = currentMouse.x * Math.PI * 0.5; // 左右看
-            headPivot.rotation.x = currentMouse.y * -Math.PI * 0.25; // 上下看
+            // 💡 修正 2：縮小旋轉幅度！並修正上下相反
+            headPivot.rotation.y = currentMouse.x * Math.PI * 0.25;  // 左右看 (幅度變小)
+            headPivot.rotation.x = -currentMouse.y * Math.PI * 0.15; // 上下看 (加了負號且幅度變小)
             headPivot.rotation.z = 0; // 回正頭部的傾斜
             
         } else {
             // === 狀態 2：閒置中 (隨機旋轉) ===
-            idleTime += 0.01; // 增加時間基數
+            idleTime += 0.01; 
             
-            // 使用 sin/cos 產生滑順的隨機轉動值
-            const randomRotY = Math.sin(idleTime) * Math.PI;      // 左右亂轉
-            const randomRotX = Math.cos(idleTime * 0.7) * 0.5;    // 微微點頭/抬頭
-            const randomRotZ = Math.sin(idleTime * 0.5) * 0.3;    // 微微歪頭
+            // 💡 修正 3：把閒置亂轉的幅度也縮小，才不會發呆時也變鬼頭
+            const randomRotY = Math.sin(idleTime) * Math.PI * 0.15;      
+            const randomRotX = Math.cos(idleTime * 0.7) * 0.1;    
+            const randomRotZ = Math.sin(idleTime * 0.5) * 0.05;    
             
-            // 讓頭部平滑地過渡到隨機旋轉的軌跡上
             headPivot.rotation.y += (randomRotY - headPivot.rotation.y) * 0.02;
             headPivot.rotation.x += (randomRotX - headPivot.rotation.x) * 0.02;
             headPivot.rotation.z += (randomRotZ - headPivot.rotation.z) * 0.02;
         }
     }
-
     // 渲染場景
     renderer.render(scene, camera);
 }

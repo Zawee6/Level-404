@@ -22,7 +22,7 @@ window.addEventListener('mousemove', (event) => {
     clearTimeout(mouseTimeout);
     mouseTimeout = setTimeout(() => {
         isMouseActive = false;
-    }, 500);
+    }, 1000);
 });
 
 // 1. 初始化 Lenis

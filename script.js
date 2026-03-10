@@ -122,7 +122,7 @@ loader.load('buildingcopy.glb', (gltf) => {
     
     // 3. 縮小模型倍數：把原本的 100 改成 15 或 20
     const maxDim = Math.max(size.x, size.y, size.z);
-    const bgScale = 90 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
+    const bgScale = 80 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
     bgGroup.scale.set(bgScale, bgScale, bgScale);
     
     console.log("✅ 背景圖層模型已載入");
@@ -155,7 +155,7 @@ loader.load('grasscopy.glb', (gltf) => {
     // ==========================================
     // 第一個數字是 X軸(寬度)，第二個是 Y軸(厚度)，第三個是 Z軸(深度)
     // 試著把它放大 5 倍或 10 倍！
-    floorModel.scale.set(15, 15, 15); 
+    floorModel.scale.set(20, 20, 20); 
     
     // 5. 將地板加入與建築物同一個背景容器
     bgGroup.add(floorModel);
@@ -188,7 +188,7 @@ loader.load('headcopy.glb', (gltf) => {
     
     // 4. 💡 關鍵修正：抵銷雙重放大，精準設定大小！
     const maxDim = Math.max(size.x, size.y, size.z);
-    const headScale = 10 / maxDim; // 👈 這裡設定頭部的最終大小！現在設定為 2。
+    const headScale = 6 / maxDim; // 👈 這裡設定頭部的最終大小！現在設定為 2。
     headPivot.scale.set(headScale, headScale, headScale); 
     
     // 5. 將頭部加入與建築物同一個背景圖層 (bgGroup)

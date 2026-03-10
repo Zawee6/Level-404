@@ -201,40 +201,51 @@ loader.load('headcopy.glb', (gltf) => {
 });
 
 // ==========================================
-// 🌟 載入第五個模型：Walkman (與路牌同步，固定存在)
+// 🌟 載入第五個模型：Walkman (同步比例、瞬間出現)
 // ==========================================
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     
-    // 1. 計算中心並置中
     const box = new THREE.Box3().setFromObject(walkmanModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     
-    // 將內部內容移到中心點
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     
-    // 2. 設定初始旋轉 (上下顛倒)
+    // 1. 上下顛倒
     walkmanModel.rotation.z = Math.PI; 
     
-    // 3. 加入告示牌圖層 (pivotGroup)
-    // 💡 因為在 pivotGroup 裡，它會自動跟著路牌一起「放大」和「上滑」
+    // 2. 加入告示牌圖層 (與路牌同進退)
     pivotGroup.add(walkmanModel);
     
-    // 4. 設定與路牌的相對位置
-    walkmanModel.position.y -= 2; // 在路牌下方
-    walkmanModel.position.z += 3; // 往鏡頭前方凸出
-
     // ==========================================
-    // 💡 關鍵修正：直接設定最終大小，移除所有成長動畫
+    // 💡 修正 1：大幅縮小基礎比例
+    // 因為它會跟著路牌放大 10 倍，所以這裡設 0.8 就夠了
     // ==========================================
     const maxDim = Math.max(size.x, size.y, size.z);
-    const targetScale = 4 / maxDim; 
-    
-    // 直接給它確定的比例，不再從 0 開始
-    walkmanModel.scale.set(targetScale, targetScale, targetScale); 
-    
-    console.log("✅ Walkman 已固定在路牌下方，將與路牌同步互動");
+    const walkmanScale = 0.8 / maxDim; // 👈 縮小基礎比例
+    walkmanModel.scale.set(walkmanScale, walkmanScale, walkmanScale);
+
+    // ==========================================
+    // 💡 修正 2：位置下移並貼近路牌
+    // y 設為 -6 讓它避開標題文字，z 設為 0.5 稍微凸出即可
+    // ==========================================
+    walkmanModel.position.y -= 6; 
+    walkmanModel.position.z += 0.5;
+
+    // ==========================================
+    // 💡 修正 3：瞬間出現 (不使用慢慢長大的動畫)
+    // ==========================================
+    walkmanModel.visible = false; // 預設隱形
+
+    ScrollTrigger.create({
+        trigger: ".concept-section",
+        start: "top 80%", // 當區塊快要進入時
+        onEnter: () => walkmanModel.visible = true,   // 進入時瞬間顯示
+        onLeaveBack: () => walkmanModel.visible = false // 滑回去時隱藏
+    });
+
+    console.log("✅ Walkman 已修正比例並設定瞬間出現");
 
 }, undefined, (error) => {
     console.error("❌ Walkman 載入失敗：", error);

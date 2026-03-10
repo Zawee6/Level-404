@@ -93,7 +93,10 @@ loader.load('buildingcopy.glb', (gltf) => {
     
     // 3. 💡 關鍵：把它放大到佔據整個畫面
     const maxDim = Math.max(size.x, size.y, size.z);
-    const bgScale = 25 / maxDim; // 這個倍數可以根據您的模型大小自由調整 (覺得不夠滿就改大)
+
+    // 👇 將這裡的 25 改成 100 試試看 (如果還是太小可以改 200)
+    const bgScale = 100 / maxDim; 
+
     bgGroup.scale.set(bgScale, bgScale, bgScale);
     
     console.log("✅ 背景圖層模型已載入");

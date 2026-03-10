@@ -1,3 +1,29 @@
+// ==========================================
+// 🌟 設定頭部模型的互動變數 🌟
+// ==========================================
+let headPivot; // 用來控制頭部旋轉與位置的容器
+let targetMouse = { x: 0, y: 0 };
+let currentMouse = { x: 0, y: 0 };
+let isMouseActive = false;
+let mouseTimeout;
+let idleTime = 0;
+
+// 監聽滑鼠移動事件
+window.addEventListener('mousemove', (event) => {
+    // 1. 將滑鼠螢幕座標轉換為 -1 到 1 的 3D 空間座標
+    targetMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    targetMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    
+    // 2. 標記滑鼠正在移動
+    isMouseActive = true;
+    
+    // 3. 如果滑鼠停下超過 0.5 秒，就切換回「閒置狀態」
+    clearTimeout(mouseTimeout);
+    mouseTimeout = setTimeout(() => {
+        isMouseActive = false;
+    }, 500);
+});
+
 // 1. 初始化 Lenis
 const lenis = new Lenis();
 function raf(time) {
@@ -140,9 +166,70 @@ loader.load('YOUR_FLOOR_MODEL.glb', (gltf) => {
     console.error("❌ 地板模型載入失敗：", error);
 });
 
+// ==========================================
+// 🌟 載入第四個模型：互動頭部
+// ==========================================
+loader.load('headcopy.glb', (gltf) => {
+    const headModel = gltf.scene;
+    
+    // 1. 計算幾何中心並強制置中
+    const box = new THREE.Box3().setFromObject(headModel);
+    const center = box.getCenter(new THREE.Vector3());
+    
+    // 2. 建立頭部的控制容器 (確保它是以「脖子/中心」為軸心旋轉)
+    headPivot = new THREE.Group();
+    headModel.position.set(-center.x, -center.y, -center.z);
+    headPivot.add(headModel);
+    
+    // 3. 💡 設定位置到「右上角」
+    // 因為在 bgGroup 裡面，數字代表相對於背景的位置，您可微調 X(左右) 與 Y(上下)
+    headPivot.position.set(60, 40, 0); 
+    
+    // 4. 💡 設定頭部大小 (您可以依據需求放大縮小)
+    headPivot.scale.set(10, 10, 10); 
+    
+    // 5. 將頭部加入與建築物同一個背景圖層 (bgGroup)
+    bgGroup.add(headPivot);
+    
+    console.log("✅ 頭部模型已載入");
+
+}, undefined, (error) => {
+    console.error("❌ 頭部模型載入失敗：", error);
+});
+
 // 5. 渲染與視窗縮放
 function animate() {
     requestAnimationFrame(animate);
+    // 💡 頭部的互動邏輯 💡
+    if (headPivot) {
+        if (isMouseActive) {
+            // === 狀態 1：滑鼠移動中 (盯著滑鼠) ===
+            // 讓當前角度平滑過渡到目標角度 (Lerp)
+            currentMouse.x += (targetMouse.x - currentMouse.x) * 0.1;
+            currentMouse.y += (targetMouse.y - currentMouse.y) * 0.1;
+            
+            // 計算看向滑鼠的旋轉角度 (乘以 Math.PI 控制轉頭幅度)
+            headPivot.rotation.y = currentMouse.x * Math.PI * 0.5; // 左右看
+            headPivot.rotation.x = currentMouse.y * Math.PI * 0.25; // 上下看
+            headPivot.rotation.z = 0; // 回正頭部的傾斜
+            
+        } else {
+            // === 狀態 2：閒置中 (隨機旋轉) ===
+            idleTime += 0.01; // 增加時間基數
+            
+            // 使用 sin/cos 產生滑順的隨機轉動值
+            const randomRotY = Math.sin(idleTime) * Math.PI;      // 左右亂轉
+            const randomRotX = Math.cos(idleTime * 0.7) * 0.5;    // 微微點頭/抬頭
+            const randomRotZ = Math.sin(idleTime * 0.5) * 0.3;    // 微微歪頭
+            
+            // 讓頭部平滑地過渡到隨機旋轉的軌跡上
+            headPivot.rotation.y += (randomRotY - headPivot.rotation.y) * 0.02;
+            headPivot.rotation.x += (randomRotX - headPivot.rotation.x) * 0.02;
+            headPivot.rotation.z += (randomRotZ - headPivot.rotation.z) * 0.02;
+        }
+    }
+
+    // 渲染場景
     renderer.render(scene, camera);
 }
 animate();

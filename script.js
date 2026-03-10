@@ -96,7 +96,7 @@ loader.load('buildingcopy.glb', (gltf) => {
     
     // 3. 縮小模型倍數：把原本的 100 改成 15 或 20
     const maxDim = Math.max(size.x, size.y, size.z);
-    const bgScale = 40 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
+    const bgScale = 100 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
     bgGroup.scale.set(bgScale, bgScale, bgScale);
     
     console.log("✅ 背景圖層模型已載入");

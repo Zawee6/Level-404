@@ -229,7 +229,7 @@ loader.load('walkmancopy.glb', (gltf) => {
     // ==========================================
     // 先算出它的基準大小，再強制設定為 5 倍大
     const maxDim = Math.max(size.x, size.y, size.z);
-    const finalScale = 5 / maxDim; 
+    const finalScale = 1 / maxDim; 
     walkmanGroup.scale.set(finalScale, finalScale, finalScale);
     
     console.log("✅ Walkman 模型已載入、顛倒並放大 5 倍");

@@ -228,7 +228,7 @@ loader.load('grasscopy.glb', (gltf) => {
     const c = b.getCenter(new THREE.Vector3());
     m.position.set(-c.x, -c.y, -c.z);
     m.position.y -= 10; m.position.z += 15;
-    m.scale.set(25, 25, 25); 
+    m.scale.set(40, 45, 25); 
     bgGroup.add(m);
 });
 

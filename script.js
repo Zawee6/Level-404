@@ -78,16 +78,42 @@ loader.load('level404_sign.glb', (gltf) => {
     
     console.log("✅ 模型已精準置中");
 
-    // 🌟 步驟 D：設定隨著滑動放大的動畫 🌟
+    // ==========================================
+    // 🌟 步驟 D：全新 GSAP 滾動特效 (封面滾走 + 路牌定格與上移)
+    // ==========================================
+
+    // 💡 動畫 1：讓背景 (建築、草地、頭) 當作封面，往下滑時往上移出畫面
+    gsap.to(bgGroup.position, {
+        y: 40, // 往上移動 40 單位 (移出鏡頭上方)
+        scrollTrigger: {
+            trigger: ".concept-section", // 當滑到第二區塊時觸發
+            start: "top bottom",         // 畫面一開始往下滑就啟動
+            end: "top top",              // 當第二區塊頂部碰到螢幕最上方時結束
+            scrub: 1,
+        }
+    });
+
+    // 💡 動畫 2：讓路牌放大，並在第二區塊「停止」放大
     gsap.to(pivotGroup.scale, {
-        x: initialScale * 10, // 放大倍數，可根據需求調整
+        x: initialScale * 10,
         y: initialScale * 10,
         z: initialScale * 10,
         scrollTrigger: {
-            trigger: ".concept-section", 
-            start: "top bottom",        
-            end: "bottom center",       
-            scrub: 1,                   
+            trigger: ".concept-section",
+            start: "top bottom",
+            end: "top top",              // 👈 關鍵：改成 top top 讓它提早在 section 停住
+            scrub: 1,
+        }
+    });
+
+    // 💡 動畫 3：繼續往下滑到商品區塊時，讓路牌也跟著往上移出畫面
+    gsap.to(pivotGroup.position, {
+        y: 30, // 讓路牌也往上移出鏡頭
+        scrollTrigger: {
+            trigger: ".merch-section",   // 當滑到周邊商品區塊時觸發
+            start: "top bottom",         
+            end: "top top",
+            scrub: 1,
         }
     });
 

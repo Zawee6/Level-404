@@ -8,6 +8,9 @@ let isMouseActive = false;
 let mouseTimeout;
 let idleTime = 0;
 
+// 💡 修正關鍵：註冊 ScrollTrigger 外掛，否則瀏覽器會報錯找不到它
+gsap.registerPlugin(ScrollTrigger);
+
 // 監聽滑鼠移動事件
 window.addEventListener('mousemove', (event) => {
     const headXOffset = 0.8; 
@@ -201,51 +204,40 @@ loader.load('headcopy.glb', (gltf) => {
 });
 
 // ==========================================
-// 🌟 載入第五個模型：Walkman (同步比例、瞬間出現)
+// 🌟 載入第五個模型：Walkman (瞬間出現，不縮放)
 // ==========================================
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     
+    // ... (置中與旋轉邏輯維持不變) ...
     const box = new THREE.Box3().setFromObject(walkmanModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-    
     walkmanModel.position.set(-center.x, -center.y, -center.z);
-    
-    // 1. 上下顛倒
     walkmanModel.rotation.z = Math.PI; 
-    
-    // 2. 加入告示牌圖層 (與路牌同進退)
     pivotGroup.add(walkmanModel);
-    
-    // ==========================================
-    // 💡 修正 1：大幅縮小基礎比例
-    // 因為它會跟著路牌放大 10 倍，所以這裡設 0.8 就夠了
-    // ==========================================
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const walkmanScale = 0.8 / maxDim; // 👈 縮小基礎比例
-    walkmanModel.scale.set(walkmanScale, walkmanScale, walkmanScale);
 
-    // ==========================================
-    // 💡 修正 2：位置下移並貼近路牌
-    // y 設為 -6 讓它避開標題文字，z 設為 0.5 稍微凸出即可
-    // ==========================================
+    // 1. 設定位置與「正常的比例」 (不從 0 開始)
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const targetScale = 0.8 / maxDim; 
+    walkmanModel.scale.set(targetScale, targetScale, targetScale); 
     walkmanModel.position.y -= 6; 
     walkmanModel.position.z += 0.5;
 
-    // ==========================================
-    // 💡 修正 3：瞬間出現 (不使用慢慢長大的動畫)
-    // ==========================================
-    walkmanModel.visible = false; // 預設隱形
+    // 2. 💡 關鍵：預設隱形，不使用縮放動畫
+    walkmanModel.visible = false; 
 
+    // 3. 💡 關鍵：滑到位置時「瞬間」變出來
     ScrollTrigger.create({
         trigger: ".concept-section",
-        start: "top 80%", // 當區塊快要進入時
-        onEnter: () => walkmanModel.visible = true,   // 進入時瞬間顯示
-        onLeaveBack: () => walkmanModel.visible = false // 滑回去時隱藏
+        start: "top 80%", 
+        onEnter: () => {
+            walkmanModel.visible = true; // 進入區塊時直接顯示
+        },
+        onLeaveBack: () => {
+            walkmanModel.visible = false; // 滑回最上面時才藏起來
+        }
     });
-
-    console.log("✅ Walkman 已修正比例並設定瞬間出現");
 
 }, undefined, (error) => {
     console.error("❌ Walkman 載入失敗：", error);

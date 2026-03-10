@@ -8,34 +8,26 @@ let isMouseActive = false;
 let mouseTimeout;
 let idleTime = 0;
 
-// 💡 修正關鍵：註冊 ScrollTrigger 外掛，否則瀏覽器會報錯找不到它
+// 💡 修正關鍵：註冊外掛
 gsap.registerPlugin(ScrollTrigger);
 
-// 監聽滑鼠移動事件
+// 監聽滑鼠移動
 window.addEventListener('mousemove', (event) => {
     const headXOffset = 0.8; 
     const headYOffset = 0.2; 
-    
     targetMouse.x = (event.clientX / window.innerWidth - headXOffset) * 2;
     targetMouse.y = -(event.clientY / window.innerHeight - headYOffset) * 2;
-    
     isMouseActive = true;
-    
     clearTimeout(mouseTimeout);
-    mouseTimeout = setTimeout(() => {
-        isMouseActive = false;
-    }, 1000);
+    mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1000);
 });
 
 // 1. 初始化 Lenis
 const lenis = new Lenis();
-function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-}
+function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
 requestAnimationFrame(raf);
 
-// 2. Three.js 基礎環境
+// 2. Three.js 環境
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -53,28 +45,20 @@ light.position.set(5, 5, 5);
 scene.add(light);
 
 // ==========================================
-// 🌟 核心容器宣告 (必須在最前面統一宣告)
+// 🌟 核心容器宣告
 // ==========================================
-let pivotGroup = new THREE.Group(); // 路牌專屬容器
+let pivotGroup = new THREE.Group(); 
 scene.add(pivotGroup);
 
-let bgGroup = new THREE.Group(); // 背景(建築、草地、頭)共用大紙箱
+let bgGroup = new THREE.Group(); 
 bgGroup.position.z = -30; 
 scene.add(bgGroup);
 
-let walkmanGroup = new THREE.Group(); 
-// 先把它藏在鏡頭非常下方的位置 (-30)，這樣一開始就不會看到它
-walkmanGroup.position.y = -30; 
-// 可以讓它稍微往後退一點，才不會跟專輯圖片撞在一起
-walkmanGroup.position.z = -5; 
-scene.add(walkmanGroup);
-
 // ==========================================
-// 🌟 全新 GSAP 滾動特效 🌟
+// 🌟 全新 GSAP 滾動特效
 // ==========================================
 
-// 動畫 1：整個背景(建築+草地+頭) 當作封面，往上滑出畫面
-// 💡 猛藥：把 y 從 50 改成 150，把深厚的草地徹底拉出畫面！
+// 動畫 1：背景封面往上移
 gsap.to(bgGroup.position, {
     y: 150, 
     scrollTrigger: {
@@ -84,7 +68,6 @@ gsap.to(bgGroup.position, {
         scrub: 1,
     }
 });
-
 
 // ==========================================
 // 4. 載入模型區域
@@ -105,48 +88,30 @@ loader.load('level404_sign.glb', (gltf) => {
     const initialScale = 5 / maxDim; 
     pivotGroup.scale.set(initialScale, initialScale, initialScale);
     
-    console.log("✅ 路牌模型已載入");
-    
-    // ==========================================
-    // 💡 拆解動畫：精準控制放大與上滑的時機！
-    // ==========================================
-
-    // 🎬 動畫 A：路牌先放大 (佔據網頁剛滑到第二區塊的前半段)
+    // 🎬 動畫 A：路牌先放大
     gsap.to(pivotGroup.scale, {
-        x: initialScale * 5,
-        y: initialScale * 5,
-        z: initialScale * 5,
+        x: initialScale * 10,
+        y: initialScale * 10,
+        z: initialScale * 10,
         scrollTrigger: {
             trigger: ".concept-section",
-            start: "top bottom",     // 當區塊頂部剛碰到畫面底部時開始
-            end: "top 40%",          // 當區塊滑到畫面中間偏上 (這時 Album 圖片已經清楚出現) 時停止放大
+            start: "top bottom",     
+            end: "top 40%",          
             scrub: 1,
         }
     });
 
-    // 🎬 動畫 B：專輯圖片出現後，路牌才開始往上滑走
+    // 🎬 動畫 B：隨後往上滑走
     gsap.to(pivotGroup.position, {
         y: 40, 
         scrollTrigger: {
             trigger: ".concept-section",
-            start: "top 40%",        // 👈 完美銜接！剛好從上面放大結束的地方開始
-            end: "top top",          // 當區塊頂部貼齊螢幕頂端時，路牌徹底滑出畫面
+            start: "top 40%",        
+            end: "top top",          
             scrub: 1,
         }
     });
-
-    // 排隊動作 1：路牌先放大 (佔用前半段進度)
-    signTl.to(pivotGroup.scale, {
-        x: initialScale * 10,
-        y: initialScale * 10,
-        z: initialScale * 10,
-        duration: 1
-    })
-    // 排隊動作 2：接著往上滑走 (佔用後半段進度)
-    .to(pivotGroup.position, {
-        y: 40, 
-        duration: 1
-    });
+    // 💡 這裡原本報錯的 signTl 區塊已被移除
 });
 
 // 載入建築
@@ -155,15 +120,10 @@ loader.load('buildingcopy.glb', (gltf) => {
     const box = new THREE.Box3().setFromObject(bgModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-    
     bgModel.position.set(-center.x, -center.y, -center.z);
-    bgGroup.add(bgModel); // 💡 加入背景箱子
-    
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const bgScale = 80 / maxDim; 
+    bgGroup.add(bgModel);
+    const bgScale = 80 / Math.max(size.x, size.y, size.z); 
     bgGroup.scale.set(bgScale, bgScale, bgScale);
-    
-    console.log("✅ 建築模型已載入");
 });
 
 // 載入地板
@@ -171,14 +131,11 @@ loader.load('grasscopy.glb', (gltf) => {
     const floorModel = gltf.scene;
     const box = new THREE.Box3().setFromObject(floorModel);
     const center = box.getCenter(new THREE.Vector3());
-    
     floorModel.position.set(-center.x, -center.y, -center.z);
     floorModel.position.y -= 10; 
     floorModel.position.z += 15;
     floorModel.scale.set(25, 25, 25); 
-    
-    bgGroup.add(floorModel); // 💡 確保地板也加進同一個背景箱子！
-    console.log("✅ 地板模型已載入並綁定");
+    bgGroup.add(floorModel);
 });
 
 // 載入頭部
@@ -187,88 +144,57 @@ loader.load('headcopy.glb', (gltf) => {
     const box = new THREE.Box3().setFromObject(headModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3()); 
-    
     headPivot = new THREE.Group();
     headModel.rotation.y = -Math.PI/2; 
     headModel.position.set(-center.x, -center.y, -center.z);
     headPivot.add(headModel);
-    
     headPivot.position.set(40, 15, 0); 
-    
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const headScale = 10 / maxDim; 
+    const headScale = 10 / Math.max(size.x, size.y, size.z); 
     headPivot.scale.set(headScale, headScale, headScale); 
-    
-    bgGroup.add(headPivot); // 💡 頭也加進同一個背景箱子！
-    console.log("✅ 頭部模型已載入");
+    bgGroup.add(headPivot);
 });
 
-// ==========================================
-// 🌟 載入第五個模型：Walkman (瞬間出現，不縮放)
-// ==========================================
+// 載入 Walkman
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
-    
-    // ... (置中與旋轉邏輯維持不變) ...
     const box = new THREE.Box3().setFromObject(walkmanModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
+    
     walkmanModel.position.set(-center.x, -center.y, -center.z);
-    walkmanModel.rotation.z = Math.PI; 
-    pivotGroup.add(walkmanModel);
+    walkmanModel.rotation.z = Math.PI; // 上下顛倒
+    pivotGroup.add(walkmanModel); // 與路牌同圖層
 
-    // 1. 設定位置與「正常的比例」 (不從 0 開始)
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const targetScale = 0.8 / maxDim; 
+    const targetScale = 0.8 / Math.max(size.x, size.y, size.z); 
     walkmanModel.scale.set(targetScale, targetScale, targetScale); 
     walkmanModel.position.y -= 6; 
     walkmanModel.position.z += 0.5;
 
-    // 2. 💡 關鍵：預設隱形，不使用縮放動畫
+    // 💡 瞬間出現邏輯
     walkmanModel.visible = false; 
-
-    // 3. 💡 關鍵：滑到位置時「瞬間」變出來
     ScrollTrigger.create({
         trigger: ".concept-section",
         start: "top 80%", 
-        onEnter: () => {
-            walkmanModel.visible = true; // 進入區塊時直接顯示
-        },
-        onLeaveBack: () => {
-            walkmanModel.visible = false; // 滑回最上面時才藏起來
-        }
+        onEnter: () => { walkmanModel.visible = true; },
+        onLeaveBack: () => { walkmanModel.visible = false; }
     });
-
-}, undefined, (error) => {
-    console.error("❌ Walkman 載入失敗：", error);
 });
 
-// 5. 渲染與視窗縮放
+// 5. 渲染迴圈
 function animate() {
     requestAnimationFrame(animate);
-    
     if (headPivot) {
         if (isMouseActive) {
             currentMouse.x += (targetMouse.x - currentMouse.x) * 0.1;
             currentMouse.y += (targetMouse.y - currentMouse.y) * 0.1;
-            
             headPivot.rotation.y = currentMouse.x * Math.PI * 0.25;  
             headPivot.rotation.x = -currentMouse.y * Math.PI * 0.15; 
-            headPivot.rotation.z = 0; 
-            
         } else {
             idleTime += 0.01; 
-            
-            const randomRotY = Math.sin(idleTime) * Math.PI * 0.15;      
-            const randomRotX = Math.cos(idleTime * 0.7) * 0.1;    
-            const randomRotZ = Math.sin(idleTime * 0.5) * 0.05;    
-            
-            headPivot.rotation.y += (randomRotY - headPivot.rotation.y) * 0.02;
-            headPivot.rotation.x += (randomRotX - headPivot.rotation.x) * 0.02;
-            headPivot.rotation.z += (randomRotZ - headPivot.rotation.z) * 0.02;
+            headPivot.rotation.y += (Math.sin(idleTime) * Math.PI * 0.15 - headPivot.rotation.y) * 0.02;
+            headPivot.rotation.x += (Math.cos(idleTime * 0.7) * 0.1 - headPivot.rotation.x) * 0.02;
         }
     }
-    
     renderer.render(scene, camera);
 }
 animate();

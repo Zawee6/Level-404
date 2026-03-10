@@ -105,7 +105,7 @@ loader.load('level404_sign.glb', (gltf) => {
     pivotGroup.scale.set(initialScale, initialScale, initialScale);
     
     gsap.to(pivotGroup.scale, {
-        x: initialScale * 10, y: initialScale * 10, z: initialScale * 10,
+        x: initialScale * 5, y: initialScale * 5, z: initialScale * 5,
         scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 40%", scrub: 1 }
     });
 

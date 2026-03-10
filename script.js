@@ -1,4 +1,4 @@
-// 💡 修正 1：註冊外掛
+// 💡 註冊外掛
 gsap.registerPlugin(ScrollTrigger);
 
 // ==========================================
@@ -41,24 +41,23 @@ light.position.set(5, 5, 5);
 scene.add(light);
 
 // ==========================================
-// 🌟 核心容器宣告 (解開綁定，獨立運作) 🌟
+// 🌟 核心容器宣告 (三個獨立物件，互不綁定) 🌟
 // ==========================================
-
 // 1. 告示牌
 let signpostGroup = new THREE.Group(); 
 scene.add(signpostGroup);
 
-// 2. 延伸竿子
-let extendingPolePivot = new THREE.Group(); 
-extendingPolePivot.visible = false; 
-extendingPolePivot.position.set(0, -2.5, -0.1); 
-// 💡 修正：不再包在 mainAssemblyGroup 裡面，直接加入場景，並依附告示牌的位置
-scene.add(extendingPolePivot);
-
-// 3. Walkman
+// 2. Walkman (固定在畫面下方)
 let walkmanGroup = new THREE.Group(); 
-walkmanGroup.visible = false; 
+walkmanGroup.position.set(0, -6, -0.1); // 停在畫面底部
+walkmanGroup.visible = false; // 初始隱形
 scene.add(walkmanGroup);
+
+// 3. 延伸白竿子的出發點 (固定在畫面最頂端，鏡頭外)
+let polePivot = new THREE.Group(); 
+polePivot.position.set(0, 15, -0.1); // y:15 確保從螢幕上面長下來
+polePivot.visible = false; // 初始隱形
+scene.add(polePivot);
 
 // 4. 背景(建築與頭)
 let bgGroup = new THREE.Group(); 
@@ -68,58 +67,58 @@ scene.add(bgGroup);
 // ==========================================
 // 🌟 建立生長竿子 🌟
 // ==========================================
-const poleLength = 20;
-const cylinderGeo = new THREE.CylinderGeometry(0.1, 0.1, poleLength, 16);
-cylinderGeo.translate(0, -poleLength / 2, 0);
-const cylinderMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.1 });
-const extendingPoleMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
-extendingPoleMesh.scale.y = 0.001; 
-extendingPolePivot.add(extendingPoleMesh);
+// 從頂部(15) 長到底部(-6)，總長度為 21
+const poleLength = 15; 
+const cylinderGeo = new THREE.CylinderGeometry(0.3, 0.3, poleLength, 16); // 粗細設為 0.08
+cylinderGeo.translate(0, -poleLength / 2, 0); // 確保單向往下生長
+const cylinderMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.1 });
+const poleMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
+poleMesh.scale.y = 0.001; // 初始長度趨近於 0
+polePivot.add(poleMesh);
 
 // ==========================================
-// 🌟 核心動畫控制 (精準時機) 🌟
+// 🌟 核心動畫控制 (完美接力時間軸) 🌟
 // ==========================================
 
-// 動畫 1：背景往上移 (不變)
+// 動畫 1：背景往上移離開畫面
 gsap.to(bgGroup.position, {
     y: 150, 
-    scrollTrigger: {
-        trigger: ".concept-section", 
-        start: "top bottom",         
-        end: "top top",              
-        scrub: 1,
-    }
+    scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top top", scrub: 1 }
 });
 
-// 動畫 2：告示牌放大 (前半段)
-let signpostScaleAnim = gsap.to(signpostGroup.scale, {
-    paused: true, // 稍後在載入模型時賦予值
+// 動畫 2-A：長竿子的顯示時機 (早點生成)
+ScrollTrigger.create({
+    trigger: ".concept-section",
+    // 💡 數字調大 = 提早出現 (例如 60% 或 70%)
+    start: "top 90%", 
+    onEnter: () => { polePivot.visible = true; },
+    onLeaveBack: () => { polePivot.visible = false; }
 });
 
-// 動畫 3：🌟 竿子生長與 Walkman 出現 (後半段)
-let connectingTl = gsap.timeline({
+// 動畫 2-B：Walkman 的顯示時機 (精準綁定在 22 影片區塊)
+ScrollTrigger.create({
+    trigger: "#video-22", // 💡 瞄準我們剛剛在 HTML 插的旗子
+    start: "top 10%",     // 當 "22" 標題進入螢幕下方 80% 處時，Walkman 瞬間出現
+    onEnter: () => { walkmanGroup.visible = true; },
+    onLeaveBack: () => { walkmanGroup.visible = false; }
+});
+
+// 動畫 3：黑竿子往下生長 (生長速度配合 22 的位置)
+gsap.to(poleMesh.scale, {
+    y: 1, 
     scrollTrigger: {
         trigger: ".concept-section",
-        // 💡 關鍵修正：等區塊滑到一半 (top 50%)，告示牌放大完畢後才開始生長！
-        start: "top 50%", 
-        end: "bottom center", 
+        start: "top 60%",        // 竿子在區塊一開始就先慢慢長
+        endTrigger: "#video-22", // 💡 關鍵魔法：把生長「結束」的目標綁定在 22 標題！
+        end: "top 60%",          // 當 "22" 標題到達對應位置時，竿子剛好長完、完美對接！
         scrub: 1
     }
 });
 
-connectingTl.to([extendingPolePivot, walkmanGroup], { visible: true, duration: 0.1 });
-connectingTl.to(extendingPoleMesh.scale, { y: 1, duration: 3, ease: "power1.inOut" }, "synchronize");
-connectingTl.to(walkmanGroup.position, { y: -2.5 - poleLength, duration: 3, ease: "power1.inOut" }, "synchronize");
-
-// 動畫 4：全部一起滑走 (下一頁)
-gsap.to([signpostGroup.position, extendingPolePivot.position, walkmanGroup.position], {
-    y: "+=60", // 💡 相對位移，一起往上飛
-    scrollTrigger: {
-        trigger: ".merch-section", // 💡 移到第三頁時才滑走
-        start: "top bottom",        
-        end: "top top",          
-        scrub: 1,
-    }
+// 動畫 4：整個組合一起往上飛走 (前往周邊商品頁)
+gsap.to([walkmanGroup.position, polePivot.position], {
+    y: "+=40", // 相對位移飛出畫面
+    scrollTrigger: { trigger: ".merch-section", start: "top bottom", end: "top top", scrub: 1 }
 });
 
 // ==========================================
@@ -140,14 +139,20 @@ loader.load('level404_sign.glb', (gltf) => {
     const initialScale = 5 / Math.max(size.x, size.y, size.z); 
     signpostGroup.scale.set(initialScale, initialScale, initialScale);
     
-    // 💡 賦予放大動畫數值
+    // 🎬 動作 1-A：告示牌放大 (剛滑動時)
     gsap.to(signpostGroup.scale, {
-        x: initialScale * 10, y: initialScale * 10, z: initialScale * 10,
-        scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 50%", scrub: 1 }
+        x: initialScale * 3, y: initialScale * 3, z: initialScale * 3,
+        scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 70%", scrub: 1 }
+    });
+
+    // 🎬 動作 1-B：告示牌往上飛走！(在 Album 出現前完全消失)
+    gsap.to(signpostGroup.position, {
+        y: 40, 
+        scrollTrigger: { trigger: ".concept-section", start: "top 70%", end: "top 50%", scrub: 1 }
     });
 });
 
-// 2. 載入 Walkman (帶有您的微調座標)
+// 2. 載入 Walkman
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     const box = new THREE.Box3().setFromObject(walkmanModel);
@@ -156,18 +161,16 @@ loader.load('walkmancopy.glb', (gltf) => {
     
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     
-    // 🎯 您之前的微調座標
-    walkmanModel.position.x = -2.2; 
+    // 🎯 完美套用您的微調座標 (把竿子推到正中央)
+    walkmanModel.position.x = 1.8; 
     walkmanModel.position.y = -1.5; 
-    walkmanModel.position.z = 0; 
+    walkmanModel.position.z = 5; 
+    walkmanModel.rotation.z = Math.PI; // 上下顛倒
     
-    walkmanModel.rotation.z = Math.PI; 
     walkmanGroup.add(walkmanModel); 
 
-    const targetScale = 6 / Math.max(size.x, size.y, size.z); 
+    const targetScale = 50 / Math.max(size.x, size.y, size.z); 
     walkmanGroup.scale.set(targetScale, targetScale, targetScale); 
-    
-    walkmanGroup.position.set(0, -2.5, -0.1);
 });
 
 // 3. 載入建築

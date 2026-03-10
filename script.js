@@ -98,13 +98,29 @@ loader.load('level404_sign.glb', (gltf) => {
     console.log("✅ 路牌模型已載入");
     
     // ==========================================
-    // 💡 修正：使用時間軸 (Timeline) 讓動作「排隊」！先放大，再上滑
+    // 💡 拆解動畫：精準控制放大與上滑的時機！
     // ==========================================
-    let signTl = gsap.timeline({
+
+    // 🎬 動畫 A：路牌先放大 (佔據網頁剛滑到第二區塊的前半段)
+    gsap.to(pivotGroup.scale, {
+        x: initialScale * 10,
+        y: initialScale * 10,
+        z: initialScale * 10,
         scrollTrigger: {
             trigger: ".concept-section",
-            start: "top bottom",
-            end: "top 10%",       // 提早結束，確保在 404 區塊出來前就滑走
+            start: "top bottom",     // 當區塊頂部剛碰到畫面底部時開始
+            end: "top 40%",          // 當區塊滑到畫面中間偏上 (這時 Album 圖片已經清楚出現) 時停止放大
+            scrub: 1,
+        }
+    });
+
+    // 🎬 動畫 B：專輯圖片出現後，路牌才開始往上滑走
+    gsap.to(pivotGroup.position, {
+        y: 40, 
+        scrollTrigger: {
+            trigger: ".concept-section",
+            start: "top 40%",        // 👈 完美銜接！剛好從上面放大結束的地方開始
+            end: "top top",          // 當區塊頂部貼齊螢幕頂端時，路牌徹底滑出畫面
             scrub: 1,
         }
     });

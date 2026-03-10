@@ -105,6 +105,39 @@ loader.load('buildingcopy.glb', (gltf) => {
     console.error("❌ 背景模型載入失敗：", error);
 });
 
+// ... 前面是 loader.load('buildingcopy.glb', ...) 的區塊 ...
+
+// ==========================================
+// 🌟 載入第三個模型：同圖層的地板
+// ==========================================
+// 🚨 請把 'YOUR_FLOOR_MODEL.glb' 換成您的地板模型檔名
+loader.load('grasscopy.glb', (gltf) => {
+    const floorModel = gltf.scene;
+    
+    // 1. 計算幾何中心並強制置中
+    const box = new THREE.Box3().setFromObject(floorModel);
+    const center = box.getCenter(new THREE.Vector3());
+    
+    // 2. 將地板置中
+    floorModel.position.set(-center.x, -center.y, -center.z);
+    
+    // 3. 💡 關鍵調整：把地板往下移！
+    // 因為它和建築物置中疊在一起了，我們需要把地板往「下」推，讓它墊在建築物底部
+    // 這個數字 (例如 -5, -10, -20) 需要根據您建築物的高度來微調
+    floorModel.position.y -= 10; 
+    
+    // 4. (選用) 如果地板不夠寬，可以單獨把地板拉寬一點
+    // floorModel.scale.set(1.5, 1, 1.5); 
+    
+    // 5. 將地板加入與建築物同一個背景容器 (bgGroup)
+    bgGroup.add(floorModel);
+    
+    console.log("✅ 地板模型已載入同一個背景圖層");
+
+}, undefined, (error) => {
+    console.error("❌ 地板模型載入失敗：", error);
+});
+
 // 5. 渲染與視窗縮放
 function animate() {
     requestAnimationFrame(animate);

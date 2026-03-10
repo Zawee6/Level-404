@@ -192,3 +192,31 @@ a.call-to-action:hover {
         grid-template-columns: repeat(3, 1fr); 
     }
 }
+
+/* =========================================
+   🌟 第二區塊：專輯圖片樣式 🌟
+========================================= */
+.concept-image {
+    width: 90%;             /* 手機版預設佔 90% 寬度 */
+    max-width: 450px;       /* 最大寬度限制，避免在電腦上太大 */
+    height: auto;
+    border-radius: 15px;    /* 導圓角，讓邊緣更柔和 */
+    margin-bottom: 40px;    /* 和下方「概念介紹」文字拉開距離 */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8); /* 加上深色陰影，讓它從背景浮出來 */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* 微微的發光邊框 */
+    
+    /* 讓圖片出現時帶有一點動畫感 */
+    transition: transform 0.3s ease;
+}
+
+.concept-image:hover {
+    transform: scale(1.05); /* 滑鼠游標移過去時微微放大 */
+}
+
+/* 如果是電腦大螢幕，可以讓圖片再大一點 */
+@media (min-width: 769px) {
+    .concept-image {
+        max-width: 600px; 
+        margin-bottom: 50px;
+    }
+}

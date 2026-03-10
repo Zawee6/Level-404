@@ -155,7 +155,7 @@ loader.load('grasscopy.glb', (gltf) => {
     // ==========================================
     // 第一個數字是 X軸(寬度)，第二個是 Y軸(厚度)，第三個是 Z軸(深度)
     // 試著把它放大 5 倍或 10 倍！
-    floorModel.scale.set(10, 10, 10); 
+    floorModel.scale.set(15, 15, 15); 
     
     // 5. 將地板加入與建築物同一個背景容器
     bgGroup.add(floorModel);
@@ -172,26 +172,29 @@ loader.load('grasscopy.glb', (gltf) => {
 loader.load('headcopy.glb', (gltf) => {
     const headModel = gltf.scene;
     
-    // 1. 計算幾何中心並強制置中
+    // 1. 計算幾何中心並取得這顆頭的「原始大小」
     const box = new THREE.Box3().setFromObject(headModel);
     const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3()); // 💡 取得模型原始尺寸
     
-    // 2. 建立頭部的控制容器 (確保它是以「脖子/中心」為軸心旋轉)
+    // 2. 建立頭部的控制容器
     headPivot = new THREE.Group();
     headModel.position.set(-center.x, -center.y, -center.z);
     headPivot.add(headModel);
     
     // 3. 💡 設定位置到「右上角」
-    // 因為在 bgGroup 裡面，數字代表相對於背景的位置，您可微調 X(左右) 與 Y(上下)
-    headPivot.position.set(30, 20, 0); 
+    // (數值可以等大小正常後再來微調)
+    headPivot.position.set(15, 10, 0); 
     
-    // 4. 💡 設定頭部大小 (您可以依據需求放大縮小)
-    headPivot.scale.set(1, 1, 1); 
+    // 4. 💡 關鍵修正：抵銷雙重放大，精準設定大小！
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const headScale = 2 / maxDim; // 👈 這裡設定頭部的最終大小！現在設定為 2。
+    headPivot.scale.set(headScale, headScale, headScale); 
     
     // 5. 將頭部加入與建築物同一個背景圖層 (bgGroup)
     bgGroup.add(headPivot);
     
-    console.log("✅ 頭部模型已載入");
+    console.log("✅ 頭部模型已載入並修正大小");
 
 }, undefined, (error) => {
     console.error("❌ 頭部模型載入失敗：", error);

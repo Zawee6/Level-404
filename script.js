@@ -131,12 +131,9 @@ loader.load('buildingcopy.glb', (gltf) => {
     console.error("❌ 背景模型載入失敗：", error);
 });
 
-// ... 前面是 loader.load('buildingcopy.glb', ...) 的區塊 ...
-
 // ==========================================
 // 🌟 載入第三個模型：同圖層的地板
 // ==========================================
-// 🚨 請把 'YOUR_FLOOR_MODEL.glb' 換成您的地板模型檔名
 loader.load('grasscopy.glb', (gltf) => {
     const floorModel = gltf.scene;
     
@@ -147,20 +144,26 @@ loader.load('grasscopy.glb', (gltf) => {
     // 2. 將地板置中
     floorModel.position.set(-center.x, -center.y, -center.z);
     
-    // 3. 高度微調 (維持您剛剛調好的高度)
+    // 3. 高度微調
     floorModel.position.y -= 10; 
     
     // ==========================================
-    // 💡 放大地板的關鍵在這裡 👇
+    // 💡 修正 1：把地板「往前移」靠近鏡頭
     // ==========================================
-    // 第一個數字是 X軸(寬度)，第二個是 Y軸(厚度)，第三個是 Z軸(深度)
-    // 試著把它放大 5 倍或 10 倍！
-    floorModel.scale.set(20, 20, 20); 
+    // 數字越大 (例如 10, 20, 30)，地板就會越往螢幕前方凸出來
+    floorModel.position.z += 20; 
+    
+    // ==========================================
+    // 💡 修正 2：把地板的「深度拉長」
+    // ==========================================
+    // 第一個數字是 X軸(左右寬度)，第三個數字是 Z軸(前後深度)
+    // 我們把 Z 軸的倍數加大 (例如從 15 改成 30 或 40)，讓它從建築物一路鋪到鏡頭前！
+    floorModel.scale.set(15, 15, 40); 
     
     // 5. 將地板加入與建築物同一個背景容器
     bgGroup.add(floorModel);
     
-    console.log("✅ 地板模型已載入並放大");
+    console.log("✅ 地板模型已往前拉並拉長");
 
 }, undefined, (error) => {
     console.error("❌ 地板模型載入失敗：", error);

@@ -11,8 +11,6 @@ let idleTime = 0;
 // 監聽滑鼠移動事件
 window.addEventListener('mousemove', (event) => {
 
-    const headXOffset = 0.8; // 0.5 是正中央，0.8 是偏右，1.0 是最右邊
-    const headYOffset = 0.2; // 0.5 是正中央，0.2 是偏上，0.0 是最上面
     // 1. 將滑鼠螢幕座標轉換為 -1 到 1 的 3D 空間座標
     targetMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     targetMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -153,13 +151,13 @@ loader.load('grasscopy.glb', (gltf) => {
     // ==========================================
     let floorContainer = new THREE.Group();
     floorContainer.position.z = -28; 
-    floorContainer.position.y = -8; // 👈 如果草地太高或太低，調這個數字！
+    floorContainer.position.y = -12; // 👈 如果草地太高或太低，調這個數字！
     
     // ==========================================
     // 💡 關鍵 2：不受建築物干擾的「暴力放大」
     // 因為它獨立了，現在放大 100 倍就是真正的 100 倍！
     // ==========================================
-    floorModel.scale.set(10, 1, 15); 
+    floorModel.scale.set(40, 1, 50); 
     
     // 將草地放入獨立容器，然後【直接加入場景 scene】
     floorContainer.add(floorModel);
@@ -186,7 +184,7 @@ loader.load('headcopy.glb', (gltf) => {
     headPivot = new THREE.Group();
     
     // 💡 修正 1：把頭轉正！(如果發現它用後腦勺看你，就把這行改成 -Math.PI / 2)
-    headModel.rotation.y = -Math.PI / 2; 
+    headModel.rotation.y = -Math.PI; 
 
     headModel.position.set(-center.x, -center.y, -center.z);
     headPivot.add(headModel);
@@ -220,8 +218,8 @@ function animate() {
             currentMouse.y += (targetMouse.y - currentMouse.y) * 0.1;
             
             // 💡 修正 2：縮小旋轉幅度！並修正上下相反
-            headPivot.rotation.y = -currentMouse.x * Math.PI * 0.25;  // 左右看 (幅度變小)
-            headPivot.rotation.x = -currentMouse.y * Math.PI * 0.15; // 上下看 (加了負號且幅度變小)
+            headPivot.rotation.y = currentMouse.x * Math.PI * 0.25;  // 左右看 (幅度變小)
+            headPivot.rotation.x = currentMouse.y * Math.PI * 0.15; // 上下看 (加了負號且幅度變小)
             headPivot.rotation.z = 0; // 回正頭部的傾斜
             
         } else {

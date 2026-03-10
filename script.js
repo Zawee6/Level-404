@@ -8,7 +8,7 @@ let isMouseActive = false;
 let mouseTimeout;
 let idleTime = 0;
 
-// 💡 修正關鍵：註冊外掛
+// 💡 註冊外掛
 gsap.registerPlugin(ScrollTrigger);
 
 // 監聽滑鼠移動
@@ -111,7 +111,7 @@ loader.load('level404_sign.glb', (gltf) => {
             scrub: 1,
         }
     });
-    // 💡 這裡原本報錯的 signTl 區塊已被移除
+    // 💡 修正：已移除報錯的 signTl 區塊
 });
 
 // 載入建築
@@ -167,7 +167,9 @@ loader.load('walkmancopy.glb', (gltf) => {
 
     const targetScale = 0.8 / Math.max(size.x, size.y, size.z); 
     walkmanModel.scale.set(targetScale, targetScale, targetScale); 
-    walkmanModel.position.y -= 6; 
+    
+    // 💡 調整位置：y 不要下移太多（-4），否則放大後會掉出螢幕外
+    walkmanModel.position.y -= 4; 
     walkmanModel.position.z += 0.5;
 
     // 💡 瞬間出現邏輯

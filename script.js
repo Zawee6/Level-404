@@ -200,47 +200,53 @@ loader.load('headcopy.glb', (gltf) => {
     console.log("✅ 頭部模型已載入");
 });
 
-/// ==========================================
-// 🌟 載入第五個模型：Walkman (與路牌同圖層)
+// ==========================================
+// 🌟 載入第五個模型：Walkman (與路牌同圖層，Section 才出現)
 // ==========================================
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     
-    // 1. 計算幾何中心並置中
+    // 1. 計算中心並置中
     const box = new THREE.Box3().setFromObject(walkmanModel);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     
-    // 將模型內部的內容移到中心
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     
-    // ==========================================
-    // 💡 關鍵 1：上下顛倒 (旋轉 180 度)
-    // ==========================================
+    // 2. 設定初始旋轉 (上下顛倒)
     walkmanModel.rotation.z = Math.PI; 
     
-    // ==========================================
-    // 💡 關鍵 2：加入與告示牌相同的圖層 (pivotGroup)
-    // ==========================================
-    // 這樣它會跟著告示牌一起放大、一起滑動
+    // 3. 加入告示牌圖層 (pivotGroup)
     pivotGroup.add(walkmanModel);
     
-    // ==========================================
-    // 💡 關鍵 3：調整位置與大小
-    // ==========================================
-    // 因為在 pivotGroup 裡面，我們設定它在路牌的「下方」或「旁邊」
-    // 這裡設 y: -2 會讓它出現在路牌下面一點點
+    // 4. 設定位置 (微調：讓它在路牌下方並往前凸出)
     walkmanModel.position.y -= 2; 
-
-    // 調整大小：讓它看起來比路牌小一點或適中
-    // 既然要「放大 5 倍」，我們用路牌的邏輯來精準控制
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const walkmanScale = 4 / maxDim; // 👈 數字 1.5 可微調，覺得太小就改大
-    walkmanModel.scale.set(walkmanScale, walkmanScale, walkmanScale);
-    walkmanModel.position.y -= 1.5; 
     walkmanModel.position.z += 3;
 
-    console.log("✅ Walkman 已加入路牌圖層並轉向");
+    // ==========================================
+    // 💡 關鍵 1：初始狀態設為 0 (隱形)
+    // ==========================================
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const targetScale = 4 / maxDim; // 這是您要的最終放大倍率
+    walkmanModel.scale.set(0, 0, 0); // 👈 一開始完全消失
+    
+    console.log("✅ Walkman 已預備好，等待滑動出現");
+
+    // ==========================================
+    // 💡 關鍵 2：ScrollTrigger 控制「出現」時機
+    // ==========================================
+    gsap.to(walkmanModel.scale, {
+        x: targetScale,
+        y: targetScale,
+        z: targetScale,
+        scrollTrigger: {
+            trigger: ".concept-section",
+            start: "top 80%",        // 當第二區塊快要冒出來時 (底部向上 20% 處)
+            end: "top 50%",          // 滑到一半時完全放大完畢
+            scrub: 1,                // 讓出現的速度跟著手指滑動
+            // onEnter: () => console.log("Walkman 出現！") 
+        }
+    });
 
 }, undefined, (error) => {
     console.error("❌ Walkman 載入失敗：", error);

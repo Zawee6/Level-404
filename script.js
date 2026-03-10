@@ -41,6 +41,32 @@ light.position.set(5, 5, 5);
 scene.add(light);
 
 // ==========================================
+// 🎵 背景音樂控制 🎵
+// ==========================================
+const music = document.getElementById('bg-music');
+
+// 由於瀏覽器限制，通常需要使用者點擊網頁後才能開始播放
+window.addEventListener('click', () => {
+    if (music.paused) {
+        music.play().catch(error => {
+            console.log("播放被阻擋：", error);
+        });
+    }
+}, { once: true }); // { once: true } 確保這個事件只會觸發一次
+
+const musicToggle = document.getElementById('music-toggle');
+
+musicToggle.addEventListener('click', () => {
+    if (music.paused) {
+        music.play();
+        musicToggle.innerText = "🔊 PLAY";
+    } else {
+        music.pause();
+        musicToggle.innerText = "🔇 MUTE";
+    }
+});
+
+// ==========================================
 // 🌟 核心容器宣告 (三個獨立物件，互不綁定) 🌟
 // ==========================================
 // 1. 告示牌

@@ -87,19 +87,16 @@ loader.load('buildingcopy.glb', (gltf) => {
     
     bgGroup.add(bgModel);
     
-    // 2. 💡 關鍵：把它往後推，放在路牌的後面
-    // 數字越小 (例如 -20, -50) 代表離相機越遠、越在圖層底層
-    bgGroup.position.z = -200; 
-
-    // 💡 2. (選用) 如果你想讓建築物稍微往下沉，不要擋住中間，可以調整 Y 軸
-    bgGroup.position.y = -5;
+    // ==========================================
+    // 💡 調整重點在這裡 👇
+    // ==========================================
     
-    // 3. 💡 關鍵：把它放大到佔據整個畫面
+    // 2. 往後推得更深：從 -20 改成 -80 (數字越負，離我們越遠)
+    bgGroup.position.z = -80; 
+    
+    // 3. 縮小模型倍數：把原本的 100 改成 15 或 20
     const maxDim = Math.max(size.x, size.y, size.z);
-
-    // 👇 將這裡的 25 改成 100 試試看 (如果還是太小可以改 200)
-    const bgScale = 15 / maxDim; 
-
+    const bgScale = 15 / maxDim; // 👈 這裡的 15 可以慢慢微調，覺得太大就改 10，太小就改 25
     bgGroup.scale.set(bgScale, bgScale, bgScale);
     
     console.log("✅ 背景圖層模型已載入");
@@ -107,7 +104,6 @@ loader.load('buildingcopy.glb', (gltf) => {
 }, undefined, (error) => {
     console.error("❌ 背景模型載入失敗：", error);
 });
-
 
 // 5. 渲染與視窗縮放
 function animate() {

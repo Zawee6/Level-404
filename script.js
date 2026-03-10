@@ -64,6 +64,16 @@ let bgGroup = new THREE.Group();
 bgGroup.position.z = -30; 
 scene.add(bgGroup);
 
+// 5. 旋轉木馬容器
+let carouselGroup = new THREE.Group();
+carouselGroup.visible = false; // 先設為隱形，等滑到 section 再出現
+scene.add(carouselGroup);
+
+// 6. 溜滑梯容器
+let slideGroup = new THREE.Group();
+slideGroup.visible = false; 
+scene.add(slideGroup);
+
 // ==========================================
 // 🌟 建立生長竿子 🌟
 // ==========================================
@@ -117,6 +127,35 @@ gsap.to([walkmanGroup.position, polePivot.position], {
 gsap.to([walkmanGroup.position, polePivot.position], {
     y: "+=40", // 相對位移飛出畫面
     scrollTrigger: { trigger: ".merch-section", start: "top bottom", end: "top top", scrub: 1 }
+});
+
+// 木馬與溜滑梯的滑入動畫
+ScrollTrigger.create({
+    trigger: ".concept-image",
+    start: "top 80%",
+    onEnter: () => { 
+        carouselGroup.visible = true; 
+        slideGroup.visible = true; 
+        
+        // ⬅️ 木馬從左滑入到 -12
+        gsap.to(carouselGroup.position, { x: -12, duration: 1.5, ease: "power2.out" }); 
+        
+        // ➡️ 溜滑梯從右滑入到 12
+        gsap.to(slideGroup.position, { x: 12, duration: 1.5, ease: "power2.out" }); 
+    },
+    onLeaveBack: () => { 
+        // 木馬往左退回 -30，溜滑梯往右退回 30
+        gsap.to(carouselGroup.position, { x: -30, duration: 1, ease: "power2.in" });
+        gsap.to(slideGroup.position, { 
+            x: 30, 
+            duration: 1, 
+            ease: "power2.in",
+            onComplete: () => { 
+                carouselGroup.visible = false; 
+                slideGroup.visible = false; 
+            }
+        }); 
+    }
 });
 
 // ==========================================
@@ -208,6 +247,44 @@ loader.load('headcopy.glb', (gltf) => {
     bgGroup.add(headPivot);
 });
 
+// 6. 載入旋轉木馬 (Carousel)
+loader.load('carouselcopy.glb', (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    
+    // 幾何置中
+    model.position.set(-center.x, -center.y, -center.z);
+    carouselGroup.add(model);
+    
+    // 🎯 大小微調 (根據模型實際比例調整 8 這個數字)
+    const s = 8 / Math.max(size.x, size.y, size.z);
+    carouselGroup.scale.set(s, s, s);
+    
+    // 🎯 位置設定：放在左側 (x: -12)，高度與 Walkman 差不多 (y: -6)
+    carouselGroup.position.set(-30, 0, 0); 
+});
+
+// 7. 載入溜滑梯 (Slide)
+loader.load('slidecopy.glb', (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    
+    model.position.set(-center.x, -center.y, -center.z);
+    slideGroup.add(model);
+    
+    // 設定大小
+    const s = 6 / Math.max(size.x, size.y, size.z);
+    slideGroup.scale.set(s, s, s);
+    
+    // 🎯 初始位置：設在右側外面 (x: 30)
+    // 高度設為 -6 (與 Walkman 平行) 或自訂高度
+    slideGroup.position.set(30, 0, 0); 
+});
+
 // 渲染迴圈
 function animate() {
     requestAnimationFrame(animate);
@@ -221,6 +298,17 @@ function animate() {
             idleTime += 0.01; 
             headPivot.rotation.y += (Math.sin(idleTime) * Math.PI * 0.15 - headPivot.rotation.y) * 0.02;
             headPivot.rotation.x += (Math.cos(idleTime * 0.7) * 0.1 - headPivot.rotation.x) * 0.02;
+        }
+        // 🎯 讓旋轉木馬水平旋轉 (y軸)
+        if (carouselGroup&& carouselGroup.visible) {
+            carouselGroup.rotation.y += 0.01; // 數字越大轉越快
+        }
+        // 🎯 溜滑梯也旋轉 (做一樣的事)
+         if (slideGroup && slideGroup.visible) {
+            slideGroup.rotation.y -= 0.01; 
+        }
+        if (headPivot) {
+            // ... 原有的頭部轉動代碼
         }
     }
     renderer.render(scene, camera);

@@ -184,13 +184,13 @@ loader.load('walkmancopy.glb', (gltf) => {
     // ==========================================
     // 1. 左右對齊 (最重要)：把 Walkman 的竿子推到對齊白色延長線
     // 如果它在畫面偏右，我們就把它往左推 (試著把 0 改成 1.5 或 -1.5)
-    walkmanModel.position.x += 0; 
+    walkmanModel.position.x += -2.2; 
     
     // 2. 上下縫隙修補：如果白色竿子跟 Walkman 的竿子沒有緊密接合，或者吃進去太多
-    walkmanModel.position.y += 0.5; // 調大(如1)會往上貼合，調小(如-0.5)會往下降
+    walkmanModel.position.y += -1.5; // 調大(如1)會往上貼合，調小(如-0.5)會往下降
     
     // 3. 前後厚度對齊：如果兩根竿子看起來一前一後穿模了
-    walkmanModel.position.z += 0; 
+    walkmanModel.position.z += 0.1; 
     // ==========================================
 
     // 上下顛倒

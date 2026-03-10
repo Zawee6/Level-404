@@ -59,6 +59,13 @@ let bgGroup = new THREE.Group(); // 背景(建築、草地、頭)共用大紙箱
 bgGroup.position.z = -30; 
 scene.add(bgGroup);
 
+let walkmanGroup = new THREE.Group(); 
+// 先把它藏在鏡頭非常下方的位置 (-30)，這樣一開始就不會看到它
+walkmanGroup.position.y = -30; 
+// 可以讓它稍微往後退一點，才不會跟專輯圖片撞在一起
+walkmanGroup.position.z = -5; 
+scene.add(walkmanGroup);
+
 // ==========================================
 // 🌟 全新 GSAP 滾動特效 🌟
 // ==========================================
@@ -191,6 +198,69 @@ loader.load('headcopy.glb', (gltf) => {
     
     bgGroup.add(headPivot); // 💡 頭也加進同一個背景箱子！
     console.log("✅ 頭部模型已載入");
+});
+
+// ==========================================
+// 🌟 載入第五個模型：Walkman (上下顛倒，在 Section 2 出現)
+// ==========================================
+loader.load('walkmancopy.glb', (gltf) => {
+    const walkmanModel = gltf.scene;
+    
+    // 1. 計算幾何中心並強制置中
+    const box = new THREE.Box3().setFromObject(walkmanModel);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    
+    walkmanModel.position.set(-center.x, -center.y, -center.z);
+    
+    // ==========================================
+    // 💡 關鍵 1：上下顛倒！(旋轉 180 度 = Math.PI)
+    // ==========================================
+    // 使用 Z 軸旋轉可以讓它保持正面面對鏡頭，但上下翻轉
+    walkmanModel.rotation.z = Math.PI; 
+    
+    // 如果您發現它是用側面看您，可以加上 Y 軸轉正 (視模型原始方向而定)
+    // walkmanModel.rotation.y = Math.PI / 2; 
+
+    walkmanGroup.add(walkmanModel);
+    
+    // ==========================================
+    // 💡 關鍵 2：精準放大 5 倍！
+    // ==========================================
+    // 先算出它的基準大小，再強制設定為 5 倍大
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const finalScale = 5 / maxDim; 
+    walkmanGroup.scale.set(finalScale, finalScale, finalScale);
+    
+    console.log("✅ Walkman 模型已載入、顛倒並放大 5 倍");
+
+    // ==========================================
+    // 💡 關鍵 3：讓它在第二區塊升上來的 GSAP 動畫
+    // ==========================================
+    // 當進入 concept-section 時，從下方 (-30) 升到畫面中間 (0)
+    gsap.to(walkmanGroup.position, {
+        y: 0, 
+        scrollTrigger: {
+            trigger: ".concept-section",
+            start: "top bottom",     // 當區塊剛出現時開始升起
+            end: "top 20%",          // 區塊快到畫面頂端時，它剛好就位在正中央
+            scrub: 1,
+        }
+    });
+
+    // (加碼) 當繼續往下滑到周邊商品區塊時，讓它也跟著往上滑走
+    gsap.to(walkmanGroup.position, {
+        y: 40, // 往上飛出鏡頭
+        scrollTrigger: {
+            trigger: ".merch-section",
+            start: "top bottom",
+            end: "top top",
+            scrub: 1,
+        }
+    });
+
+}, undefined, (error) => {
+    console.error("❌ Walkman 模型載入失敗：", error);
 });
 
 // 5. 渲染與視窗縮放

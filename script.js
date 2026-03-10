@@ -201,7 +201,7 @@ loader.load('headcopy.glb', (gltf) => {
 });
 
 // ==========================================
-// 🌟 載入第五個模型：Walkman (與路牌同圖層，Section 才出現)
+// 🌟 載入第五個模型：Walkman (與路牌同步，固定存在)
 // ==========================================
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
@@ -211,42 +211,30 @@ loader.load('walkmancopy.glb', (gltf) => {
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     
+    // 將內部內容移到中心點
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     
     // 2. 設定初始旋轉 (上下顛倒)
     walkmanModel.rotation.z = Math.PI; 
     
     // 3. 加入告示牌圖層 (pivotGroup)
+    // 💡 因為在 pivotGroup 裡，它會自動跟著路牌一起「放大」和「上滑」
     pivotGroup.add(walkmanModel);
     
-    // 4. 設定位置 (微調：讓它在路牌下方並往前凸出)
-    walkmanModel.position.y -= 2; 
-    walkmanModel.position.z += 3;
+    // 4. 設定與路牌的相對位置
+    walkmanModel.position.y -= 2; // 在路牌下方
+    walkmanModel.position.z += 3; // 往鏡頭前方凸出
 
     // ==========================================
-    // 💡 關鍵 1：初始狀態設為 0 (隱形)
+    // 💡 關鍵修正：直接設定最終大小，移除所有成長動畫
     // ==========================================
     const maxDim = Math.max(size.x, size.y, size.z);
-    const targetScale = 4 / maxDim; // 這是您要的最終放大倍率
-    walkmanModel.scale.set(0, 0, 0); // 👈 一開始完全消失
+    const targetScale = 4 / maxDim; 
     
-    console.log("✅ Walkman 已預備好，等待滑動出現");
-
-    // ==========================================
-    // 💡 關鍵 2：ScrollTrigger 控制「出現」時機
-    // ==========================================
-    gsap.to(walkmanModel.scale, {
-        x: targetScale,
-        y: targetScale,
-        z: targetScale,
-        scrollTrigger: {
-            trigger: ".concept-section",
-            start: "top 80%",        // 當第二區塊快要冒出來時 (底部向上 20% 處)
-            end: "top 50%",          // 滑到一半時完全放大完畢
-            scrub: 1,                // 讓出現的速度跟著手指滑動
-            // onEnter: () => console.log("Walkman 出現！") 
-        }
-    });
+    // 直接給它確定的比例，不再從 0 開始
+    walkmanModel.scale.set(targetScale, targetScale, targetScale); 
+    
+    console.log("✅ Walkman 已固定在路牌下方，將與路牌同步互動");
 
 }, undefined, (error) => {
     console.error("❌ Walkman 載入失敗：", error);

@@ -103,9 +103,9 @@ loader.load('level404_sign.glb', (gltf) => {
 
     // 🎬 動畫 A：路牌先放大 (佔據網頁剛滑到第二區塊的前半段)
     gsap.to(pivotGroup.scale, {
-        x: initialScale * 10,
-        y: initialScale * 10,
-        z: initialScale * 10,
+        x: initialScale * 5,
+        y: initialScale * 5,
+        z: initialScale * 5,
         scrollTrigger: {
             trigger: ".concept-section",
             start: "top bottom",     // 當區塊頂部剛碰到畫面底部時開始

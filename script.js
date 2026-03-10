@@ -138,10 +138,10 @@ ScrollTrigger.create({
         slideGroup.visible = true; 
         
         // ⬅️ 木馬從左滑入到 -12
-        gsap.to(carouselGroup.position, { x: -12, duration: 1.5, ease: "power2.out" }); 
+        gsap.to(carouselGroup.position, { x: -10, duration: 1.5, ease: "power2.out" }); 
         
         // ➡️ 溜滑梯從右滑入到 12
-        gsap.to(slideGroup.position, { x: 12, duration: 1.5, ease: "power2.out" }); 
+        gsap.to(slideGroup.position, { x: 10, duration: 1.5, ease: "power2.out" }); 
     },
     onLeaveBack: () => { 
         // 木馬往左退回 -30，溜滑梯往右退回 30

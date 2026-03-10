@@ -184,7 +184,7 @@ loader.load('headcopy.glb', (gltf) => {
     
     // 3. 💡 設定位置到「右上角」
     // (數值可以等大小正常後再來微調)
-    headPivot.position.set(10, 10, 0); 
+    headPivot.position.set(15, 12, 0); 
     
     // 4. 💡 關鍵修正：抵銷雙重放大，精準設定大小！
     const maxDim = Math.max(size.x, size.y, size.z);

@@ -213,7 +213,7 @@ function animate() {
             
             // 計算看向滑鼠的旋轉角度 (乘以 Math.PI 控制轉頭幅度)
             headPivot.rotation.y = currentMouse.x * Math.PI * 0.5; // 左右看
-            headPivot.rotation.x = currentMouse.y * Math.PI * 0.25; // 上下看
+            headPivot.rotation.x = currentMouse.y * -Math.PI * 0.25; // 上下看
             headPivot.rotation.z = 0; // 回正頭部的傾斜
             
         } else {

@@ -149,7 +149,7 @@ loader.load('grasscopy.glb', (gltf) => {
     floorModel.position.y -= 10; 
     
     // 4. 回復最初的簡單放大倍數 (長、寬、高都等比例放大)
-    floorModel.scale.set(15, 15, 15); 
+    floorModel.scale.set(25, 25, 25); 
     
     // 5. 乖乖加回與建築物同一個背景容器 (bgGroup) 中
     bgGroup.add(floorModel);
@@ -175,7 +175,7 @@ loader.load('headcopy.glb', (gltf) => {
     headPivot = new THREE.Group();
     
     // 💡 修正 1：把頭轉正！(如果發現它用後腦勺看你，就把這行改成 -Math.PI / 2)
-    headModel.rotation.y = -Math.PI; 
+    headModel.rotation.y = -Math.PI/2; 
 
     headModel.position.set(-center.x, -center.y, -center.z);
     headPivot.add(headModel);

@@ -68,6 +68,33 @@ loader.load('level404_sign.glb', (gltf) => {
     console.error("❌ 載入錯誤：", error);
 });
 
+// 🚨 請把 'YOUR_BACKGROUND_MODEL.glb' 換成您要當背景的模型檔名 🚨
+loader.load('buildingcopy.glb', (gltf) => {
+    const bgModel = gltf.scene;
+    
+    // 1. 計算幾何中心並強制置中
+    const box = new THREE.Box3().setFromObject(bgModel);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    bgModel.position.set(-center.x, -center.y, -center.z);
+    
+    bgGroup.add(bgModel);
+    
+    // 2. 💡 關鍵：把它往後推，放在路牌的後面
+    // 數字越小 (例如 -20, -50) 代表離相機越遠、越在圖層底層
+    bgGroup.position.z = -20; 
+    
+    // 3. 💡 關鍵：把它放大到佔據整個畫面
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const bgScale = 25 / maxDim; // 這個倍數可以根據您的模型大小自由調整 (覺得不夠滿就改大)
+    bgGroup.scale.set(bgScale, bgScale, bgScale);
+    
+    console.log("✅ 背景圖層模型已載入");
+
+}, undefined, (error) => {
+    console.error("❌ 背景模型載入失敗：", error);
+});
+
 // 5. 渲染與視窗縮放
 function animate() {
     requestAnimationFrame(animate);

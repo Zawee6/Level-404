@@ -41,25 +41,57 @@ light.position.set(5, 5, 5);
 scene.add(light);
 
 // ==========================================
-// 🌟 容器宣告 🌟
+// 🌟 核心容器宣告 (重要架構改動) 🌟
 // ==========================================
-let pivotGroup = new THREE.Group(); // 告示牌
-scene.add(pivotGroup);
 
-let bgGroup = new THREE.Group();    // 背景 (建築+地板+頭)
+// 1. 🌟 主組裝箱：把告示牌、竿子、Walkman 都裝進這裡，方便一起滑走
+let mainAssemblyGroup = new THREE.Group(); 
+scene.add(mainAssemblyGroup);
+
+// 2. 🌟 告示牌的獨立箱子 (維持縮放邏輯)
+let signpostGroup = new THREE.Group(); 
+mainAssemblyGroup.add(signpostGroup);
+
+// 3. 🌟 延伸竿子箱子 (這是我們要在 Three.js 裡生長的竿子)
+let extendingPolePivot = new THREE.Group(); 
+extendingPolePivot.visible = false; // 一開始隱形
+// 💡 Z 設為 -0.1 讓竿子稍微在告示牌後面一點，看起來銜接比較自然
+extendingPolePivot.position.set(0, -2.5, -0.1); 
+mainAssemblyGroup.add(extendingPolePivot);
+
+// 4. 🌟 Walkman 獨立箱子
+let walkmanGroup = new THREE.Group(); 
+walkmanGroup.visible = false; // 一開始隱形
+mainAssemblyGroup.add(walkmanGroup);
+
+// 5. 建築與頭部 (背景) 容器
+let bgGroup = new THREE.Group(); 
 bgGroup.position.z = -30; 
 scene.add(bgGroup);
 
-let walkmanGroup = new THREE.Group(); // 🌟 Walkman 專用容器
-// 💡 修正：初始位置改為 -15，縮短升起所需的捲動距離
-walkmanGroup.position.set(0, -15, 2); 
-scene.add(walkmanGroup);
+// ==========================================
+// 🌟 生長魔法：建立要在 Three.js 裡長大的竿子 🌟
+// ==========================================
+// 使用圓柱體 (CylinderGeometry) 
+// 參數：上半徑0.1, 下半徑0.1, 長度設為非常長(20), 圓周分段16
+const poleLength = 20;
+const cylinderGeo = new THREE.CylinderGeometry(0.1, 0.1, poleLength, 16);
+// 💡 關鍵步驟：將圓柱體的幾何中心上移到它的頂端 (Y軸移動-長度的一半)
+// 這樣在對它的Mesh做 scale.y 的時候，它就會從頂端單向往下長，而不是從中間雙向放大！
+cylinderGeo.translate(0, -poleLength / 2, 0);
+
+// 材質：白色 (跟專輯封面竿子一樣色)
+const cylinderMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const extendingPoleMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
+extendingPoleMesh.scale.y = 0.001; // 初始長度設為趨近於 0
+extendingPolePivot.add(extendingPoleMesh);
+
 
 // ==========================================
 // 🌟 核心動畫控制 🌟
 // ==========================================
 
-// 1. 背景(建築) 往上移
+// 動畫 A：背景(建築) 往上移 (不變)
 gsap.to(bgGroup.position, {
     y: 150, 
     scrollTrigger: {
@@ -70,50 +102,72 @@ gsap.to(bgGroup.position, {
     }
 });
 
-// 💡 修正：使用 Timeline 統一管理 Walkman 動作，避免動畫衝突
-let walkmanTl = gsap.timeline({
+// 動畫 B：🌟 全新「竿子生長與同步連接」時間軸 🌟
+let connectingTl = gsap.timeline({
     scrollTrigger: {
         trigger: ".concept-section",
         start: "top bottom", 
-        end: "bottom top", 
+        end: "bottom center", // 💡 在滑到區塊中間前完成連接，不要拖太晚
         scrub: 1
     }
 });
 
-// 🎬 動作 A：從下方升起到中間 (進度 0% - 30%)
-walkmanTl.to(walkmanGroup.position, { y: -5, duration: 3 });
-// 🎬 動作 B：停留在中間 (進度 30% - 70%)
-walkmanTl.to(walkmanGroup.position, { y: -5, duration: 4 });
-// 🎬 動作 C：最後跟著網頁一起飛走 (進度 70% - 100%)
-walkmanTl.to(walkmanGroup.position, { y: 60, duration: 3 });
+// 時機 1：當區塊剛升上來時，把竿子跟 Walkman 變出來
+connectingTl.to([extendingPolePivot, walkmanGroup], { visible: true, duration: 0.1 });
 
-// ==========================================
-// 🌟 載入模型區域 🌟
-// ==========================================
-const loader = new THREE.GLTFLoader();
+// 時機 2：🌟 「竿子生長」與「Walkman 移動」完全同步 🌟
+// 1. 竿子單向往下延伸 (scale.y 1)
+connectingTl.to(extendingPoleMesh.scale, { y: 1, duration: 3, ease: "power1.inOut" }, "synchronize");
 
-// 1. 載入路牌
+// 2. Walkman 垂直下移 (y: 從竿子頂部(-2.5) 移動到底部(-2.5-長度))
+// 💡 計算：-2.5 偏移量，加上竿子原本的長度 20。最終位置在 y=-22.5
+connectingTl.to(walkmanGroup.position, { y: -2.5 - poleLength, duration: 3, ease: "power1.inOut" }, "synchronize");
+
+
+// 動畫 C：💡 告示牌自己的動作 (维持不變)
+// 🎬 動作 C-1：告示牌先放大
 loader.load('level404_sign.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     model.position.set(-center.x, -center.y, -center.z);
-    pivotGroup.add(model);
+    
+    // 💡 關鍵修正：放到 signpostGroup 裡！
+    signpostGroup.add(model);
     
     const initialScale = 5 / Math.max(size.x, size.y, size.z); 
-    pivotGroup.scale.set(initialScale, initialScale, initialScale);
+    signpostGroup.scale.set(initialScale, initialScale, initialScale);
     
-    gsap.to(pivotGroup.scale, {
-        x: initialScale * 5, y: initialScale * 5, z: initialScale * 5,
-        scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 40%", scrub: 1 }
+    // 告示牌放大動畫 (佔據網頁剛滑到第二區塊的前半段)
+    gsap.to(signpostGroup.scale, {
+        x: initialScale * 5,
+        y: initialScale * 5,
+        z: initialScale * 5,
+        scrollTrigger: {
+            trigger: ".concept-section",
+            start: "top bottom",     
+            end: "top 40%",          
+            scrub: 1,
+        }
     });
 
-    gsap.to(pivotGroup.position, {
-        y: 40, 
-        scrollTrigger: { trigger: ".concept-section", start: "top 40%", end: "top top", scrub: 1 }
+    // 🎬 動作 C-2：告示牌滑走動畫 (改成移動整個 mainAssemblyGroup！)
+    gsap.to(mainAssemblyGroup.position, {
+        y: 60, 
+        scrollTrigger: {
+            trigger: ".concept-section",
+            start: "top 40%",        
+            end: "top top",          
+            scrub: 1,
+        }
     });
 });
+
+
+// ==========================================
+// 🌟 載入 Walkman 與背景模型 (不變) 🌟
+// ==========================================
 
 // 2. 載入 Walkman
 loader.load('walkmancopy.glb', (gltf) => {
@@ -123,15 +177,22 @@ loader.load('walkmancopy.glb', (gltf) => {
     const size = box.getSize(new THREE.Vector3());
     
     walkmanModel.position.set(-center.x, -center.y, -center.z);
-    walkmanModel.rotation.z = Math.PI; // 上下顛倒
     
+    // 💡 維持上下顛倒
+    walkmanModel.rotation.z = Math.PI; 
+    
+    // 💡 加入 Walkman 箱子
     walkmanGroup.add(walkmanModel); 
 
     const maxDim = Math.max(size.x, size.y, size.z);
-    const targetScale = 5 / maxDim; // 5 倍大
+    // 💡 這裡設定 Walkman 的最終大小倍率
+    const targetScale = 5 / maxDim; 
     walkmanGroup.scale.set(targetScale, targetScale, targetScale); 
     
-    console.log("✅ Walkman 獨立載入成功");
+    // 💡 初始 Z 軸往前凸出一點 (在竿子前面)，Y 軸初始在竿子最頂端(-2.5)
+    walkmanGroup.position.set(0, -2.5, 0);
+    
+    console.log("✅ Walkman 已預備好連接生長");
 });
 
 // 3. 載入建築
@@ -171,7 +232,7 @@ loader.load('headcopy.glb', (gltf) => {
     bgGroup.add(headPivot);
 });
 
-// 渲染迴圈
+// 渲染迴圈與視窗縮放 (不變)
 function animate() {
     requestAnimationFrame(animate);
     if (headPivot) {

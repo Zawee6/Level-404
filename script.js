@@ -92,7 +92,7 @@ loader.load('buildingcopy.glb', (gltf) => {
     // ==========================================
     
     // 2. 往後推得更深：從 -20 改成 -80 (數字越負，離我們越遠)
-    bgGroup.position.z = -80; 
+    bgGroup.position.z = -40; 
     
     // 3. 縮小模型倍數：把原本的 100 改成 15 或 20
     const maxDim = Math.max(size.x, size.y, size.z);

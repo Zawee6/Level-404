@@ -68,7 +68,14 @@ loader.load('level404_sign.glb', (gltf) => {
     console.error("❌ 載入錯誤：", error);
 });
 
-// 🚨 請把 'YOUR_BACKGROUND_MODEL.glb' 換成您要當背景的模型檔名 🚨
+
+// ==========================================
+// 🌟 載入第二個背景模型 (修正區塊) 🌟
+// ==========================================
+// 💡 修正：必須先建立 bgGroup 並加入場景中！
+let bgGroup = new THREE.Group();
+scene.add(bgGroup);
+
 loader.load('buildingcopy.glb', (gltf) => {
     const bgModel = gltf.scene;
     
@@ -94,6 +101,7 @@ loader.load('buildingcopy.glb', (gltf) => {
 }, undefined, (error) => {
     console.error("❌ 背景模型載入失敗：", error);
 });
+
 
 // 5. 渲染與視窗縮放
 function animate() {

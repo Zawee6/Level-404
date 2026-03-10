@@ -1,8 +1,8 @@
-// 💡 註冊外掛
+// 💡 修正 1：註冊外掛
 gsap.registerPlugin(ScrollTrigger);
 
 // ==========================================
-// 🌟 變數與基礎環境 🌟
+// 🌟 基礎變數設定 🌟
 // ==========================================
 let headPivot; 
 let targetMouse = { x: 0, y: 0 };
@@ -21,10 +21,12 @@ window.addEventListener('mousemove', (event) => {
     mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1000);
 });
 
+// 初始化 Lenis 捲動
 const lenis = new Lenis();
 function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
 requestAnimationFrame(raf);
 
+// Three.js 基礎環境
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -41,18 +43,24 @@ light.position.set(5, 5, 5);
 scene.add(light);
 
 // ==========================================
-// 🌟 容器宣告 🌟
+// 🌟 容器宣告 (全部獨立) 🌟
 // ==========================================
-let pivotGroup = new THREE.Group(); // 路牌 + Walkman
+let pivotGroup = new THREE.Group(); // 告示牌專用
 scene.add(pivotGroup);
 
-let bgGroup = new THREE.Group(); // 建築 + 草地 + 頭
+let bgGroup = new THREE.Group();    // 背景(建築+頭)專用
 bgGroup.position.z = -30; 
 scene.add(bgGroup);
 
+let walkmanGroup = new THREE.Group(); // 🌟 Walkman 專用容器
+walkmanGroup.position.y = -30;         // 一開始藏在螢幕下方
+scene.add(walkmanGroup);
+
 // ==========================================
-// 🌟 全局動畫 🌟
+// 🌟 核心動畫控制 🌟
 // ==========================================
+
+// 1. 背景(建築) 往上移
 gsap.to(bgGroup.position, {
     y: 150, 
     scrollTrigger: {
@@ -60,6 +68,28 @@ gsap.to(bgGroup.position, {
         start: "top bottom",         
         end: "top top",              
         scrub: 1,
+    }
+});
+
+// 2. Walkman 升起動畫 (獨立控制)
+gsap.to(walkmanGroup.position, {
+    y: -5, // 升起到螢幕中間偏下，避開標題文字
+    scrollTrigger: {
+        trigger: ".concept-section",
+        start: "top bottom", 
+        end: "top 20%", 
+        scrub: 1
+    }
+});
+
+// 3. Walkman 跟著路牌一起滑走
+gsap.to(walkmanGroup.position, {
+    y: 50, 
+    scrollTrigger: {
+        trigger: ".concept-section",
+        start: "top 40%", 
+        end: "top top", 
+        scrub: 1
     }
 });
 
@@ -80,18 +110,20 @@ loader.load('level404_sign.glb', (gltf) => {
     const initialScale = 5 / Math.max(size.x, size.y, size.z); 
     pivotGroup.scale.set(initialScale, initialScale, initialScale);
     
+    // 路牌放大
     gsap.to(pivotGroup.scale, {
         x: initialScale * 10, y: initialScale * 10, z: initialScale * 10,
         scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 40%", scrub: 1 }
     });
 
+    // 路牌滑走
     gsap.to(pivotGroup.position, {
         y: 40, 
         scrollTrigger: { trigger: ".concept-section", start: "top 40%", end: "top top", scrub: 1 }
     });
 });
 
-// 2. 載入 Walkman (💡 這次保證會跑到這！)
+// 2. 載入 Walkman (獨立、放大 5 倍、顛倒)
 loader.load('walkmancopy.glb', (gltf) => {
     const walkmanModel = gltf.scene;
     const box = new THREE.Box3().setFromObject(walkmanModel);
@@ -100,26 +132,18 @@ loader.load('walkmancopy.glb', (gltf) => {
     
     walkmanModel.position.set(-center.x, -center.y, -center.z);
     walkmanModel.rotation.z = Math.PI; // 上下顛倒
-    pivotGroup.add(walkmanModel); // 加入路牌容器
-
-    const targetScale = 0.8 / Math.max(size.x, size.y, size.z); 
-    walkmanModel.scale.set(targetScale, targetScale, targetScale); 
-    walkmanModel.position.y -= 4; // 下移，避免遮擋標題
-    walkmanModel.position.z += 0.5;
-
-    // 💡 關鍵：預設隱藏
-    walkmanModel.visible = false; 
     
-    ScrollTrigger.create({
-        trigger: ".concept-section",
-        start: "top 80%", 
-        onEnter: () => { walkmanModel.visible = true; },
-        onLeaveBack: () => { walkmanModel.visible = false; }
-    });
-    console.log("✅ Walkman 已成功載入並設定隱藏邏輯");
+    walkmanGroup.add(walkmanModel); 
+
+    // 精準放大 5 倍的邏輯
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const targetScale = 5 / maxDim; // 💡 這裡直接設定為 5 倍大
+    walkmanGroup.scale.set(targetScale, targetScale, targetScale); 
+    
+    console.log("✅ Walkman 獨立載入成功");
 });
 
-// 3. 載入建築、地板、頭部 (簡化載入邏輯)
+// 3. 載入建築
 loader.load('buildingcopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
@@ -130,6 +154,7 @@ loader.load('buildingcopy.glb', (gltf) => {
     bgGroup.scale.set(s, s, s);
 });
 
+// 4. 載入地板
 loader.load('grasscopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
@@ -140,6 +165,7 @@ loader.load('grasscopy.glb', (gltf) => {
     bgGroup.add(m);
 });
 
+// 5. 載入頭部
 loader.load('headcopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
@@ -154,6 +180,7 @@ loader.load('headcopy.glb', (gltf) => {
     bgGroup.add(headPivot);
 });
 
+// 渲染迴圈
 function animate() {
     requestAnimationFrame(animate);
     if (headPivot) {

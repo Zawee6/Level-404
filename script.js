@@ -152,8 +152,8 @@ loader.load('grasscopy.glb', (gltf) => {
     // 並且稍微往下沉，墊在建築物下方 (例如 -15，可微調)
     // ==========================================
     let floorContainer = new THREE.Group();
-    floorContainer.position.z = -30; 
-    floorContainer.position.y = -15; // 👈 如果草地太高或太低，調這個數字！
+    floorContainer.position.z = -28; 
+    floorContainer.position.y = -8; // 👈 如果草地太高或太低，調這個數字！
     
     // ==========================================
     // 💡 關鍵 2：不受建築物干擾的「暴力放大」
@@ -220,8 +220,8 @@ function animate() {
             currentMouse.y += (targetMouse.y - currentMouse.y) * 0.1;
             
             // 💡 修正 2：縮小旋轉幅度！並修正上下相反
-            headPivot.rotation.y = currentMouse.x * Math.PI * 0.25;  // 左右看 (幅度變小)
-            headPivot.rotation.x = currentMouse.y * Math.PI * 0.15; // 上下看 (加了負號且幅度變小)
+            headPivot.rotation.y = -currentMouse.x * Math.PI * 0.25;  // 左右看 (幅度變小)
+            headPivot.rotation.x = -currentMouse.y * Math.PI * 0.15; // 上下看 (加了負號且幅度變小)
             headPivot.rotation.z = 0; // 回正頭部的傾斜
             
         } else {

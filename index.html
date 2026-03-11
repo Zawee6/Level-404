@@ -19,8 +19,8 @@
                 <a href="#hero" class="nav-link">FUNDRAISING</a>
                 <a href="#album-section" class="nav-link">ALBUM</a>
                 <a href="#mv-section" class="nav-link">MV</a>
-                <a href="#music-section" class="nav-link">MUSIC</a>
                 <a href="#story-section" class="nav-link">STORY</a>
+                <a href="#music-section" class="nav-link">MUSIC</a>
                 <a href="#item-section" class="nav-link">ITEM</a>
             </div>
         </div>
@@ -39,9 +39,23 @@
         您的瀏覽器不支援音訊元素。
     </audio>
 
-    <button id="music-toggle" class="music-btn">🔇 MUTE</button>
+    <div class="mini-control-box">
+        <div id="mini-player" class="mini-player">
+            <div class="mini-top-row">
+                <span id="mini-track-name">READY TO PLAY</span>
+                <div class="mini-btns">
+                    <button id="mini-play-btn" class="mini-icon-btn">▶</button>
+                    <button id="music-toggle" class="mini-icon-btn mute-btn">🔇</button>
+                </div>
+            </div>
+            <div class="mini-progress-container">
+                <input type="range" id="mini-progress-bar" class="mini-range" min="0" max="100" value="0" style="--progress: 0%;">
+            </div>
+        </div>
+    </div>
 
     <div id="three-container"></div> 
+    <div id="sea-overlay"></div> <!-- 新增：大海背景疊加層 -->
 
     <section id="hero" class="section hero-section">
         <h2>Fundraising</h2>
@@ -73,16 +87,6 @@
         </div>
     </section>
 
-    <section id="music-section" class="section music-section">
-        <h2>MUSIC</h2>
-        <div class="music-content">
-            <p>沉浸在 Level 404 的聲音景觀中。</p>
-            <div style="width: 100%; max-width: 600px; height: 150px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 1px dashed #ff4500; margin: 20px auto;">
-                <p>COMING SOON / SPOTIFY EMBED</p>
-            </div>
-        </div>
-    </section>
-
     <section id="story-section" class="section story-section">
         <h2>STORY</h2>
         <div class="story-container">
@@ -102,6 +106,49 @@
                 </div>
             </div>
             <button class="story-nav next">❯</button>
+        </div>
+    </section>
+
+    <section id="music-section" class="section music-section">
+        <h2>MUSIC</h2>
+        <div class="music-content">
+            
+            <div class="music-player-wrapper">
+                <!-- 播放列表 (左側) -->
+                <div class="playlist-container">
+                    <ul id="playlist">
+                        <li data-src="musictrack/track1.mp3">那裡已經沒有人了</li>
+                        <li data-src="musictrack/track2.mp3">凝視深淵的納西瑟斯</li>
+                        <li data-src="musictrack/track3.mp3">這輩子也就這樣了</li>
+                        <li data-src="musictrack/track4.mp3">閾限空間：小時候想開的診所</li>
+                        <li data-src="musictrack/track5.mp3">22</li>
+                        <li data-src="musictrack/track6.mp3">閾限空間：尼莫點</li>
+                        <li data-src="musictrack/track7.mp3">閾限空間：駕訓班</li>
+                        <li data-src="musictrack/track8.mp3">昨日世界</li>
+                        <li data-src="musictrack/track9.mp3">離邦</li>
+                        <li data-src="musictrack/track10.mp3">閾限空間：負宇宙</li>
+                        <li data-src="musictrack/track11.mp3">風箏</li>
+                        <li data-src="musictrack/track12.mp3">最長的隧道盡頭</li>
+                    </ul>
+                </div>
+
+                <!-- 播放器控制 (右側) -->
+                <div class="player-controls">
+                    <div class="player-info">
+                        <span id="current-track-name">請選擇歌曲</span>
+                    </div>
+                    <div class="control-row">
+                        <button id="player-play-btn" class="player-btn">▶ PLAY</button>
+                    </div>
+                    <div class="progress-row">
+                        <input type="range" id="progress-bar" min="0" max="100" value="0">
+                        <div class="time-display">
+                            <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+                        </div>
+                    </div>
+                    <audio id="player-audio"></audio>
+                </div>
+            </div>
         </div>
     </section>
 

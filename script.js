@@ -88,24 +88,179 @@ loadingManager.onError = (url) => {
 };
 
 // ==========================================
-// 🎵 背景音樂控制 🎵
+// 🎵 背景音樂與播放器同步邏輯 🎵
 // ==========================================
 const music = document.getElementById('bg-music');
 const musicToggle = document.getElementById('music-toggle');
+const playerAudio = document.getElementById('player-audio');
+const playlistItems = document.querySelectorAll('#playlist li');
+const playerPlayBtn = document.getElementById('player-play-btn');
+const progressBar = document.getElementById('progress-bar');
+const currentTimeDisplay = document.getElementById('current-time');
+const durationDisplay = document.getElementById('duration');
+const currentTrackNameDisplay = document.getElementById('current-track-name');
 
+// 迷你播放器元素
+const miniPlayBtn = document.getElementById('mini-play-btn');
+const miniTrackName = document.getElementById('mini-track-name');
+const miniProgressBar = document.getElementById('mini-progress-bar');
+
+let isGlobalMuted = true; // 預設靜音狀態
+let bgMusicFadeTimeout;
+
+function formatTime(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
+// 平滑淡入背景音樂
+function fadeInBG() {
+    clearTimeout(bgMusicFadeTimeout);
+    if (isGlobalMuted) return;
+    
+    music.play();
+    gsap.to(music, { volume: 1, duration: 2 });
+}
+
+// 平滑淡出背景音樂
+function fadeOutBG() {
+    clearTimeout(bgMusicFadeTimeout);
+    gsap.to(music, { 
+        volume: 0, 
+        duration: 1
+    });
+}
+
+// 監聽全局點擊以啟動音訊
 window.addEventListener('click', () => {
+    if (isGlobalMuted) return;
     if (music.paused) {
         music.play().catch(err => console.log("Autoplay blocked:", err));
     }
 }, { once: true });
 
+// 全局靜音控制
 musicToggle.addEventListener('click', () => {
-    if (music.paused) {
-        music.play();
-        musicToggle.innerText = "🔊 PLAY";
-    } else {
+    isGlobalMuted = !isGlobalMuted;
+    
+    if (isGlobalMuted) {
         music.pause();
-        musicToggle.innerText = "🔇 MUTE";
+        playerAudio.pause();
+        playerPlayBtn.innerText = "▶ PLAY";
+        miniPlayBtn.innerText = "▶";
+        musicToggle.innerText = "🔇";
+        music.volume = 0;
+        playerAudio.volume = 0;
+    } else {
+        musicToggle.innerText = "🔊";
+        playerAudio.volume = 1;
+        
+        // 如果播放器沒在動，就恢復背景音樂
+        if (playerAudio.paused) {
+            fadeInBG();
+        }
+    }
+});
+
+// 播放控制邏輯 (主副同步)
+function togglePlayback() {
+    if (isGlobalMuted) {
+        isGlobalMuted = false;
+        musicToggle.innerText = "🔊";
+        playerAudio.volume = 1;
+    }
+
+    if (!playerAudio.src || playerAudio.src === "" || playerAudio.src.endsWith('/')) {
+        const firstItem = playlistItems[0];
+        if (firstItem) {
+            firstItem.click();
+            return;
+        }
+    }
+
+    if (playerAudio.paused) {
+        fadeOutBG();
+        playerAudio.play();
+        playerPlayBtn.innerText = "⏸ PAUSE";
+        miniPlayBtn.innerText = "⏸";
+    } else {
+        playerAudio.pause();
+        playerPlayBtn.innerText = "▶ PLAY";
+        miniPlayBtn.innerText = "▶";
+        bgMusicFadeTimeout = setTimeout(fadeInBG, 5000);
+    }
+}
+
+// 播放列表點擊邏輯
+playlistItems.forEach(item => {
+    item.addEventListener('click', () => {
+        if (isGlobalMuted) {
+            isGlobalMuted = false;
+            musicToggle.innerText = "🔊";
+            playerAudio.volume = 1;
+        }
+
+        playlistItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        
+        const trackName = item.innerText;
+        currentTrackNameDisplay.innerText = trackName;
+        miniTrackName.innerText = trackName;
+
+        const src = item.getAttribute('data-src');
+        playerAudio.src = src;
+        
+        fadeOutBG(); 
+        playerAudio.play();
+        playerPlayBtn.innerText = "⏸ PAUSE";
+        miniPlayBtn.innerText = "⏸";
+    });
+});
+
+// 事件綁定
+playerPlayBtn.addEventListener('click', togglePlayback);
+miniPlayBtn.addEventListener('click', togglePlayback);
+
+playerAudio.addEventListener('timeupdate', () => {
+    const progress = (playerAudio.currentTime / playerAudio.duration) * 100 || 0;
+    
+    // 同步主進度條與迷你進度條
+    progressBar.value = progress;
+    miniProgressBar.value = progress;
+    currentTimeDisplay.innerText = formatTime(playerAudio.currentTime);
+});
+
+playerAudio.addEventListener('loadedmetadata', () => {
+    durationDisplay.innerText = formatTime(playerAudio.duration);
+});
+
+// 主進度條調整
+progressBar.addEventListener('input', () => {
+    const seekTime = (progressBar.value / 100) * playerAudio.duration;
+    playerAudio.currentTime = seekTime;
+});
+
+// 迷你進度條調整
+miniProgressBar.addEventListener('input', () => {
+    const seekTime = (miniProgressBar.value / 100) * playerAudio.duration;
+    playerAudio.currentTime = seekTime;
+});
+
+// 歌曲結束處理
+playerAudio.addEventListener('ended', () => {
+    const activeItem = document.querySelector('#playlist li.active');
+    if (activeItem) {
+        const nextItem = activeItem.nextElementSibling;
+        if (nextItem) {
+            nextItem.click();
+        } else {
+            playlistItems[0].click();
+        }
+    } else {
+        playerPlayBtn.innerText = "▶ PLAY";
+        miniPlayBtn.innerText = "▶";
+        bgMusicFadeTimeout = setTimeout(fadeInBG, 5000);
     }
 });
 
@@ -116,7 +271,7 @@ const signpostGroup = new THREE.Group();
 scene.add(signpostGroup);
 
 const walkmanGroup = new THREE.Group(); 
-walkmanGroup.position.set(0, -6, -0.1); 
+walkmanGroup.position.set(0, -25, 0); 
 walkmanGroup.visible = false; 
 scene.add(walkmanGroup);
 
@@ -150,10 +305,31 @@ polePivot.position.set(-0.1, 0, 0);
 // 🎬 動畫控制 (GSAP + ScrollTrigger)
 // ==========================================
 
-// 1. 背景離開
+// 大海背景疊加層 (sea.gif) 滑動動畫
+const seaTL = gsap.timeline({
+    scrollTrigger: {
+        trigger: ".concept-section", 
+        start: "top bottom",
+        endTrigger: ".music-section", 
+        end: "bottom top",
+        scrub: true
+    }
+});
+
+seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }) 
+     .to("#sea-overlay", { y: "0%", duration: 2 }) 
+     .to("#sea-overlay", { y: "-100%", ease: "none" }); 
+
+// 1. 背景(建築+頭+地板)離開
 gsap.to(bgGroup.position, {
     y: 150, 
-    scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top top", scrub: 1 }
+    ease: "none",
+    scrollTrigger: { 
+        trigger: "#hero", 
+        start: "top top", 
+        end: "bottom top", 
+        scrub: true 
+    }
 });
 
 // 2. 竿子顯示
@@ -164,15 +340,34 @@ ScrollTrigger.create({
     onLeaveBack: () => { polePivot.visible = false; }
 });
 
-// 3. Walkman 顯示 (綁定圖片)
-ScrollTrigger.create({
-    trigger: ".concept-image", 
-    start: "top 50%",
-    onEnter: () => { walkmanGroup.visible = true; },
-    onLeaveBack: () => { walkmanGroup.visible = false; }
+// 竿子上滑
+gsap.to(polePivot.position, {
+    y: 60, 
+    scrollTrigger: {
+        trigger: ".story-section",
+        start: "top bottom", 
+        end: "top top",      
+        scrub: 0.1
+    }
 });
 
-// 4. 組合往上飛走 (前往周邊商品頁)
+// 3. Walkman 顯示與滑入
+gsap.fromTo(walkmanGroup.position, 
+    { y: -40 }, 
+    {
+        y: 0,
+        scrollTrigger: {
+            trigger: ".story-section",
+            start: "top bottom",
+            end: "top center",
+            scrub: 0.1,
+            onEnter: () => { walkmanGroup.visible = true; },
+            onLeaveBack: () => { walkmanGroup.visible = false; }
+        }
+    }
+);
+
+// 4. 組合往上飛走
 gsap.to([walkmanGroup.position, polePivot.position], {
     y: "+=40", 
     scrollTrigger: { trigger: ".merch-section", start: "top bottom", end: "top top", scrub: 1 }
@@ -208,7 +403,7 @@ ScrollTrigger.create({
 const loader = new THREE.GLTFLoader(loadingManager);
 
 // 1. 路牌
-loader.load('level404_sign.glb', (gltf) => {
+loader.load('model/level404_sign.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
@@ -231,22 +426,20 @@ loader.load('level404_sign.glb', (gltf) => {
 }, undefined, (error) => console.error('Error loading signpost:', error));
 
 // 2. Walkman
-loader.load('walkmancopy.glb', (gltf) => {
-    const walkmanModel = gltf.scene;
-    const box = new THREE.Box3().setFromObject(walkmanModel);
+loader.load('model/walkmancopy.glb', (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-    
-    walkmanModel.position.set(-center.x + 1.784, -center.y - 1.6, -center.z + 8.55);
-    walkmanModel.rotation.z = Math.PI; 
-    
-    walkmanGroup.add(walkmanModel); 
-    const targetScale = 24 / Math.max(size.x, size.y, size.z); 
-    walkmanGroup.scale.set(targetScale, targetScale, targetScale); 
-});
+    model.position.set(-center.x+3.56, -center.y, -center.z);
+    model.rotation.z = Math.PI; 
+    walkmanGroup.add(model); 
+    const initialScale = 10 / Math.max(size.x, size.y, size.z); 
+    walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
+}, undefined, (error) => console.error('Error loading walkman:', error));
 
 // 3. 建築
-loader.load('buildingcopy.glb', (gltf) => {
+loader.load('model/buildingcopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
     const c = b.getCenter(new THREE.Vector3());
@@ -257,18 +450,18 @@ loader.load('buildingcopy.glb', (gltf) => {
 });
 
 // 4. 地板
-loader.load('grasscopy.glb', (gltf) => {
+loader.load('model/grasscopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
     const c = b.getCenter(new THREE.Vector3());
-    m.position.set(-c.x, -c.y, -c.z - 10); // Offset adjusted
+    m.position.set(-c.x, -c.y, -c.z - 10); 
     m.position.y -= 10; m.position.z += 15;
     m.scale.set(40, 45, 25); 
     bgGroup.add(m);
 });
 
 // 5. 頭部
-loader.load('headcopy.glb', (gltf) => {
+loader.load('model/headcopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
     const c = b.getCenter(new THREE.Vector3());
@@ -283,7 +476,7 @@ loader.load('headcopy.glb', (gltf) => {
 });
 
 // 6. 旋轉木馬
-loader.load('carouselcopy.glb', (gltf) => {
+loader.load('model/carouselcopy.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
@@ -296,7 +489,7 @@ loader.load('carouselcopy.glb', (gltf) => {
 });
 
 // 7. 溜滑梯
-loader.load('slidecopy.glb', (gltf) => {
+loader.load('model/slidecopy.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
@@ -315,11 +508,10 @@ const dropbtn = document.querySelector('.dropbtn');
 const dropdownContent = document.querySelector('.dropdown-content');
 
 dropbtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // 防止事件冒泡到 window
+    e.stopPropagation(); 
     dropdownContent.classList.toggle('show');
 });
 
-// 點擊選單連結後平滑捲動並自動收起
 const navLinks = document.querySelectorAll('.nav-link');
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
@@ -339,7 +531,6 @@ navLinks.forEach(link => {
     });
 });
 
-// 點擊頁面其他地方收起選單
 window.addEventListener('click', () => {
     if (dropdownContent.classList.contains('show')) {
         dropdownContent.classList.remove('show');
@@ -377,7 +568,6 @@ nextBtn.addEventListener('click', () => {
     updateStoryCards();
 });
 
-// 初始化字卡狀態
 updateStoryCards();
 
 // ==========================================
@@ -388,41 +578,28 @@ function animate() {
     
     if (headPivot) {
         if (isMouseActive) {
-            // 🖱️ 滑鼠活動中：平滑追蹤 (受 CONSTRAINT_RADIUS 限制)
             currentMouse.x += (targetMouse.x - currentMouse.x) * 0.08;
             currentMouse.y += (targetMouse.y - currentMouse.y) * 0.08;
-
             headPivot.rotation.y = currentMouse.x * Math.PI * 0.5;  
             headPivot.rotation.x = -currentMouse.y * Math.PI * 0.2; 
         } else {
-            // 🔄 滑鼠停住：開始慢速自轉
             headPivot.rotation.y += 0.005; 
-            headPivot.rotation.x += (0 - headPivot.rotation.x) * 0.05; // X 軸緩緩回正
-
-            // 🎯 同步 currentMouse 防止滑鼠恢復移動時瞬間跳回
+            headPivot.rotation.x += (0 - headPivot.rotation.x) * 0.05; 
             currentMouse.x = headPivot.rotation.y / (Math.PI * 0.5);
             currentMouse.y = 0;
         }
-
-        // 疊加微小呼吸感
         idleTime += 0.01;
         headPivot.rotation.y += Math.sin(idleTime) * 0.003;
         headPivot.rotation.x += Math.cos(idleTime * 0.5) * 0.003;
     }
 
-    // 物件自轉
-    if (carouselGroup && carouselGroup.visible) {
-        carouselGroup.rotation.y += 0.01; 
-    }
-    if (slideGroup && slideGroup.visible) {
-        slideGroup.rotation.y -= 0.01; 
-    }
+    if (carouselGroup && carouselGroup.visible) carouselGroup.rotation.y += 0.01; 
+    if (slideGroup && slideGroup.visible) slideGroup.rotation.y -= 0.01; 
 
     renderer.render(scene, camera);
 }
 animate();
 
-// 響應式視窗
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();

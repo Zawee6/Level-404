@@ -43,22 +43,6 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
-// 選單平滑捲動導航
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-            lenis.scrollTo(targetElement, {
-                offset: 0,
-                duration: 1.5,
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
-            });
-        }
-    });
-});
-
 // Three.js 基礎設定
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
@@ -323,6 +307,78 @@ loader.load('slidecopy.glb', (gltf) => {
     slideGroup.scale.set(s, s, s);
     slideGroup.position.set(30, 0, 0); 
 });
+
+// ==========================================
+// 📱 選單控制 (Menu Toggle) 📱
+// ==========================================
+const dropbtn = document.querySelector('.dropbtn');
+const dropdownContent = document.querySelector('.dropdown-content');
+
+dropbtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // 防止事件冒泡到 window
+    dropdownContent.classList.toggle('show');
+});
+
+// 點擊選單連結後平滑捲動並自動收起
+const navLinks = document.querySelectorAll('.nav-link');
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        const targetId = link.getAttribute('href');
+        if (targetId && targetId.startsWith('#')) {
+            e.preventDefault();
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                lenis.scrollTo(targetElement, {
+                    offset: 0,
+                    duration: 1.5,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+                });
+            }
+        }
+        dropdownContent.classList.remove('show');
+    });
+});
+
+// 點擊頁面其他地方收起選單
+window.addEventListener('click', () => {
+    if (dropdownContent.classList.contains('show')) {
+        dropdownContent.classList.remove('show');
+    }
+});
+
+// ==========================================
+// 📖 STORY 字卡切換邏輯 📖
+// ==========================================
+const storyCards = document.querySelectorAll('.story-card');
+const prevBtn = document.querySelector('.story-nav.prev');
+const nextBtn = document.querySelector('.story-nav.next');
+let currentCardIndex = 0;
+
+function updateStoryCards() {
+    storyCards.forEach((card, index) => {
+        card.classList.remove('active', 'prev-card', 'next-card');
+        if (index === currentCardIndex) {
+            card.classList.add('active');
+        } else if (index < currentCardIndex) {
+            card.classList.add('prev-card');
+        } else {
+            card.classList.add('next-card');
+        }
+    });
+}
+
+prevBtn.addEventListener('click', () => {
+    currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length;
+    updateStoryCards();
+});
+
+nextBtn.addEventListener('click', () => {
+    currentCardIndex = (currentCardIndex + 1) % storyCards.length;
+    updateStoryCards();
+});
+
+// 初始化字卡狀態
+updateStoryCards();
 
 // ==========================================
 // 🔄 渲染迴圈 🔄

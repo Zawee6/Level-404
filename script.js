@@ -43,6 +43,22 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
+// 選單平滑捲動導航
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            lenis.scrollTo(targetElement, {
+                offset: 0,
+                duration: 1.5,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+            });
+        }
+    });
+});
+
 // Three.js 基礎設定
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();

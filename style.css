@@ -1,4 +1,74 @@
 /* =========================================
+   0. 頂部導航與下拉選單
+========================================= */
+.top-nav {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10000; /* 確保在所有元素（包括 Loading）之上 */
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 12px 24px;
+    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    border-radius: 0px;
+    letter-spacing: 3px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.9);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 5px;
+    backdrop-filter: blur(10px);
+}
+
+.dropdown-content a {
+    color: #bbb;
+    padding: 15px 20px;
+    text-decoration: none;
+    display: block;
+    font-size: 12px;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+.dropdown-content a:hover {
+    background-color: #ff4500;
+    color: #fff;
+    padding-left: 25px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #ff4500;
+    border-color: #ff4500;
+}
+
+/* =========================================
    1. 全域設定與 Loading 畫面
 ========================================= */
 html {

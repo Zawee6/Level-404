@@ -120,7 +120,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
     padding: 15px 20px;
-    width: 280px;
+    width: 320px; /* 稍微加寬 */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     transition: all 0.3s ease;
 }
@@ -128,15 +128,18 @@ body {
 .mini-player {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 3px; /* 縮小至 3px */
 }
 
-.mini-track-row {
+.mini-top-row {
+    display: flex;
+    justify-content: space-between; /* 讓曲名與按鈕分開到左右兩端 */
+    align-items: center;
     width: 100%;
 }
 
 #mini-track-name {
-    display: block;
+    flex: 1;
     font-size: 0.75rem;
     font-weight: bold;
     color: #ff4500;
@@ -145,13 +148,14 @@ body {
     text-overflow: ellipsis;
     letter-spacing: 1px;
     text-align: left;
+    padding-right: 15px;
 }
 
 .mini-btns {
     display: flex;
-    justify-content: flex-start; /* 改為靠左排列，位於進度條上方 */
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 .mini-icon-btn {
@@ -179,16 +183,17 @@ body {
     width: 100%;
 }
 
-/* 迷你互動進度條樣式 */
+/* 迷你互動進度條樣式 - 橘色填滿效果 */
 .mini-range {
     width: 100%;
-    accent-color: #ff4500;
     cursor: pointer;
     height: 4px;
-    background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
     outline: none;
+    appearance: none;
     -webkit-appearance: none;
+    /* 使用漸層背景模擬橘色填滿 (由 JS 更新 --progress) */
+    background: linear-gradient(to right, #ff4500 var(--progress, 0%), rgba(255, 255, 255, 0.1) var(--progress, 0%));
 }
 
 .mini-range::-webkit-slider-runnable-track {
@@ -197,15 +202,20 @@ body {
 }
 
 .mini-range::-webkit-slider-thumb {
+    appearance: none;
     -webkit-appearance: none;
-    height: 10px;
-    width: 10px;
+    height: 12px;
+    width: 12px;
     border-radius: 50%;
     background: #ff4500;
     cursor: pointer;
-    margin-top: -3px; /* 置中 */
+    margin-top: -4px; /* 置中 */
     box-shadow: 0 0 5px rgba(255, 69, 0, 0.5);
+    border: 2px solid white;
 }
+
+/* 隱藏舊按鈕 */
+.music-btn { display: none; }
 
 /* 🌟 3D 主視覺容器 🌟 */
 #three-container {

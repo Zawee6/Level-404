@@ -16,11 +16,12 @@
         <div class="dropdown">
             <button class="dropbtn">MENU</button>
             <div class="dropdown-content">
-                <a href="#hero" class="nav-link">ALBUM</a>
+                <a href="#hero" class="nav-link">FUNDRAISING</a>
+                <a href="#album-section" class="nav-link">ALBUM</a>
                 <a href="#mv-section" class="nav-link">MV</a>
-                <a href="#">STORY</a>
-                <a href="#">MUSIC</a>
-                <a href="#">ITEM</a>
+                <a href="#music-section" class="nav-link">MUSIC</a>
+                <a href="#story-section" class="nav-link">STORY</a>
+                <a href="#item-section" class="nav-link">ITEM</a>
             </div>
         </div>
     </nav>
@@ -43,14 +44,17 @@
     <div id="three-container"></div> 
 
     <section id="hero" class="section hero-section">
-        <h2>致我深愛的殘缺</h2>
+        <h2>Fundraising</h2>
         <a href="https://www.youtube.com/@vacantmendel" target="_blank" class="call-to-action">SUPPORT US</a>
     </section>
 
-    <section class="section concept-section">
+    <section id="album-section" class="section concept-section">
         <h2>Level 404</h2>
         <img src="albumdemo.jpg" alt="Album Demo" class="concept-image">
-        <h2 id="mv-section">MUSIC VIDEO</h2>
+    </section>
+
+    <section id="mv-section" class="section mv-section">
+        <h2>MUSIC VIDEO</h2>
 
         <div class="mv-block">
             <h2>離邦</h2>
@@ -69,7 +73,39 @@
         </div>
     </section>
 
-    <section class="section merch-section">
+    <section id="music-section" class="section music-section">
+        <h2>MUSIC</h2>
+        <div class="music-content">
+            <p>沉浸在 Level 404 的聲音景觀中。</p>
+            <div style="width: 100%; max-width: 600px; height: 150px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 1px dashed #ff4500; margin: 20px auto;">
+                <p>COMING SOON / SPOTIFY EMBED</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="story-section" class="section story-section">
+        <h2>STORY</h2>
+        <div class="story-container">
+            <button class="story-nav prev">❮</button>
+            <div class="story-card-wrapper">
+                <div class="story-card active">
+                    <h3>01. 殘缺的起源</h3>
+                    <p>在這個完美的數位世界裡，404 不再是錯誤，而是一種存在的證明。我們都在尋找那些被系統遺忘的片段。</p>
+                </div>
+                <div class="story-card">
+                    <h3>02. 虛擬的邊界</h3>
+                    <p>當現實與虛擬的界線模糊，聲音成為了唯一的導航。穿梭在故障的頻率中，我們聽見了真實的跳動。</p>
+                </div>
+                <div class="story-card">
+                    <h3>03. 最終的歸屬</h3>
+                    <p>不需要被修正，不需要被格式化。在 Level 404，每一個殘缺的靈魂都能找到屬於自己的音軌。</p>
+                </div>
+            </div>
+            <button class="story-nav next">❯</button>
+        </div>
+    </section>
+
+    <section id="item-section" class="section item-section merch-section">
         <h2>🛒 獨家周邊商品</h2>
         <p class="subtitle">將您的音樂概念穿戴在身上！</p>
 

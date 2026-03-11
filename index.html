@@ -12,6 +12,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav class="top-nav">
+        <div class="dropdown">
+            <button class="dropbtn">MENU</button>
+            <div class="dropdown-content">
+                <a href="#hero" class="nav-link">ALBUM</a>
+                <a href="#mv-section" class="nav-link">MV</a>
+                <a href="#">STORY</a>
+                <a href="#">MUSIC</a>
+                <a href="#">ITEM</a>
+            </div>
+        </div>
+    </nav>
+
     <!-- 載入畫面 -->
     <div id="loading-overlay">
         <div class="loader-content">
@@ -29,7 +42,7 @@
 
     <div id="three-container"></div> 
 
-    <section class="section hero-section">
+    <section id="hero" class="section hero-section">
         <h2>致我深愛的殘缺</h2>
         <a href="https://www.youtube.com/@vacantmendel" target="_blank" class="call-to-action">SUPPORT US</a>
     </section>
@@ -37,7 +50,7 @@
     <section class="section concept-section">
         <h2>Level 404</h2>
         <img src="albumdemo.jpg" alt="Album Demo" class="concept-image">
-        <h2>MUSIC VIDEO</h2>
+        <h2 id="mv-section">MUSIC VIDEO</h2>
 
         <div class="mv-block">
             <h2>離邦</h2>

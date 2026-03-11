@@ -38,6 +38,11 @@
     backdrop-filter: blur(10px);
 }
 
+/* 顯示選單 */
+.dropdown-content.show {
+    display: block;
+}
+
 .dropdown-content a {
     color: #bbb;
     padding: 15px 20px;
@@ -47,20 +52,6 @@
     letter-spacing: 2px;
     transition: all 0.3s ease;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.dropdown-content a:last-child {
-    border-bottom: none;
-}
-
-.dropdown-content a:hover {
-    background-color: #ff4500;
-    color: #fff;
-    padding-left: 25px;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
 }
 
 .dropdown:hover .dropbtn {
@@ -169,7 +160,11 @@ body {
 }
 
 .concept-section {
-    min-height: 300vh; 
+    min-height: 100vh; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     background-color: rgba(30, 30, 30, 0.5);
 }
 
@@ -232,9 +227,102 @@ a.call-to-action:hover {
 }
 
 /* =========================================
-   3. 周邊商品區塊
+   3. MV、MUSIC、STORY 與周邊商品區塊
 ========================================= */
-.merch-section { background-color: #222; }
+.mv-section {
+    background-color: rgba(20, 20, 20, 0.6);
+    min-height: 150vh; 
+}
+
+.music-section {
+    background-color: #111;
+    min-height: 80vh;
+}
+
+.story-section {
+    background-color: rgba(25, 25, 25, 0.8);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.story-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.story-card-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.story-card {
+    position: absolute;
+    width: 80%;
+    max-width: 500px;
+    padding: 40px;
+    background: rgba(40, 40, 40, 0.9);
+    border: 1px solid #ff4500;
+    border-radius: 15px;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.8) translateX(100px);
+    transition: all 0.5s ease;
+    pointer-events: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.story-card.active {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+    pointer-events: auto;
+    z-index: 2;
+}
+
+.story-card.prev-card {
+    opacity: 0.3;
+    transform: scale(0.8) translateX(-150px);
+}
+
+.story-card.next-card {
+    opacity: 0.3;
+    transform: scale(0.8) translateX(150px);
+}
+
+.story-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #ff4500;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 10;
+    padding: 20px;
+    transition: color 0.3s;
+}
+
+.story-nav:hover {
+    color: #fff;
+}
+
+.story-nav.prev { left: -20px; }
+.story-nav.next { right: -20px; }
+
+.item-section, .merch-section { 
+    background-color: #222; 
+}
+
 .subtitle { font-size: 1.1em; color: #aaa; margin-bottom: 40px; }
 
 .merch-grid {

@@ -487,7 +487,7 @@ loader.load('model/walkmancopy.glb', (gltf) => {
     walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
 });
 
-loader.load('model/buildingcopy.glb', (gltf) => {
+loader.load('model/building.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
     const c = b.getCenter(new THREE.Vector3());

@@ -54,10 +54,20 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-scene.add(new THREE.AmbientLight(0xffffff, 1.5)); 
-const light = new THREE.DirectionalLight(0xffffff, 2);
-light.position.set(5, 5, 5);
-scene.add(light);
+// 🎨 冷白色憂鬱燈光設定
+scene.add(new THREE.AmbientLight(0xddeeff, 1.0)); // 冷白色環境光
+
+const areaLight = new THREE.SpotLight(0xffffff, 3); // 純白主面光
+areaLight.position.set(10, 25, 10);
+areaLight.angle = Math.PI / 4;
+areaLight.penumbra = 1; 
+areaLight.decay = 1.5;
+areaLight.distance = 150;
+scene.add(areaLight);
+
+const sideLight = new THREE.DirectionalLight(0xddeeff, 0.8); // 冷白色側光
+sideLight.position.set(-15, 10, 5);
+scene.add(sideLight);
 
 // ==========================================
 // 📦 載入管理器 (Loading Manager)
@@ -74,6 +84,7 @@ loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
 
 loadingManager.onLoad = () => {
     console.log('所有資源載入完成');
+    ScrollTrigger.refresh();
     gsap.to(loadingOverlay, {
         opacity: 0,
         duration: 0.8,
@@ -81,10 +92,6 @@ loadingManager.onLoad = () => {
             loadingOverlay.style.display = 'none';
         }
     });
-};
-
-loadingManager.onError = (url) => {
-    console.error('載入錯誤:', url);
 };
 
 // ==========================================
@@ -100,12 +107,11 @@ const currentTimeDisplay = document.getElementById('current-time');
 const durationDisplay = document.getElementById('duration');
 const currentTrackNameDisplay = document.getElementById('current-track-name');
 
-// 迷你播放器元素
 const miniPlayBtn = document.getElementById('mini-play-btn');
 const miniTrackName = document.getElementById('mini-track-name');
 const miniProgressBar = document.getElementById('mini-progress-bar');
 
-let isGlobalMuted = true; // 預設靜音狀態
+let isGlobalMuted = true; 
 let bgMusicFadeTimeout;
 
 function formatTime(seconds) {
@@ -114,25 +120,18 @@ function formatTime(seconds) {
     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 }
 
-// 平滑淡入背景音樂
 function fadeInBG() {
     clearTimeout(bgMusicFadeTimeout);
     if (isGlobalMuted) return;
-    
     music.play();
     gsap.to(music, { volume: 1, duration: 2 });
 }
 
-// 平滑淡出背景音樂
 function fadeOutBG() {
     clearTimeout(bgMusicFadeTimeout);
-    gsap.to(music, { 
-        volume: 0, 
-        duration: 1
-    });
+    gsap.to(music, { volume: 0, duration: 1 });
 }
 
-// 監聽全局點擊以啟動音訊
 window.addEventListener('click', () => {
     if (isGlobalMuted) return;
     if (music.paused) {
@@ -140,10 +139,9 @@ window.addEventListener('click', () => {
     }
 }, { once: true });
 
-// 全局靜音控制
-musicToggle.addEventListener('click', () => {
+musicToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
     isGlobalMuted = !isGlobalMuted;
-    
     if (isGlobalMuted) {
         music.pause();
         playerAudio.pause();
@@ -155,30 +153,20 @@ musicToggle.addEventListener('click', () => {
     } else {
         musicToggle.innerText = "🔊";
         playerAudio.volume = 1;
-        
-        // 如果播放器沒在動，就恢復背景音樂
-        if (playerAudio.paused) {
-            fadeInBG();
-        }
+        if (playerAudio.paused) fadeInBG();
     }
 });
 
-// 播放控制邏輯 (主副同步)
 function togglePlayback() {
     if (isGlobalMuted) {
         isGlobalMuted = false;
         musicToggle.innerText = "🔊";
         playerAudio.volume = 1;
     }
-
     if (!playerAudio.src || playerAudio.src === "" || playerAudio.src.endsWith('/')) {
         const firstItem = playlistItems[0];
-        if (firstItem) {
-            firstItem.click();
-            return;
-        }
+        if (firstItem) { firstItem.click(); return; }
     }
-
     if (playerAudio.paused) {
         fadeOutBG();
         playerAudio.play();
@@ -192,25 +180,21 @@ function togglePlayback() {
     }
 }
 
-// 播放列表點擊邏輯
 playlistItems.forEach(item => {
-    item.addEventListener('click', () => {
+    item.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (isGlobalMuted) {
             isGlobalMuted = false;
             musicToggle.innerText = "🔊";
             playerAudio.volume = 1;
         }
-
         playlistItems.forEach(i => i.classList.remove('active'));
         item.classList.add('active');
-        
         const trackName = item.innerText;
         currentTrackNameDisplay.innerText = trackName;
         miniTrackName.innerText = trackName;
-
         const src = item.getAttribute('data-src');
         playerAudio.src = src;
-        
         fadeOutBG(); 
         playerAudio.play();
         playerPlayBtn.innerText = "⏸ PAUSE";
@@ -218,16 +202,14 @@ playlistItems.forEach(item => {
     });
 });
 
-// 事件綁定
-playerPlayBtn.addEventListener('click', togglePlayback);
-miniPlayBtn.addEventListener('click', togglePlayback);
+playerPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlayback(); });
+miniPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlayback(); });
 
 playerAudio.addEventListener('timeupdate', () => {
     const progress = (playerAudio.currentTime / playerAudio.duration) * 100 || 0;
-    
-    // 同步主進度條與迷你進度條
     progressBar.value = progress;
     miniProgressBar.value = progress;
+    miniProgressBar.style.setProperty('--progress', progress + '%');
     currentTimeDisplay.innerText = formatTime(playerAudio.currentTime);
 });
 
@@ -235,28 +217,23 @@ playerAudio.addEventListener('loadedmetadata', () => {
     durationDisplay.innerText = formatTime(playerAudio.duration);
 });
 
-// 主進度條調整
 progressBar.addEventListener('input', () => {
     const seekTime = (progressBar.value / 100) * playerAudio.duration;
     playerAudio.currentTime = seekTime;
 });
 
-// 迷你進度條調整
 miniProgressBar.addEventListener('input', () => {
     const seekTime = (miniProgressBar.value / 100) * playerAudio.duration;
     playerAudio.currentTime = seekTime;
+    miniProgressBar.style.setProperty('--progress', miniProgressBar.value + '%');
 });
 
-// 歌曲結束處理
 playerAudio.addEventListener('ended', () => {
     const activeItem = document.querySelector('#playlist li.active');
     if (activeItem) {
         const nextItem = activeItem.nextElementSibling;
-        if (nextItem) {
-            nextItem.click();
-        } else {
-            playlistItems[0].click();
-        }
+        if (nextItem) nextItem.click();
+        else playlistItems[0].click();
     } else {
         playerPlayBtn.innerText = "▶ PLAY";
         miniPlayBtn.innerText = "▶";
@@ -292,7 +269,9 @@ const slideGroup = new THREE.Group();
 slideGroup.visible = false; 
 scene.add(slideGroup);
 
-// 建立竿子
+const ballGroup = new THREE.Group();
+scene.add(ballGroup);
+
 const poleLength = 20; 
 const cylinderGeo = new THREE.CylinderGeometry(0.7, 0.7, poleLength, 16); 
 const cylinderMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.5, metalness: 0.1 });
@@ -305,7 +284,6 @@ polePivot.position.set(-0.1, 0, 0);
 // 🎬 動畫控制 (GSAP + ScrollTrigger)
 // ==========================================
 
-// 大海背景疊加層 (sea.gif) 滑動動畫
 const seaTL = gsap.timeline({
     scrollTrigger: {
         trigger: ".concept-section", 
@@ -320,7 +298,6 @@ seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" })
      .to("#sea-overlay", { y: "0%", duration: 2 }) 
      .to("#sea-overlay", { y: "-100%", ease: "none" }); 
 
-// 1. 背景(建築+頭+地板)離開
 gsap.to(bgGroup.position, {
     y: 150, 
     ease: "none",
@@ -332,7 +309,6 @@ gsap.to(bgGroup.position, {
     }
 });
 
-// 2. 竿子顯示
 ScrollTrigger.create({
     trigger: ".concept-section",
     start: "top 68%", 
@@ -340,7 +316,6 @@ ScrollTrigger.create({
     onLeaveBack: () => { polePivot.visible = false; }
 });
 
-// 竿子上滑
 gsap.to(polePivot.position, {
     y: 60, 
     scrollTrigger: {
@@ -351,7 +326,6 @@ gsap.to(polePivot.position, {
     }
 });
 
-// 3. Walkman 顯示與滑入
 gsap.fromTo(walkmanGroup.position, 
     { y: -40 }, 
     {
@@ -367,13 +341,11 @@ gsap.fromTo(walkmanGroup.position,
     }
 );
 
-// 4. 組合往上飛走
 gsap.to([walkmanGroup.position, polePivot.position], {
     y: "+=40", 
     scrollTrigger: { trigger: ".merch-section", start: "top bottom", end: "top top", scrub: 1 }
 });
 
-// 5. 木馬與溜滑梯滑入
 ScrollTrigger.create({
     trigger: ".concept-image",
     start: "top 80%",
@@ -397,12 +369,93 @@ ScrollTrigger.create({
     }
 });
 
+// 滾動球動畫邏輯
+let ballBaseMesh;
+let isBallAnimationActive = false;
+
+function spawnRollingBall() {
+    if (!ballBaseMesh || !isBallAnimationActive) return;
+
+    const newBall = ballBaseMesh.clone();
+    newBall.visible = true;
+    ballGroup.add(newBall);
+
+    const startX = (Math.random() - 0.5) * 40; 
+    const outDirection = Math.random() > 0.5 ? 1 : -1; 
+    const endX = outDirection * 50;
+
+    newBall.position.set(startX, 25, 0);
+    newBall.rotation.set(0, 0, 0);
+
+    const tl = gsap.timeline({
+        onComplete: () => { ballGroup.remove(newBall); }
+    });
+
+    tl.to(newBall.position, {
+        x: startX + (outDirection * 10),
+        y: -10,
+        duration: 4, 
+        ease: "power1.in"
+    }).to(newBall.position, {
+        x: endX,
+        y: -30,
+        duration: 3, 
+        ease: "power1.out"
+    });
+
+    gsap.to(newBall.rotation, {
+        x: Math.PI * 4,
+        z: Math.PI * 2 * -outDirection,
+        duration: 7, 
+        ease: "none"
+    });
+}
+
+function ballSpawnLoop() {
+    if (!isBallAnimationActive) return;
+    spawnRollingBall();
+    gsap.delayedCall(1.5, ballSpawnLoop); // 縮短間隔至 1.5 秒
+}
+
+ScrollTrigger.create({
+    trigger: ".concept-section", // 從 ALBUM 區開始
+    start: "top bottom",
+    endTrigger: "html", // 持續到整個網頁結束
+    end: "bottom top",
+    onEnter: () => { 
+        if (!isBallAnimationActive) {
+            isBallAnimationActive = true; 
+            ballSpawnLoop(); 
+        }
+    },
+    onEnterBack: () => { 
+        if (!isBallAnimationActive) {
+            isBallAnimationActive = true; 
+            ballSpawnLoop(); 
+        }
+    },
+    onLeave: () => { 
+        // 只有在滾動超過底部或回到頂部時才考慮停止（這裡設定為完全離開觸發區域）
+    },
+    onLeaveBack: () => { 
+        // 回到 Hero 區時停止並清理
+        isBallAnimationActive = false; 
+        gsap.killDelayedCallsTo(ballSpawnLoop); 
+        ballGroup.clear(); 
+    }
+});
+
 // ==========================================
 // 🚀 載入模型 🚀
 // ==========================================
 const loader = new THREE.GLTFLoader(loadingManager);
 
-// 1. 路牌
+loader.load('model/ball1.glb', (gltf) => {
+    ballBaseMesh = gltf.scene;
+    ballBaseMesh.visible = false;
+    ballBaseMesh.scale.set(3, 3, 3);
+});
+
 loader.load('model/level404_sign.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -410,22 +463,18 @@ loader.load('model/level404_sign.glb', (gltf) => {
     const size = box.getSize(new THREE.Vector3());
     model.position.set(-center.x, -center.y, -center.z);
     signpostGroup.add(model);
-    
     const initialScale = 10 / Math.max(size.x, size.y, size.z); 
     signpostGroup.scale.set(initialScale, initialScale, initialScale);
-    
     gsap.to(signpostGroup.scale, {
         x: initialScale * 3, y: initialScale * 3, z: initialScale * 3,
         scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 70%", scrub: 1 }
     });
-
     gsap.to(signpostGroup.position, {
         y: 40, 
         scrollTrigger: { trigger: ".concept-section", start: "top 70%", end: "top 50%", scrub: 1 }
     });
-}, undefined, (error) => console.error('Error loading signpost:', error));
+});
 
-// 2. Walkman
 loader.load('model/walkmancopy.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -436,9 +485,8 @@ loader.load('model/walkmancopy.glb', (gltf) => {
     walkmanGroup.add(model); 
     const initialScale = 10 / Math.max(size.x, size.y, size.z); 
     walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
-}, undefined, (error) => console.error('Error loading walkman:', error));
+});
 
-// 3. 建築
 loader.load('model/buildingcopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
@@ -449,7 +497,6 @@ loader.load('model/buildingcopy.glb', (gltf) => {
     bgGroup.scale.set(s, s, s);
 });
 
-// 4. 地板
 loader.load('model/grasscopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
@@ -460,7 +507,6 @@ loader.load('model/grasscopy.glb', (gltf) => {
     bgGroup.add(m);
 });
 
-// 5. 頭部
 loader.load('model/headcopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
@@ -475,7 +521,6 @@ loader.load('model/headcopy.glb', (gltf) => {
     bgGroup.add(headPivot);
 });
 
-// 6. 旋轉木馬
 loader.load('model/carouselcopy.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -488,7 +533,6 @@ loader.load('model/carouselcopy.glb', (gltf) => {
     carouselGroup.position.set(-30, 0, 0); 
 });
 
-// 7. 溜滑梯
 loader.load('model/slidecopy.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -501,17 +545,9 @@ loader.load('model/slidecopy.glb', (gltf) => {
     slideGroup.position.set(30, 0, 0); 
 });
 
-// ==========================================
-// 📱 選單控制 (Menu Toggle) 📱
-// ==========================================
 const dropbtn = document.querySelector('.dropbtn');
 const dropdownContent = document.querySelector('.dropdown-content');
-
-dropbtn.addEventListener('click', (e) => {
-    e.stopPropagation(); 
-    dropdownContent.classList.toggle('show');
-});
-
+dropbtn.addEventListener('click', (e) => { e.stopPropagation(); dropdownContent.classList.toggle('show'); });
 const navLinks = document.querySelectorAll('.nav-link');
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
@@ -520,62 +556,32 @@ navLinks.forEach(link => {
             e.preventDefault();
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
-                lenis.scrollTo(targetElement, {
-                    offset: 0,
-                    duration: 1.5,
-                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
-                });
+                lenis.scrollTo(targetElement, { offset: 0, duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
             }
         }
         dropdownContent.classList.remove('show');
     });
 });
+window.addEventListener('click', () => { if (dropdownContent.classList.contains('show')) dropdownContent.classList.remove('show'); });
 
-window.addEventListener('click', () => {
-    if (dropdownContent.classList.contains('show')) {
-        dropdownContent.classList.remove('show');
-    }
-});
-
-// ==========================================
-// 📖 STORY 字卡切換邏輯 📖
-// ==========================================
 const storyCards = document.querySelectorAll('.story-card');
 const prevBtn = document.querySelector('.story-nav.prev');
 const nextBtn = document.querySelector('.story-nav.next');
 let currentCardIndex = 0;
-
 function updateStoryCards() {
     storyCards.forEach((card, index) => {
         card.classList.remove('active', 'prev-card', 'next-card');
-        if (index === currentCardIndex) {
-            card.classList.add('active');
-        } else if (index < currentCardIndex) {
-            card.classList.add('prev-card');
-        } else {
-            card.classList.add('next-card');
-        }
+        if (index === currentCardIndex) card.classList.add('active');
+        else if (index < currentCardIndex) card.classList.add('prev-card');
+        else card.classList.add('next-card');
     });
 }
-
-prevBtn.addEventListener('click', () => {
-    currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length;
-    updateStoryCards();
-});
-
-nextBtn.addEventListener('click', () => {
-    currentCardIndex = (currentCardIndex + 1) % storyCards.length;
-    updateStoryCards();
-});
-
+prevBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length; updateStoryCards(); });
+nextBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex + 1) % storyCards.length; updateStoryCards(); });
 updateStoryCards();
 
-// ==========================================
-// 🔄 渲染迴圈 🔄
-// ==========================================
 function animate() {
     requestAnimationFrame(animate);
-    
     if (headPivot) {
         if (isMouseActive) {
             currentMouse.x += (targetMouse.x - currentMouse.x) * 0.08;
@@ -592,10 +598,8 @@ function animate() {
         headPivot.rotation.y += Math.sin(idleTime) * 0.003;
         headPivot.rotation.x += Math.cos(idleTime * 0.5) * 0.003;
     }
-
     if (carouselGroup && carouselGroup.visible) carouselGroup.rotation.y += 0.01; 
     if (slideGroup && slideGroup.visible) slideGroup.rotation.y -= 0.01; 
-
     renderer.render(scene, camera);
 }
 animate();

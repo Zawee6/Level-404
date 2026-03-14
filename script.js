@@ -253,7 +253,7 @@ walkmanGroup.visible = false;
 scene.add(walkmanGroup);
 
 const polePivot = new THREE.Group(); 
-polePivot.position.set(0, 15, 0.1); 
+polePivot.position.set(-0.1, -40, 0); 
 polePivot.visible = false; 
 scene.add(polePivot);
 
@@ -271,14 +271,6 @@ scene.add(slideGroup);
 
 const ballGroup = new THREE.Group();
 scene.add(ballGroup);
-
-const poleLength = 20; 
-const cylinderGeo = new THREE.CylinderGeometry(0.7, 0.7, poleLength, 16); 
-const cylinderMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.5, metalness: 0.1 });
-const poleMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
-poleMesh.scale.y = 1; 
-polePivot.add(poleMesh);
-polePivot.position.set(-0.1, 0, 0);
 
 // ==========================================
 // 🎬 動畫控制 (GSAP + ScrollTrigger)
@@ -302,18 +294,28 @@ gsap.to(bgGroup.position, {
     y: 150, 
     ease: "none",
     scrollTrigger: { 
-        trigger: "#hero", 
+        trigger: "#top", 
         start: "top top", 
         end: "bottom top", 
         scrub: true 
     }
 });
 
+// 🎯 竿子在最上方區塊 65% 處滑入 (一次性觸發，避免同步速度感不適)
 ScrollTrigger.create({
-    trigger: ".concept-section",
-    start: "top 68%", 
-    onEnter: () => { polePivot.visible = true; },
-    onLeaveBack: () => { polePivot.visible = false; }
+    trigger: "#top",
+    start: "65% top", 
+    onEnter: () => { 
+        polePivot.visible = true; 
+        gsap.to(polePivot.position, { y: 5, duration: 1.5, ease: "power2.out" });
+    },
+    onLeaveBack: () => { 
+        gsap.to(polePivot.position, { 
+            y: -40, 
+            duration: 1, 
+            onComplete: () => { polePivot.visible = false; } 
+        });
+    }
 });
 
 gsap.to(polePivot.position, {
@@ -359,13 +361,13 @@ ScrollTrigger.create({
         gsap.to(carouselGroup.position, { x: -30, duration: 1.2, ease: "power2.in" });
         gsap.to(slideGroup.position, { 
             x: 30, 
-            duration: 1, 
+            duration: 1.2, 
             ease: "power2.in",
-            onComplete: () => { 
-                carouselGroup.visible = false; 
+            onComplete: () => {
                 slideGroup.visible = false; 
+                carouselGroup.visible = false;
             }
-        }); 
+        });
     }
 });
 
@@ -414,13 +416,13 @@ function spawnRollingBall() {
 function ballSpawnLoop() {
     if (!isBallAnimationActive) return;
     spawnRollingBall();
-    gsap.delayedCall(1.5, ballSpawnLoop); // 縮短間隔至 1.5 秒
+    gsap.delayedCall(1.5, ballSpawnLoop); 
 }
 
 ScrollTrigger.create({
-    trigger: ".concept-section", // 從 ALBUM 區開始
+    trigger: ".concept-section", 
     start: "top bottom",
-    endTrigger: "html", // 持續到整個網頁結束
+    endTrigger: "html", 
     end: "bottom top",
     onEnter: () => { 
         if (!isBallAnimationActive) {
@@ -434,11 +436,7 @@ ScrollTrigger.create({
             ballSpawnLoop(); 
         }
     },
-    onLeave: () => { 
-        // 只有在滾動超過底部或回到頂部時才考慮停止（這裡設定為完全離開觸發區域）
-    },
     onLeaveBack: () => { 
-        // 回到 Hero 區時停止並清理
         isBallAnimationActive = false; 
         gsap.killDelayedCallsTo(ballSpawnLoop); 
         ballGroup.clear(); 
@@ -456,7 +454,7 @@ loader.load('model/ball1.glb', (gltf) => {
     ballBaseMesh.scale.set(3, 3, 3);
 });
 
-loader.load('model/level404_sign.glb', (gltf) => {
+loader.load('model/level404.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
@@ -465,13 +463,26 @@ loader.load('model/level404_sign.glb', (gltf) => {
     signpostGroup.add(model);
     const initialScale = 10 / Math.max(size.x, size.y, size.z); 
     signpostGroup.scale.set(initialScale, initialScale, initialScale);
-    gsap.to(signpostGroup.scale, {
-        x: initialScale * 3, y: initialScale * 3, z: initialScale * 3,
-        scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 70%", scrub: 1 }
+    
+    // 🎯 告示牌先同步放大、後同步上滑 (保留順序動畫，起始點恢復至 top bottom)
+    const signpostTL = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".concept-section",
+            start: "top bottom",
+            end: "top 20%",
+            scrub: 1,
+            onEnter: () => { signpostGroup.visible = true; },
+            onLeaveBack: () => { signpostGroup.visible = false; }
+        }
     });
-    gsap.to(signpostGroup.position, {
-        y: 40, 
-        scrollTrigger: { trigger: ".concept-section", start: "top 70%", end: "top 50%", scrub: 1 }
+
+    signpostTL.to(signpostGroup.scale, {
+        x: initialScale * 3, y: initialScale * 3, z: initialScale * 3,
+        ease: "power1.inOut"
+    })
+    .to(signpostGroup.position, {
+        y: 40,
+        ease: "power1.inOut"
     });
 });
 
@@ -487,24 +498,26 @@ loader.load('model/walkmancopy.glb', (gltf) => {
     walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
 });
 
-loader.load('model/building.glb', (gltf) => {
+loader.load('model/buildingcopy.glb', (gltf) => {
     const m = gltf.scene;
     const b = new THREE.Box3().setFromObject(m);
     const c = b.getCenter(new THREE.Vector3());
+    const size = b.getSize(new THREE.Vector3());
     m.position.set(-c.x, -c.y, -c.z);
     bgGroup.add(m);
-    const s = 80 / Math.max(b.getSize(new THREE.Vector3()).x, b.getSize(new THREE.Vector3()).y, b.getSize(new THREE.Vector3()).z);
-    bgGroup.scale.set(s, s, s);
+    const s = 80 / Math.max(size.x, size.y, size.z);
+    m.scale.set(s, s, s);
 });
 
-loader.load('model/grasscopy.glb', (gltf) => {
-    const m = gltf.scene;
-    const b = new THREE.Box3().setFromObject(m);
-    const c = b.getCenter(new THREE.Vector3());
-    m.position.set(-c.x, -c.y, -c.z - 10); 
-    m.position.y -= 10; m.position.z += 15;
-    m.scale.set(40, 45, 25); 
-    bgGroup.add(m);
+loader.load('model/pole.glb', (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    model.position.set(-center.x-6.7, -center.y+5, -center.z+50);
+    polePivot.add(model);
+    const s = 24 / Math.max(size.x, size.y, size.z);
+    model.scale.set(s, s, s);
 });
 
 loader.load('model/headcopy.glb', (gltf) => {

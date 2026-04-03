@@ -1,6 +1,6 @@
 /**
  * Level 404 - Main Script (Cinematic Version)
- * Optimized for Mobile Performance.
+ * Optimized for Mobile Performance while maintaining visual integrity.
  */
 
 // 💡 偵測是否為手機端
@@ -20,7 +20,7 @@ let mouseTimeout;
 let idleTime = 0;
 const CONSTRAINT_RADIUS = 0.5; 
 
-// 滑鼠移動偵測 (僅在非手機端啟用以省電)
+// 滑鼠移動偵測
 if (!isMobile) {
     window.addEventListener('mousemove', (event) => {
         isMouseActive = true;
@@ -53,11 +53,10 @@ camera.position.set(0, 0, 10);
 
 const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true, powerPreference: "high-performance" });
 renderer.setSize(window.innerWidth, window.innerHeight);
-// 🚀 手機端限制解析度為 1，桌機最高 2
 renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-// 🎨 燈光設定 (手機端簡化燈光計算)
+// 🎨 燈光設定
 scene.add(new THREE.AmbientLight(0xddeeff, 1.2)); 
 const areaLight = new THREE.SpotLight(0xffffff, isMobile ? 2 : 3);
 areaLight.position.set(10, 25, 10);
@@ -121,20 +120,18 @@ if (musicToggle) {
 }
 
 // ==========================================
-// 🌌 打造擬真圓形光暈星空 🌌
+// 🌌 星空優化
 // ==========================================
 function createRealisticStarTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 64; 
     canvas.height = 64;
     const ctx = canvas.getContext('2d');
-    
     const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
     gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)'); 
     gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)'); 
     gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 64, 64);
     return new THREE.CanvasTexture(canvas);
@@ -152,7 +149,6 @@ for(let i = 0; i < starCount; i++) {
     starPosArray[i * 3] = (Math.random() - 0.5) * 1800;
     starPosArray[i * 3 + 1] = (Math.random() - 0.5) * 1800;
     starPosArray[i * 3 + 2] = (Math.random() - 0.5) * 1800;
-
     const type = Math.random();
     let r, g, b;
     if (type > 0.8) { r = 0.7; g = 0.8; b = 1.0; }
@@ -210,6 +206,9 @@ slideGroup.position.z = -20;
 slideGroup.visible = false; 
 scene.add(slideGroup);
 
+const ballGroup = new THREE.Group();
+scene.add(ballGroup);
+
 function updateResponsiveLayout() {
     const width = window.innerWidth;
     const isNowMobile = width <= 768;
@@ -226,8 +225,21 @@ function updateResponsiveLayout() {
         }
     }
 
-    if (carouselGroup) carouselGroup.visible = !isNowMobile;
-    if (slideGroup) slideGroup.visible = !isNowMobile;
+    if (carouselGroup) {
+        carouselGroup.visible = isNowMobile ? false : carouselGroup.visible;
+        if (!isNowMobile) {
+            carouselGroup.scale.set(2.5, 2.5, 2.5);
+            carouselGroup.position.y = 0; 
+        }
+    }
+
+    if (slideGroup) {
+        slideGroup.visible = isNowMobile ? false : slideGroup.visible;
+        if (!isNowMobile) {
+            slideGroup.scale.set(6.0, 6.0, 6.0);
+            slideGroup.position.y = 0; 
+        }
+    }
 
     if (bgGroup) {
         bgGroup.scale.set(isNowMobile ? 0.7 : 1, isNowMobile ? 0.7 : 1, isNowMobile ? 0.7 : 1);
@@ -243,12 +255,31 @@ gsap.to(bgGroup.position, { y: 150, ease: "none", scrollTrigger: { trigger: "#to
 const poleTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "top 25%", scrub: 0.7, onEnter: () => { polePivot.visible = true; }, onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }}});
 poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 }).to(polePivot.position, { y: 5, duration: 3 }).to(polePivot.position, { y: 60, duration: 1.0 });
 
+// 🚀 確保 Walkman 在手機端也能正確觸發
 const walkmanTL = gsap.timeline({ scrollTrigger: { trigger: ".story-section", start: "top 80%", endTrigger: ".merch-section", end: "top top", scrub: 1.5, onEnter: () => { walkmanGroup.visible = true; }, onLeaveBack: () => { walkmanGroup.visible = false; }}});
 walkmanTL.fromTo(walkmanGroup.position, { y: -40 }, { y: -5, duration: 1 }).to(walkmanGroup.position, { y: -5, duration: 3 }).to(walkmanGroup.position, { y: 25, duration: 1 });
 
+// 🚀 恢復木馬與滑梯動畫
+ScrollTrigger.create({
+    trigger: ".concept-section", 
+    start: "top 50%",            
+    onEnter: () => { 
+        if (window.innerWidth > 768) {
+            carouselGroup.visible = true; slideGroup.visible = true; 
+            gsap.to(carouselGroup.position, { x: -30, duration: 0.6, ease: "power3.out" }); 
+            gsap.to(slideGroup.position, { x: 30, duration: 0.6, ease: "power3.out" }); 
+        }
+    },
+    onLeaveBack: () => { 
+        if (window.innerWidth > 768) {
+            gsap.to(carouselGroup.position, { x: -70, duration: 0.6, ease: "power2.in" }); 
+            gsap.to(slideGroup.position, { x: 70, duration: 0.6, ease: "power2.in", onComplete: () => { slideGroup.visible = false; carouselGroup.visible = false; }});
+        }
+    }
+});
+
 const loader = new THREE.GLTFLoader(loadingManager);
 
-// 🚀 核心模型 (全端載入)
 loader.load('model/level404.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -274,7 +305,6 @@ loader.load('model/walkmancopy.glb', (gltf) => {
     walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
 });
 
-// 🚀 背景模型 (現在手機端也會載入)
 loader.load('model/buildingcopy.glb', (m) => {
     const model = m.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -295,7 +325,7 @@ loader.load('model/pole.glb', (gltf) => {
     model.scale.set(s, s, s);
 });
 
-// 🚀 僅桌機端載入的模型
+// 僅桌機端載入
 if (!isMobile) {
     loader.load('model/headcopy.glb', (gltf) => {
         const m = gltf.scene;
@@ -416,11 +446,8 @@ function animate() {
         headPivot.rotation.y += Math.sin(idleTime) * 0.003;
         headPivot.rotation.x += Math.cos(idleTime * 0.5) * 0.003;
     }
-    
-    // 🚀 手機端也會執行的動畫
     if (carouselGroup && carouselGroup.visible) carouselGroup.rotation.y += 0.01; 
     if (slideGroup && slideGroup.visible) slideGroup.rotation.y -= 0.01; 
-    
     renderer.render(scene, camera);
 }
 animate();

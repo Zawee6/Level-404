@@ -375,9 +375,11 @@ document.querySelectorAll('.nav-link').forEach(link => {
 window.addEventListener('click', () => { if (dropdownContent && dropdownContent.classList.contains('show')) dropdownContent.classList.remove('show'); });
 
 const storyCards = document.querySelectorAll('.story-card');
+const storyContainer = document.querySelector('.story-container');
 const prevBtn = document.querySelector('.story-nav.prev');
 const nextBtn = document.querySelector('.story-nav.next');
 let currentCardIndex = 0;
+
 function updateStoryCards() {
     if(!storyCards.length) return;
     storyCards.forEach((card, index) => {
@@ -387,8 +389,45 @@ function updateStoryCards() {
         else card.classList.add('next-card');
     });
 }
-if (prevBtn) prevBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length; updateStoryCards(); });
-if (nextBtn) nextBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex + 1) % storyCards.length; updateStoryCards(); });
+
+function nextCard() {
+    currentCardIndex = (currentCardIndex + 1) % storyCards.length;
+    updateStoryCards();
+}
+
+function prevCard() {
+    currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length;
+    updateStoryCards();
+}
+
+if (prevBtn) prevBtn.addEventListener('click', prevCard);
+if (nextBtn) nextBtn.addEventListener('click', nextCard);
+
+// 📱 手機端左右滑動切換
+let touchStartX = 0;
+let touchEndX = 0;
+
+if (storyContainer) {
+    storyContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    storyContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+}
+
+function handleSwipe() {
+    const swipeThreshold = 50; // 滑動超過 50px 才觸發
+    if (touchEndX < touchStartX - swipeThreshold) {
+        nextCard(); // 向左滑，看下一張
+    }
+    if (touchEndX > touchStartX + swipeThreshold) {
+        prevCard(); // 向右滑，看前一張
+    }
+}
+
 updateStoryCards();
 
 function animate() {

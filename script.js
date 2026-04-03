@@ -1,6 +1,6 @@
 /**
  * Level 404 - Main Script (Cinematic Version)
- * Optimized for Mobile Performance while maintaining visual integrity.
+ * Optimized for Mobile Performance and Stability.
  */
 
 // 💡 偵測是否為手機端
@@ -20,17 +20,14 @@ let mouseTimeout;
 let idleTime = 0;
 const CONSTRAINT_RADIUS = 0.5; 
 
-// 滑鼠移動偵測
 if (!isMobile) {
     window.addEventListener('mousemove', (event) => {
         isMouseActive = true;
         clearTimeout(mouseTimeout);
         mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1500);
-
         const nx = (event.clientX / window.innerWidth - 0.5) * 2;
         const ny = -(event.clientY / window.innerHeight - 0.5) * 2;
         const dist = Math.sqrt(nx * nx + ny * ny);
-        
         const scale = dist > CONSTRAINT_RADIUS ? CONSTRAINT_RADIUS / dist : 1.0;
         targetMouse.x = nx * scale;
         targetMouse.y = ny * scale;
@@ -51,7 +48,12 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000); 
 camera.position.set(0, 0, 10); 
 
-const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true, powerPreference: "high-performance" });
+const renderer = new THREE.WebGLRenderer({ 
+    antialias: !isMobile, 
+    alpha: true, 
+    powerPreference: "high-performance",
+    precision: isMobile ? "mediump" : "highp" 
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
@@ -120,9 +122,10 @@ if (musicToggle) {
 }
 
 // ==========================================
-// 🌌 星空優化
+// 🌌 星空系統
 // ==========================================
 function createRealisticStarTexture() {
+    if (isMobile) return null;
     const canvas = document.createElement('canvas');
     canvas.width = 64; 
     canvas.height = 64;
@@ -141,7 +144,7 @@ const starGroup = new THREE.Group();
 scene.add(starGroup);
 
 const starGeometry = new THREE.BufferGeometry();
-const starCount = isMobile ? 1500 : 6000; 
+const starCount = isMobile ? 1000 : 6000; 
 const starPosArray = new Float32Array(starCount * 3);
 const starColorArray = new Float32Array(starCount * 3);
 
@@ -163,7 +166,7 @@ starGeometry.setAttribute('position', new THREE.BufferAttribute(starPosArray, 3)
 starGeometry.setAttribute('color', new THREE.BufferAttribute(starColorArray, 3));
 
 const starMaterial = new THREE.PointsMaterial({
-    size: isMobile ? 6 : 4.5, 
+    size: isMobile ? 2 : 4.5, 
     map: createRealisticStarTexture(),
     transparent: true,
     opacity: 0.8,
@@ -206,17 +209,12 @@ slideGroup.position.z = -20;
 slideGroup.visible = false; 
 scene.add(slideGroup);
 
-const ballGroup = new THREE.Group();
-scene.add(ballGroup);
-
 function updateResponsiveLayout() {
     const width = window.innerWidth;
     const isNowMobile = width <= 768;
-
     camera.fov = isNowMobile ? 85 : 75; 
     camera.position.z = isNowMobile ? 12 : 10; 
     camera.updateProjectionMatrix();
-
     if (headPivot) {
         headPivot.visible = !isNowMobile;
         if (!isNowMobile) {
@@ -224,62 +222,91 @@ function updateResponsiveLayout() {
             headPivot.scale.set(1.5, 1.5, 1.5); 
         }
     }
-
     if (carouselGroup) {
         carouselGroup.visible = isNowMobile ? false : carouselGroup.visible;
-        if (!isNowMobile) {
-            carouselGroup.scale.set(2.5, 2.5, 2.5);
-            carouselGroup.position.y = 0; 
-        }
+        if (!isNowMobile) { carouselGroup.scale.set(2.5, 2.5, 2.5); carouselGroup.position.y = 0; }
     }
-
     if (slideGroup) {
         slideGroup.visible = isNowMobile ? false : slideGroup.visible;
-        if (!isNowMobile) {
-            slideGroup.scale.set(6.0, 6.0, 6.0);
-            slideGroup.position.y = 0; 
-        }
+        if (!isNowMobile) { slideGroup.scale.set(6.0, 6.0, 6.0); slideGroup.position.y = 0; }
     }
-
     if (bgGroup) {
         bgGroup.scale.set(isNowMobile ? 0.7 : 1, isNowMobile ? 0.7 : 1, isNowMobile ? 0.7 : 1);
     }
 }
 
-// GSAP Animations
-const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
-seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }).to("#sea-overlay", { y: "0%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
+// ==========================================
+// 🚀 核心動畫邏輯 🚀
+// ==========================================
 
-gsap.to(bgGroup.position, { y: 150, ease: "none", scrollTrigger: { trigger: "#top", start: "top top", end: "bottom top", scrub: true }});
-
-const poleTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "top 25%", scrub: 0.7, onEnter: () => { polePivot.visible = true; }, onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }}});
-poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 }).to(polePivot.position, { y: 5, duration: 3 }).to(polePivot.position, { y: 60, duration: 1.0 });
-
-// 🚀 確保 Walkman 在手機端也能正確觸發
-const walkmanTL = gsap.timeline({ scrollTrigger: { trigger: ".story-section", start: "top 80%", endTrigger: ".merch-section", end: "top top", scrub: 1.5, onEnter: () => { walkmanGroup.visible = true; }, onLeaveBack: () => { walkmanGroup.visible = false; }}});
-walkmanTL.fromTo(walkmanGroup.position, { y: -40 }, { y: -5, duration: 1 }).to(walkmanGroup.position, { y: -5, duration: 3 }).to(walkmanGroup.position, { y: 25, duration: 1 });
-
-// 🚀 恢復木馬與滑梯動畫
-ScrollTrigger.create({
-    trigger: ".concept-section", 
-    start: "top 50%",            
-    onEnter: () => { 
-        if (window.innerWidth > 768) {
-            carouselGroup.visible = true; slideGroup.visible = true; 
-            gsap.to(carouselGroup.position, { x: -30, duration: 0.6, ease: "power3.out" }); 
-            gsap.to(slideGroup.position, { x: 30, duration: 0.6, ease: "power3.out" }); 
-        }
-    },
-    onLeaveBack: () => { 
-        if (window.innerWidth > 768) {
-            gsap.to(carouselGroup.position, { x: -70, duration: 0.6, ease: "power2.in" }); 
-            gsap.to(slideGroup.position, { x: 70, duration: 0.6, ease: "power2.in", onComplete: () => { slideGroup.visible = false; carouselGroup.visible = false; }});
-        }
+// 🚀 1. 背景建築上升動畫 (Fix: 確保它一定會動)
+gsap.to(bgGroup.position, {
+    y: 150,
+    ease: "none",
+    scrollTrigger: {
+        trigger: "#top",
+        start: "top top",
+        end: "bottom top",
+        scrub: true
     }
 });
 
-const loader = new THREE.GLTFLoader(loadingManager);
+// 🚀 2. 電線桿動畫
+const poleTL = gsap.timeline({ 
+    scrollTrigger: { 
+        trigger: ".concept-section", 
+        start: "top bottom", 
+        endTrigger: ".story-section", 
+        end: "top 25%", 
+        scrub: 0.7, 
+        onEnter: () => { polePivot.visible = true; }, 
+        onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }
+    }
+});
+poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 })
+      .to(polePivot.position, { y: 5, duration: 3 })
+      .to(polePivot.position, { y: 60, duration: 1.0 });
 
+// 🚀 3. Walkman 動畫
+const walkmanTL = gsap.timeline({ 
+    scrollTrigger: { 
+        trigger: ".story-section", 
+        start: "top 80%", 
+        endTrigger: ".merch-section", 
+        end: "top top", 
+        scrub: 1.5, 
+        onEnter: () => { walkmanGroup.visible = true; }, 
+        onLeaveBack: () => { walkmanGroup.visible = false; }
+    }
+});
+walkmanTL.fromTo(walkmanGroup.position, { y: -40 }, { y: -5, duration: 1 })
+         .to(walkmanGroup.position, { y: -5, duration: 3 })
+         .to(walkmanGroup.position, { y: 25, duration: 1 });
+
+// 🚀 4. 木馬與滑梯動畫 (僅桌機)
+if (!isMobile) {
+    ScrollTrigger.create({
+        trigger: ".concept-section", 
+        start: "top 50%",            
+        onEnter: () => { 
+            carouselGroup.visible = true; slideGroup.visible = true; 
+            gsap.to(carouselGroup.position, { x: -30, duration: 0.6, ease: "power3.out" }); 
+            gsap.to(slideGroup.position, { x: 30, duration: 0.6, ease: "power3.out" }); 
+        },
+        onLeaveBack: () => { 
+            gsap.to(carouselGroup.position, { x: -70, duration: 0.6, ease: "power2.in" }); 
+            gsap.to(slideGroup.position, { x: 70, duration: 0.6, ease: "power2.in", onComplete: () => { slideGroup.visible = false; carouselGroup.visible = false; }});
+        }
+    });
+}
+
+// 🚀 5. Sea Overlay 動畫 (僅桌機)
+if (!isMobile) {
+    const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
+    seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }).to("#sea-overlay", { y: "0%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
+}
+
+const loader = new THREE.GLTFLoader(loadingManager);
 loader.load('model/level404.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -325,7 +352,6 @@ loader.load('model/pole.glb', (gltf) => {
     model.scale.set(s, s, s);
 });
 
-// 僅桌機端載入
 if (!isMobile) {
     loader.load('model/headcopy.glb', (gltf) => {
         const m = gltf.scene;
@@ -338,7 +364,6 @@ if (!isMobile) {
         bgGroup.add(headPivot);
         updateResponsiveLayout();
     });
-
     loader.load('model/carouselcopy.glb', (gltf) => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
@@ -347,7 +372,6 @@ if (!isMobile) {
         carouselGroup.add(model);
         updateResponsiveLayout();
     });
-
     loader.load('model/slidecopy.glb', (gltf) => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
@@ -390,37 +414,19 @@ function updateStoryCards() {
     });
 }
 
-function nextCard() {
-    currentCardIndex = (currentCardIndex + 1) % storyCards.length;
-    updateStoryCards();
-}
-
-function prevCard() {
-    currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length;
-    updateStoryCards();
-}
-
+function nextCard() { currentCardIndex = (currentCardIndex + 1) % storyCards.length; updateStoryCards(); }
+function prevCard() { currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length; updateStoryCards(); }
 if (prevBtn) prevBtn.addEventListener('click', prevCard);
 if (nextBtn) nextBtn.addEventListener('click', nextCard);
 
 let touchStartX = 0;
-let touchEndX = 0;
-
 if (storyContainer) {
-    storyContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
+    storyContainer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
     storyContainer.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 50) { if (diff > 0) nextCard(); else prevCard(); }
     }, { passive: true });
-}
-
-function handleSwipe() {
-    const swipeThreshold = 50; 
-    if (touchEndX < touchStartX - swipeThreshold) nextCard();
-    if (touchEndX > touchStartX + swipeThreshold) prevCard();
 }
 
 updateStoryCards();
@@ -430,7 +436,7 @@ function animate() {
     if (starGroup) {
         starGroup.rotation.y += 0.0003;
         starGroup.rotation.z += 0.0001;
-        starMaterial.opacity = 0.6 + Math.sin(Date.now() * 0.001) * 0.2;
+        if (!isMobile) starMaterial.opacity = 0.6 + Math.sin(Date.now() * 0.001) * 0.2;
     }
     if (headPivot && headPivot.visible) {
         if (isMouseActive) {

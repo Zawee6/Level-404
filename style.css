@@ -5,7 +5,7 @@
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 10000; /* 確保在所有元素（包括 Loading）之上 */
+    z-index: 10000;
 }
 
 .dropdown {
@@ -38,7 +38,6 @@
     backdrop-filter: blur(10px);
 }
 
-/* 顯示選單 */
 .dropdown-content.show {
     display: block;
 }
@@ -55,8 +54,8 @@
 }
 
 .dropdown:hover .dropbtn {
-    background-color: #ff4500;
-    border-color: #ff4500;
+    background-color: #d32f2f;
+    border-color: #d32f2f;
 }
 
 /* =========================================
@@ -87,7 +86,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.5s ease;
 }
 
 .loader-content {
@@ -97,8 +95,8 @@ body {
 .spinner {
     width: 50px;
     height: 50px;
-    border: 3px solid rgba(255, 69, 0, 0.3);
-    border-top: 3px solid #ff4500;
+    border: 3px solid rgba(211, 47, 47, 0.3);
+    border-top: 3px solid #d32f2f;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 20px;
@@ -109,113 +107,33 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* 🎵 整合式右下角控制方框 🎵 */
-.mini-control-box {
+/* 🎵 固定靜音按鈕 🎵 */
+.fixed-mute-btn {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 30px;
+    right: 30px;
     z-index: 1000;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    padding: 15px 20px;
-    width: 320px; /* 稍微加寬 */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
-}
-
-.mini-player {
-    display: flex;
-    flex-direction: column;
-    gap: 3px; /* 縮小至 3px */
-}
-
-.mini-top-row {
-    display: flex;
-    justify-content: space-between; /* 讓曲名與按鈕分開到左右兩端 */
-    align-items: center;
-    width: 100%;
-}
-
-#mini-track-name {
-    flex: 1;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #ff4500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    letter-spacing: 1px;
-    text-align: left;
-    padding-right: 15px;
-}
-
-.mini-btns {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-.mini-icon-btn {
-    background: transparent;
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
-.mini-icon-btn:hover {
-    border-color: #ff4500;
-    color: #ff4500;
-    background: rgba(255, 69, 0, 0.1);
+.fixed-mute-btn:hover {
+    border-color: #d32f2f;
+    color: #d32f2f;
+    transform: scale(1.1);
 }
-
-.mini-progress-container {
-    width: 100%;
-}
-
-/* 迷你互動進度條樣式 - 橘色填滿效果 */
-.mini-range {
-    width: 100%;
-    cursor: pointer;
-    height: 4px;
-    border-radius: 2px;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    /* 使用漸層背景模擬橘色填滿 (由 JS 更新 --progress) */
-    background: linear-gradient(to right, #ff4500 var(--progress, 0%), rgba(255, 255, 255, 0.1) var(--progress, 0%));
-}
-
-.mini-range::-webkit-slider-runnable-track {
-    height: 4px;
-    background: transparent;
-}
-
-.mini-range::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
-    height: 12px;
-    width: 12px;
-    border-radius: 50%;
-    background: #ff4500;
-    cursor: pointer;
-    margin-top: -4px; /* 置中 */
-    box-shadow: 0 0 5px rgba(255, 69, 0, 0.5);
-    border: 2px solid white;
-}
-
-/* 隱藏舊按鈕 */
-.music-btn { display: none; }
 
 /* 🌟 3D 主視覺容器 🌟 */
 #three-container {
@@ -236,15 +154,15 @@ body {
     height: 100vh;
     background: url('sea.gif') no-repeat center center;
     background-size: cover;
-    opacity: 0.3; /* 預設 30% 透明度 */
-    z-index: 11; /* 在模型 (10) 之後，在文字內容 (20) 之前 */
+    opacity: 0.3;
+    z-index: 11;
     pointer-events: none;
-    transform: translateY(100%); /* 初始在螢幕下方 */
+    transform: translateY(100%);
 }
 
-/* 內容區塊 */
+/* 內容區塊基礎 */
 .section {
-    padding: 80px 20px;
+    padding: 100px 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -253,245 +171,102 @@ body {
     text-align: center;
     position: relative;
     z-index: 20; 
-    background-color: rgba(17, 17, 17, 0.4); 
 }
 
-.hero-section {
-    height: 100vh;
+@media (max-width: 768px) {
+    .section { padding: 60px 15px; }
 }
+
+.hero-section { height: 100vh; }
 
 .concept-section {
     min-height: 100vh; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     background-color: rgba(30, 30, 30, 0.5);
 }
 
+.concept-image {
+    width: 90%;
+    max-width: 450px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   2. MV 區塊
+========================================= */
+.mv-section {
+    background-color: rgba(20, 20, 20, 0.6);
+    min-height: 120vh; 
+}
+
 .mv-block {
-    margin-top: 60px;
+    margin-top: 80px;
     width: 100%;
 }
 
 .mv-embed {
-    margin-bottom: 60px;    
     width: 100%;
-    display: flex;          
-    flex-direction: column; 
-    align-items: center;    
+    max-width: 800px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .mv-embed iframe {
-    width: 95%;             
-    max-width: 600px;       /* 📱 手機版：最大寬度限制 */
+    width: 100%;             
     aspect-ratio: 16 / 9;   
-    height: auto;           
-    border-radius: 8px;    
+    border-radius: 12px;    
     border: none;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); 
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); 
 }
 
 .watch-btn {
     display: inline-block;
-    margin-top: 20px;       
-    padding: 10px 30px;     
-    background-color: transparent; 
-    border: 2px solid #ff4500; 
-    color: #ff4500;                
+    margin-top: 30px;       
+    padding: 12px 40px;     
+    border: 2px solid #d32f2f; 
+    color: #d32f2f;                
     text-decoration: none;
     font-weight: bold;
-    font-size: 0.9rem;      /* 📱 手機版：精緻小字體 */
     letter-spacing: 2px;    
     transition: all 0.4s ease;
-    border-radius: 0px;
 }
 
-.watch-btn:hover {
-    background-color: #ff4500;     
-    color: #fff;                   
-    box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
-}
+.watch-btn:hover { background-color: #d32f2f; color: #fff; }
 
 a.call-to-action {
     display: inline-block;
-    margin-top: 20px;
     padding: 10px 25px;
-    background-color: #ff4500; 
+    background-color: #d32f2f; 
     color: #fff;
     text-decoration: none;
     border-radius: 5px;
-    transition: background-color 0.3s;
-}
-a.call-to-action:hover {
-    background-color: #e63900;
 }
 
 /* =========================================
-   3. MV、MUSIC、STORY 與周邊商品區塊
+   3. STORY 區塊
 ========================================= */
-.mv-section {
-    background-color: rgba(20, 20, 20, 0.6);
-    min-height: 150vh; 
-}
-
-.music-section {
-    background-color: #111;
-    min-height: 80vh;
-}
-
-/* 🎵 音樂播放器樣式 🎵 */
-.music-player-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    width: 100%;
-    max-width: 900px;
-    margin: 40px auto;
-    align-items: center;
-}
-
-.playlist-container {
-    width: 100%;
-    background: transparent;
-    border: none;
-    max-height: none; 
-    overflow-y: visible;
-}
-
-#playlist {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-}
-
-#playlist li {
-    padding: 15px 20px;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-    text-align: center;
-    font-size: 1.1rem;
-    color: #888;
-}
-
-#playlist li:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-#playlist li.active {
-    background: transparent;
-    color: #ff4500;
-    font-weight: bold;
-    border-bottom: 1px solid #ff4500;
-    transform: scale(1.15); /* 播放中的歌曲放大 1.15 倍 */
-    z-index: 1; /* 確保放大時不會被遮擋 */
-}
-
-.player-controls {
-    width: 100%;
-    max-width: 900px;
-    min-height: auto; 
-    background: rgba(0, 0, 0, 0.4);
-    padding: 40px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 25px;
-    box-sizing: border-box;
-}
-
-.player-info {
-    width: 100%;
-    text-align: center;
-    padding-bottom: 10px;
-}
-
-#current-track-name {
-    font-size: 1.5rem; /* 曲名縮小 */
-    color: #ff4500;
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
-.control-row {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.player-btn {
-    background: #ff4500;
-    color: white;
-    border: none;
-    padding: 18px 80px; 
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1.2rem;
-    letter-spacing: 4px;
-    transition: all 0.3s ease;
-}
-
-.player-btn:hover {
-    background: #e63900;
-    transform: scale(1.05);
-}
-
-.progress-row {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-#progress-bar {
-    width: 100%;
-    accent-color: #ff4500;
-    cursor: pointer;
-    height: 6px;
-}
-
-.time-display {
-    font-size: 0.8rem;
-    color: #555;
-    display: flex;
-    justify-content: space-between;
-    letter-spacing: 1px;
-}
-
-/* 響應式：手機版調整 */
-@media (max-width: 768px) {
-    .music-player-wrapper {
-        gap: 30px;
-    }
-    
-    .player-btn {
-        width: 100%;
-        padding: 15px 0;
-    }
-}
-
 .story-section {
     background-color: rgba(25, 25, 25, 0.8);
     min-height: 100vh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .story-container {
     position: relative;
     width: 100%;
-    max-width: 800px;
-    height: 400px;
+    max-width: 900px;
+    min-height: 650px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 40px;
+    margin: 40px auto;
 }
 
 .story-card-wrapper {
@@ -505,18 +280,22 @@ a.call-to-action:hover {
 
 .story-card {
     position: absolute;
-    width: 80%;
-    max-width: 500px;
-    padding: 40px;
-    background: rgba(40, 40, 40, 0.9);
-    border: 1px solid #ff4500;
-    border-radius: 15px;
+    width: 85%;
+    max-width: 550px;
+    padding: 30px;
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(211, 47, 47, 0.5);
+    border-radius: 20px;
     text-align: center;
     opacity: 0;
-    transform: scale(0.8) translateX(100px);
-    transition: all 0.5s ease;
+    transform: scale(0.8) translateX(50%);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     pointer-events: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
 .story-card.active {
@@ -524,151 +303,124 @@ a.call-to-action:hover {
     transform: scale(1) translateX(0);
     pointer-events: auto;
     z-index: 2;
+    border-color: #d32f2f;
 }
 
-.story-card.prev-card {
-    opacity: 0.3;
-    transform: scale(0.8) translateX(-150px);
+.story-card.prev-card { transform: scale(0.8) translateX(-100%); }
+.story-card.next-card { transform: scale(0.8) translateX(100%); }
+
+.song-card-image {
+    width: 100%;
+    max-width: 350px;
+    max-height: 450px;
+    object-fit: contain;
+    border-radius: 10px;
 }
 
-.story-card.next-card {
-    opacity: 0.3;
-    transform: scale(0.8) translateX(150px);
-}
+.song-lyric { font-size: 1.1rem; font-style: italic; color: #d32f2f; margin: 10px 0; }
+.song-desc { font-size: 0.95rem; color: #bbb; }
 
 .story-nav {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: rgba(0, 0, 0, 0.3);
     border: none;
-    color: #ff4500;
+    color: #d32f2f;
     font-size: 2rem;
     cursor: pointer;
     z-index: 10;
-    padding: 20px;
-    transition: color 0.3s;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
 }
 
-.story-nav:hover {
+.story-nav.prev { left: 5px; }
+.story-nav.next { right: 5px; }
+
+/* =========================================
+   4. ITEM 區塊
+========================================= */
+.item-section { background-color: #222; }
+.merch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; }
+.merch-item { background-color: #333; padding: 20px; border-radius: 8px; }
+.merch-item h3 { color: #d32f2f; }
+.buy-button { display: block; padding: 10px; background-color: #d32f2f; color: #fff; text-decoration: none; border-radius: 4px; }
+
+/* =========================================
+   5. CREDITS 區塊 (電影感修復)
+========================================= */
+.credits-section {
+    background-color: #000;
     color: #fff;
-}
-
-.story-nav.prev { left: -20px; }
-.story-nav.next { right: -20px; }
-
-.item-section, .merch-section { 
-    background-color: #222; 
-}
-
-.subtitle { font-size: 1.1em; color: #aaa; margin-bottom: 40px; }
-
-.merch-grid {
-    display: grid;
-    grid-template-columns: 1fr; /* 📱 手機版：預設單欄排列 */
-    gap: 30px; 
-    max-width: 1200px; 
-    width: 100%;
-    margin-top: 20px;
-}
-
-.merch-item {
-    background-color: #333;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    padding: 150px 20px;
     text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
+    font-family: "Times New Roman", Georgia, serif; /* 🚀 使用經典電影襯線體 */
 }
 
-.merch-item:hover {
-    transform: translateY(-5px); 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-}
-
-.merch-image {
-    width: 100%;
-    height: auto;
-    max-height: 250px; 
-    object-fit: cover; 
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-.merch-item h3 { margin: 10px 0; color: #ff4500; }
-.price { font-size: 1.4em; font-weight: bold; color: #fff; margin-bottom: 15px; }
-
-.buy-button {
-    display: block;
-    padding: 10px;
-    background-color: #ff4500;
+.credits-title {
+    font-size: 3.5rem;
+    letter-spacing: 1.2rem; /* 🚀 加大字距，營造史詩感 */
+    margin-bottom: 100px;
+    font-weight: 300;
+    text-transform: uppercase;
     color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s;
 }
-.buy-button:hover { background-color: #e63900; }
 
+.credits-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 45px;
+}
 
-/* =========================================
-   🔥 4. 電腦大螢幕強化版 (螢幕 > 768px 時觸發) 🔥
-========================================= */
+.credit-row {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 60px; /* 🚀 對稱排版的中間空隙 */
+}
+
+.credit-row .role {
+    flex: 1;
+    text-align: right;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: #777; /* 🚀 職位使用較暗顏色，層次分明 */
+    letter-spacing: 0.2rem;
+}
+
+.credit-row .name {
+    flex: 1;
+    text-align: left;
+    font-size: 1.6rem;
+    color: #fff;
+    font-weight: 400;
+    letter-spacing: 0.1rem;
+}
+
+.credits-footer {
+    margin-top: 150px;
+    font-size: 0.9rem;
+    color: #444;
+    letter-spacing: 0.15rem;
+}
+
+/* 📱 手機版調整 */
+@media (max-width: 768px) {
+    .credit-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .credit-row .role, .credit-row .name { text-align: center; flex: none; }
+    .credits-title { font-size: 2.2rem; letter-spacing: 0.5rem; }
+    .credit-row .name { font-size: 1.4rem; }
+}
+
 @media (min-width: 769px) {
-    /* 字體與間距全面升級 */
-    body { font-size: 20px; }
-    h1 { font-size: 4rem; } 
-    h2 { font-size: 3rem; margin-bottom: 30px; } 
-    p { font-size: 1.4rem; } 
-
-    .section {
-        padding: 150px 10%; /* 增加大螢幕的呼吸空間 */
-    }
-
-    /* 影片與按鈕巨大化 */
-    .mv-embed iframe {
-        max-width: 1200px;  /* 💻 電腦版：巨型影片框 */
-        border-radius: 15px;    
-        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); 
-    }
-
-    .watch-btn {
-        margin-top: 35px;       
-        padding: 15px 50px;     
-        border-width: 3px;      /* 邊框加粗 */
-        font-size: 1.2rem;      /* 文字變大 */
-        letter-spacing: 4px;    
-    }
-
-    /* 周邊商品變回三欄 */
-    .merch-grid {
-        grid-template-columns: repeat(3, 1fr); 
-    }
-}
-
-/* =========================================
-   🌟 第二區塊：專輯圖片樣式 🌟
-========================================= */
-.concept-image {
-    width: 90%;             /* 手機版預設佔 90% 寬度 */
-    max-width: 450px;       /* 最大寬度限制，避免在電腦上太大 */
-    height: auto;
-    border-radius: 15px;    /* 導圓角，讓邊緣更柔和 */
-    margin-bottom: 40px;    /* 和下方「概念介紹」文字拉開距離 */
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8); /* 加上深色陰影，讓它從背景浮出來 */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* 微微的發光邊框 */
-    
-    /* 讓圖片出現時帶有一點動畫感 */
-    transition: transform 0.3s ease;
-}
-
-.concept-image:hover {
-    transform: scale(1.05); /* 滑鼠游標移過去時微微放大 */
-}
-
-/* 如果是電腦大螢幕，可以讓圖片再大一點 */
-@media (min-width: 769px) {
-    .concept-image {
-        max-width: 600px; 
-        margin-bottom: 50px;
-    }
+    body { font-size: 18px; }
+    h2 { font-size: 3.5rem; } 
+    .merch-grid { grid-template-columns: repeat(3, 1fr); }
 }

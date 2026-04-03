@@ -1,7 +1,10 @@
 /**
  * Level 404 - Main Script (Cinematic Version)
- * Realistic Round Stars with Glow, Full Object Timelines, and Music Control.
+ * Optimized for Mobile Performance.
  */
+
+// 💡 偵測是否為手機端
+const isMobile = window.innerWidth <= 768;
 
 // 💡 註冊外掛
 gsap.registerPlugin(ScrollTrigger);
@@ -17,20 +20,22 @@ let mouseTimeout;
 let idleTime = 0;
 const CONSTRAINT_RADIUS = 0.5; 
 
-// 滑鼠移動偵測
-window.addEventListener('mousemove', (event) => {
-    isMouseActive = true;
-    clearTimeout(mouseTimeout);
-    mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1500);
+// 滑鼠移動偵測 (僅在非手機端啟用以省電)
+if (!isMobile) {
+    window.addEventListener('mousemove', (event) => {
+        isMouseActive = true;
+        clearTimeout(mouseTimeout);
+        mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1500);
 
-    const nx = (event.clientX / window.innerWidth - 0.5) * 2;
-    const ny = -(event.clientY / window.innerHeight - 0.5) * 2;
-    const dist = Math.sqrt(nx * nx + ny * ny);
-    
-    const scale = dist > CONSTRAINT_RADIUS ? CONSTRAINT_RADIUS / dist : 1.0;
-    targetMouse.x = nx * scale;
-    targetMouse.y = ny * scale;
-});
+        const nx = (event.clientX / window.innerWidth - 0.5) * 2;
+        const ny = -(event.clientY / window.innerHeight - 0.5) * 2;
+        const dist = Math.sqrt(nx * nx + ny * ny);
+        
+        const scale = dist > CONSTRAINT_RADIUS ? CONSTRAINT_RADIUS / dist : 1.0;
+        targetMouse.x = nx * scale;
+        targetMouse.y = ny * scale;
+    });
+}
 
 // Lenis 平滑捲動
 const lenis = new Lenis();
@@ -46,24 +51,25 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000); 
 camera.position.set(0, 0, 10); 
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true, powerPreference: "high-performance" });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// 🚀 手機端限制解析度為 1，桌機最高 2
+renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-// 🎨 燈光設定
+// 🎨 燈光設定 (手機端簡化燈光計算)
 scene.add(new THREE.AmbientLight(0xddeeff, 1.2)); 
-const areaLight = new THREE.SpotLight(0xffffff, 3);
+const areaLight = new THREE.SpotLight(0xffffff, isMobile ? 2 : 3);
 areaLight.position.set(10, 25, 10);
-areaLight.angle = Math.PI / 4;
-areaLight.penumbra = 1; 
 areaLight.decay = 1.5;
 areaLight.distance = 150;
 scene.add(areaLight);
 
-const sideLight = new THREE.DirectionalLight(0xddeeff, 0.8);
-sideLight.position.set(-15, 10, 5);
-scene.add(sideLight);
+if (!isMobile) {
+    const sideLight = new THREE.DirectionalLight(0xddeeff, 0.8);
+    sideLight.position.set(-15, 10, 5);
+    scene.add(sideLight);
+}
 
 // ==========================================
 // 📦 載入管理器
@@ -119,49 +125,40 @@ if (musicToggle) {
 // ==========================================
 function createRealisticStarTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
+    canvas.width = 64; // 🚀 縮小貼圖尺寸
+    canvas.height = 64;
     const ctx = canvas.getContext('2d');
     
-    // 繪製多層漸層模擬光暈
-    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');     // 核心：純白
-    gradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.9)'); 
-    gradient.addColorStop(0.25, 'rgba(255, 255, 255, 0.4)'); // 第一層光暈
-    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');  // 第二層外散
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');      // 邊緣消失
+    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); 
+    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)'); 
+    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)'); 
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
     
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 128, 128);
-    
-    const texture = new THREE.CanvasTexture(canvas);
-    return texture;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(canvas);
 }
 
 const starGroup = new THREE.Group();
 scene.add(starGroup);
 
 const starGeometry = new THREE.BufferGeometry();
-const starCount = 6000; // 減少數量以換取更高質感的單點
+// 🚀 手機端粒子數大砍 75%，大幅提升流暢度
+const starCount = isMobile ? 1500 : 6000; 
 const starPosArray = new Float32Array(starCount * 3);
 const starColorArray = new Float32Array(starCount * 3);
 
 for(let i = 0; i < starCount; i++) {
-    // 廣域隨機分佈
     starPosArray[i * 3] = (Math.random() - 0.5) * 1800;
     starPosArray[i * 3 + 1] = (Math.random() - 0.5) * 1800;
     starPosArray[i * 3 + 2] = (Math.random() - 0.5) * 1800;
 
-    // 擬真色偏：藍白、白、暖黃
     const type = Math.random();
     let r, g, b;
-    if (type > 0.8) { // 偏藍星 (熱)
-        r = 0.7; g = 0.8; b = 1.0;
-    } else if (type > 0.6) { // 偏黃星 (老)
-        r = 1.0; g = 0.9; b = 0.7;
-    } else { // 主序白星
-        r = 1.0; g = 1.0; b = 1.0;
-    }
+    if (type > 0.8) { r = 0.7; g = 0.8; b = 1.0; }
+    else if (type > 0.6) { r = 1.0; g = 0.9; b = 0.7; }
+    else { r = 1.0; g = 1.0; b = 1.0; }
     starColorArray[i * 3] = r;
     starColorArray[i * 3 + 1] = g;
     starColorArray[i * 3 + 2] = b;
@@ -171,12 +168,12 @@ starGeometry.setAttribute('position', new THREE.BufferAttribute(starPosArray, 3)
 starGeometry.setAttribute('color', new THREE.BufferAttribute(starColorArray, 3));
 
 const starMaterial = new THREE.PointsMaterial({
-    size: 4.5, // 🚀 較大的發光感
+    size: isMobile ? 6 : 4.5, 
     map: createRealisticStarTexture(),
     transparent: true,
-    opacity: 0.9,
+    opacity: 0.8,
     vertexColors: true,
-    blending: THREE.AdditiveBlending, // 🚀 加法混合讓發光更像真實光源
+    blending: isMobile ? THREE.NormalBlending : THREE.AdditiveBlending, // 🚀 手機端改用一般混合
     depthWrite: false, 
     sizeAttenuation: true
 });
@@ -214,73 +211,43 @@ slideGroup.position.z = -20;
 slideGroup.visible = false; 
 scene.add(slideGroup);
 
-const ballGroup = new THREE.Group();
-scene.add(ballGroup);
-
 function updateResponsiveLayout() {
     const width = window.innerWidth;
-    const isMobile = width <= 768;
+    const isNowMobile = width <= 768;
 
-    camera.fov = isMobile ? 85 : 75; 
-    camera.position.z = isMobile ? 12 : 10; 
+    camera.fov = isNowMobile ? 85 : 75; 
+    camera.position.z = isNowMobile ? 12 : 10; 
     camera.updateProjectionMatrix();
 
     if (headPivot) {
-        headPivot.visible = !isMobile;
-        if (!isMobile) {
+        headPivot.visible = !isNowMobile;
+        if (!isNowMobile) {
             headPivot.position.set(40, 15, 0); 
             headPivot.scale.set(1.5, 1.5, 1.5); 
         }
     }
 
-    if (carouselGroup) {
-        carouselGroup.visible = isMobile ? false : carouselGroup.visible;
-        if (!isMobile) {
-            carouselGroup.scale.set(2.5, 2.5, 2.5);
-            carouselGroup.position.y = 0; 
-        }
-    }
-
-    if (slideGroup) {
-        slideGroup.visible = isMobile ? false : slideGroup.visible;
-        if (!isMobile) {
-            slideGroup.scale.set(6.0, 6.0, 6.0);
-            slideGroup.position.y = 0; 
-        }
-    }
+    if (carouselGroup) carouselGroup.visible = !isNowMobile;
+    if (slideGroup) slideGroup.visible = !isNowMobile;
 
     if (bgGroup) {
-        bgGroup.scale.set(isMobile ? 0.7 : 1, isMobile ? 0.7 : 1, isMobile ? 0.7 : 1);
+        bgGroup.scale.set(isNowMobile ? 0.7 : 1, isNowMobile ? 0.7 : 1, isNowMobile ? 0.7 : 1);
     }
 }
 
-// GSAP Animations
+// GSAP Animations (手機端減少過場負擔)
 const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
 seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }).to("#sea-overlay", { y: "0%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
 
 gsap.to(bgGroup.position, { y: 150, ease: "none", scrollTrigger: { trigger: "#top", start: "top top", end: "bottom top", scrub: true }});
 
-const poleTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "top 25%", scrub: 0.7, onEnter: () => { polePivot.visible = true; }, onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }}});
-poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 }).to(polePivot.position, { y: 5, duration: 3 }).to(polePivot.position, { y: 60, duration: 1.0 });
+const poleTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "top 25%", scrub: 0.7, onEnter: () => { if(!isMobile) polePivot.visible = true; }, onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }}});
+if (!isMobile) {
+    poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 }).to(polePivot.position, { y: 5, duration: 3 }).to(polePivot.position, { y: 60, duration: 1.0 });
+}
 
 const walkmanTL = gsap.timeline({ scrollTrigger: { trigger: ".story-section", start: "top 80%", endTrigger: ".merch-section", end: "top top", scrub: 1.5, onEnter: () => { walkmanGroup.visible = true; }, onLeaveBack: () => { walkmanGroup.visible = false; }}});
 walkmanTL.fromTo(walkmanGroup.position, { y: -40 }, { y: -5, duration: 1 }).to(walkmanGroup.position, { y: -5, duration: 3 }).to(walkmanGroup.position, { y: 25, duration: 1 });
-
-ScrollTrigger.create({
-    trigger: ".concept-section", 
-    start: "top 50%",            
-    onEnter: () => { 
-        if (window.innerWidth > 768) {
-            carouselGroup.visible = true; slideGroup.visible = true; 
-            gsap.to(carouselGroup.position, { x: -30, duration: 0.6, ease: "power3.out" }); 
-            gsap.to(slideGroup.position, { x: 30, duration: 0.6, ease: "power3.out" }); 
-        }
-    },
-    onLeaveBack: () => { 
-        gsap.to(carouselGroup.position, { x: -70, duration: 0.6, ease: "power2.in" }); 
-        gsap.to(slideGroup.position, { x: 70, duration: 0.6, ease: "power2.in", onComplete: () => { slideGroup.visible = false; carouselGroup.visible = false; }});
-    }
-});
 
 const loader = new THREE.GLTFLoader(loadingManager);
 loader.load('model/level404.glb', (gltf) => {
@@ -308,55 +275,58 @@ loader.load('model/walkmancopy.glb', (gltf) => {
     walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
 });
 
-loader.load('model/buildingcopy.glb', (m) => {
-    const model = m.scene;
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    model.position.set(-center.x, -center.y, -center.z);
-    bgGroup.add(model);
-    const s = 80 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
-    model.scale.set(s, s, s);
-});
+// 🚀 手機端不載入非必要的大型背景模型
+if (!isMobile) {
+    loader.load('model/buildingcopy.glb', (m) => {
+        const model = m.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.set(-center.x, -center.y, -center.z);
+        bgGroup.add(model);
+        const s = 80 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
+        model.scale.set(s, s, s);
+    });
 
-loader.load('model/pole.glb', (gltf) => {
-    const model = gltf.scene;
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    model.position.set(-center.x-6.7, -center.y+5, -center.z+50);
-    polePivot.add(model);
-    const s = 24 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
-    model.scale.set(s, s, s);
-});
+    loader.load('model/pole.glb', (gltf) => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.set(-center.x-6.7, -center.y+5, -center.z+50);
+        polePivot.add(model);
+        const s = 24 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
+        model.scale.set(s, s, s);
+    });
 
-loader.load('model/headcopy.glb', (gltf) => {
-    const m = gltf.scene;
-    const b = new THREE.Box3().setFromObject(m);
-    const c = b.getCenter(new THREE.Vector3());
-    headPivot = new THREE.Group();
-    m.rotation.y = -Math.PI/2; 
-    m.position.set(-c.x, -c.y, -c.z);
-    headPivot.add(m);
-    bgGroup.add(headPivot);
-    updateResponsiveLayout();
-});
+    loader.load('model/headcopy.glb', (gltf) => {
+        const m = gltf.scene;
+        const b = new THREE.Box3().setFromObject(m);
+        const c = b.getCenter(new THREE.Vector3());
+        headPivot = new THREE.Group();
+        m.rotation.y = -Math.PI/2; 
+        m.position.set(-c.x, -c.y, -c.z);
+        headPivot.add(m);
+        bgGroup.add(headPivot);
+        updateResponsiveLayout();
+    });
 
-loader.load('model/carouselcopy.glb', (gltf) => {
-    const model = gltf.scene;
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    model.position.set(-center.x, -center.y, -center.z);
-    carouselGroup.add(model);
-    updateResponsiveLayout();
-});
+    loader.load('model/carouselcopy.glb', (gltf) => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.set(-center.x, -center.y, -center.z);
+        carouselGroup.add(model);
+        updateResponsiveLayout();
+    });
 
-loader.load('model/slidecopy.glb', (gltf) => {
-    const model = gltf.scene;
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    model.position.set(-center.x, -center.y, -center.z);
-    slideGroup.add(model);
-    updateResponsiveLayout();
-});
+    loader.load('model/slidecopy.glb', (gltf) => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.set(-center.x, -center.y, -center.z);
+        slideGroup.add(model);
+        updateResponsiveLayout();
+    });
+}
 
 const dropbtn = document.querySelector('.dropbtn');
 const dropdownContent = document.querySelector('.dropdown-content');
@@ -403,7 +373,6 @@ function prevCard() {
 if (prevBtn) prevBtn.addEventListener('click', prevCard);
 if (nextBtn) nextBtn.addEventListener('click', nextCard);
 
-// 📱 手機端左右滑動切換
 let touchStartX = 0;
 let touchEndX = 0;
 
@@ -419,13 +388,9 @@ if (storyContainer) {
 }
 
 function handleSwipe() {
-    const swipeThreshold = 50; // 滑動超過 50px 才觸發
-    if (touchEndX < touchStartX - swipeThreshold) {
-        nextCard(); // 向左滑，看下一張
-    }
-    if (touchEndX > touchStartX + swipeThreshold) {
-        prevCard(); // 向右滑，看前一張
-    }
+    const swipeThreshold = 50; 
+    if (touchEndX < touchStartX - swipeThreshold) nextCard();
+    if (touchEndX > touchStartX + swipeThreshold) prevCard();
 }
 
 updateStoryCards();
@@ -435,7 +400,7 @@ function animate() {
     if (starGroup) {
         starGroup.rotation.y += 0.0003;
         starGroup.rotation.z += 0.0001;
-        // 🚀 微弱閃爍效果
+        // 🚀 微弱閃爍效果 (手機端稍微減少計算頻率)
         starMaterial.opacity = 0.6 + Math.sin(Date.now() * 0.001) * 0.2;
     }
     if (headPivot && headPivot.visible) {
@@ -452,8 +417,10 @@ function animate() {
         headPivot.rotation.y += Math.sin(idleTime) * 0.003;
         headPivot.rotation.x += Math.cos(idleTime * 0.5) * 0.003;
     }
-    if (carouselGroup && carouselGroup.visible) carouselGroup.rotation.y += 0.01; 
-    if (slideGroup && slideGroup.visible) slideGroup.rotation.y -= 0.01; 
+    if (!isMobile) {
+        if (carouselGroup && carouselGroup.visible) carouselGroup.rotation.y += 0.01; 
+        if (slideGroup && slideGroup.visible) slideGroup.rotation.y -= 0.01; 
+    }
     renderer.render(scene, camera);
 }
 animate();

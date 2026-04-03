@@ -1,6 +1,6 @@
 /**
- * Level 404 - Main Script
- * Optimized & Refactored
+ * Level 404 - Main Script (Cinematic Version)
+ * Realistic Round Stars with Glow, Full Object Timelines, and Music Control.
  */
 
 // 💡 註冊外掛
@@ -15,21 +15,18 @@ let currentMouse = { x: 0, y: 0 };
 let isMouseActive = false;
 let mouseTimeout;
 let idleTime = 0;
-const CONSTRAINT_RADIUS = 0.5; // 🎯 圓形轉頭增益範圍 (0~1)
+const CONSTRAINT_RADIUS = 0.5; 
 
 // 滑鼠移動偵測
 window.addEventListener('mousemove', (event) => {
     isMouseActive = true;
     clearTimeout(mouseTimeout);
-    
-    // 滑鼠停住 1.5 秒後開始自動旋轉
     mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1500);
 
     const nx = (event.clientX / window.innerWidth - 0.5) * 2;
     const ny = -(event.clientY / window.innerHeight - 0.5) * 2;
     const dist = Math.sqrt(nx * nx + ny * ny);
     
-    // 🎯 圓形限制邏輯：超出範圍後鎖定在邊界
     const scale = dist > CONSTRAINT_RADIUS ? CONSTRAINT_RADIUS / dist : 1.0;
     targetMouse.x = nx * scale;
     targetMouse.y = ny * scale;
@@ -46,7 +43,7 @@ requestAnimationFrame(raf);
 // Three.js 基礎設定
 const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000); 
 camera.position.set(0, 0, 10); 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -54,10 +51,9 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-// 🎨 冷白色憂鬱燈光設定
-scene.add(new THREE.AmbientLight(0xddeeff, 1.0)); // 冷白色環境光
-
-const areaLight = new THREE.SpotLight(0xffffff, 3); // 純白主面光
+// 🎨 燈光設定
+scene.add(new THREE.AmbientLight(0xddeeff, 1.2)); 
+const areaLight = new THREE.SpotLight(0xffffff, 3);
 areaLight.position.set(10, 25, 10);
 areaLight.angle = Math.PI / 4;
 areaLight.penumbra = 1; 
@@ -65,190 +61,137 @@ areaLight.decay = 1.5;
 areaLight.distance = 150;
 scene.add(areaLight);
 
-const sideLight = new THREE.DirectionalLight(0xddeeff, 0.8); // 冷白色側光
+const sideLight = new THREE.DirectionalLight(0xddeeff, 0.8);
 sideLight.position.set(-15, 10, 5);
 scene.add(sideLight);
 
 // ==========================================
-// 📦 載入管理器 (Loading Manager)
+// 📦 載入管理器
 // ==========================================
 const loadingProgress = document.getElementById('loading-progress');
 const loadingOverlay = document.getElementById('loading-overlay');
-
 const loadingManager = new THREE.LoadingManager();
 
 loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
     const progress = Math.round((itemsLoaded / itemsTotal) * 100);
-    loadingProgress.innerText = progress;
+    if (loadingProgress) loadingProgress.innerText = progress;
 };
 
 loadingManager.onLoad = () => {
-    console.log('所有資源載入完成');
     ScrollTrigger.refresh();
     gsap.to(loadingOverlay, {
         opacity: 0,
         duration: 0.8,
         onComplete: () => {
-            loadingOverlay.style.display = 'none';
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
         }
     });
 };
 
 // ==========================================
-// 🎵 背景音樂與播放器同步邏輯 🎵
+// 🎵 背景音樂控制
 // ==========================================
 const music = document.getElementById('bg-music');
 const musicToggle = document.getElementById('music-toggle');
-const playerAudio = document.getElementById('player-audio');
-const playlistItems = document.querySelectorAll('#playlist li');
-const playerPlayBtn = document.getElementById('player-play-btn');
-const progressBar = document.getElementById('progress-bar');
-const currentTimeDisplay = document.getElementById('current-time');
-const durationDisplay = document.getElementById('duration');
-const currentTrackNameDisplay = document.getElementById('current-track-name');
-
-const miniPlayBtn = document.getElementById('mini-play-btn');
-const miniTrackName = document.getElementById('mini-track-name');
-const miniProgressBar = document.getElementById('mini-progress-bar');
-
-let isGlobalMuted = true; 
-let bgMusicFadeTimeout;
-
-function formatTime(seconds) {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-}
-
-function fadeInBG() {
-    clearTimeout(bgMusicFadeTimeout);
-    if (isGlobalMuted) return;
-    music.play();
-    gsap.to(music, { volume: 1, duration: 2 });
-}
-
-function fadeOutBG() {
-    clearTimeout(bgMusicFadeTimeout);
-    gsap.to(music, { volume: 0, duration: 1 });
-}
 
 window.addEventListener('click', () => {
-    if (isGlobalMuted) return;
-    if (music.paused) {
+    if (music && music.paused) {
         music.play().catch(err => console.log("Autoplay blocked:", err));
+        if (musicToggle) musicToggle.innerText = "🔊";
     }
 }, { once: true });
 
-musicToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    isGlobalMuted = !isGlobalMuted;
-    if (isGlobalMuted) {
-        music.pause();
-        playerAudio.pause();
-        playerPlayBtn.innerText = "▶ PLAY";
-        miniPlayBtn.innerText = "▶";
-        musicToggle.innerText = "🔇";
-        music.volume = 0;
-        playerAudio.volume = 0;
-    } else {
-        musicToggle.innerText = "🔊";
-        playerAudio.volume = 1;
-        if (playerAudio.paused) fadeInBG();
-    }
-});
-
-function togglePlayback() {
-    if (isGlobalMuted) {
-        isGlobalMuted = false;
-        musicToggle.innerText = "🔊";
-        playerAudio.volume = 1;
-    }
-    if (!playerAudio.src || playerAudio.src === "" || playerAudio.src.endsWith('/')) {
-        const firstItem = playlistItems[0];
-        if (firstItem) { firstItem.click(); return; }
-    }
-    if (playerAudio.paused) {
-        fadeOutBG();
-        playerAudio.play();
-        playerPlayBtn.innerText = "⏸ PAUSE";
-        miniPlayBtn.innerText = "⏸";
-    } else {
-        playerAudio.pause();
-        playerPlayBtn.innerText = "▶ PLAY";
-        miniPlayBtn.innerText = "▶";
-        bgMusicFadeTimeout = setTimeout(fadeInBG, 5000);
-    }
+if (musicToggle) {
+    musicToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (music.muted) {
+            music.muted = false;
+            musicToggle.innerText = "🔊";
+        } else {
+            music.muted = true;
+            musicToggle.innerText = "🔇";
+        }
+    });
 }
 
-playlistItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (isGlobalMuted) {
-            isGlobalMuted = false;
-            musicToggle.innerText = "🔊";
-            playerAudio.volume = 1;
-        }
-        playlistItems.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        const trackName = item.innerText;
-        currentTrackNameDisplay.innerText = trackName;
-        miniTrackName.innerText = trackName;
-        const src = item.getAttribute('data-src');
-        playerAudio.src = src;
-        fadeOutBG(); 
-        playerAudio.play();
-        playerPlayBtn.innerText = "⏸ PAUSE";
-        miniPlayBtn.innerText = "⏸";
-    });
-});
+// ==========================================
+// 🌌 打造擬真圓形光暈星空 🌌
+// ==========================================
+function createRealisticStarTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    
+    // 繪製多層漸層模擬光暈
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');     // 核心：純白
+    gradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.9)'); 
+    gradient.addColorStop(0.25, 'rgba(255, 255, 255, 0.4)'); // 第一層光暈
+    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');  // 第二層外散
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');      // 邊緣消失
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 128, 128);
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+}
 
-playerPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlayback(); });
-miniPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlayback(); });
+const starGroup = new THREE.Group();
+scene.add(starGroup);
 
-playerAudio.addEventListener('timeupdate', () => {
-    const progress = (playerAudio.currentTime / playerAudio.duration) * 100 || 0;
-    progressBar.value = progress;
-    miniProgressBar.value = progress;
-    miniProgressBar.style.setProperty('--progress', progress + '%');
-    currentTimeDisplay.innerText = formatTime(playerAudio.currentTime);
-});
+const starGeometry = new THREE.BufferGeometry();
+const starCount = 6000; // 減少數量以換取更高質感的單點
+const starPosArray = new Float32Array(starCount * 3);
+const starColorArray = new Float32Array(starCount * 3);
 
-playerAudio.addEventListener('loadedmetadata', () => {
-    durationDisplay.innerText = formatTime(playerAudio.duration);
-});
+for(let i = 0; i < starCount; i++) {
+    // 廣域隨機分佈
+    starPosArray[i * 3] = (Math.random() - 0.5) * 1800;
+    starPosArray[i * 3 + 1] = (Math.random() - 0.5) * 1800;
+    starPosArray[i * 3 + 2] = (Math.random() - 0.5) * 1800;
 
-progressBar.addEventListener('input', () => {
-    const seekTime = (progressBar.value / 100) * playerAudio.duration;
-    playerAudio.currentTime = seekTime;
-});
-
-miniProgressBar.addEventListener('input', () => {
-    const seekTime = (miniProgressBar.value / 100) * playerAudio.duration;
-    playerAudio.currentTime = seekTime;
-    miniProgressBar.style.setProperty('--progress', miniProgressBar.value + '%');
-});
-
-playerAudio.addEventListener('ended', () => {
-    const activeItem = document.querySelector('#playlist li.active');
-    if (activeItem) {
-        const nextItem = activeItem.nextElementSibling;
-        if (nextItem) nextItem.click();
-        else playlistItems[0].click();
-    } else {
-        playerPlayBtn.innerText = "▶ PLAY";
-        miniPlayBtn.innerText = "▶";
-        bgMusicFadeTimeout = setTimeout(fadeInBG, 5000);
+    // 擬真色偏：藍白、白、暖黃
+    const type = Math.random();
+    let r, g, b;
+    if (type > 0.8) { // 偏藍星 (熱)
+        r = 0.7; g = 0.8; b = 1.0;
+    } else if (type > 0.6) { // 偏黃星 (老)
+        r = 1.0; g = 0.9; b = 0.7;
+    } else { // 主序白星
+        r = 1.0; g = 1.0; b = 1.0;
     }
+    starColorArray[i * 3] = r;
+    starColorArray[i * 3 + 1] = g;
+    starColorArray[i * 3 + 2] = b;
+}
+
+starGeometry.setAttribute('position', new THREE.BufferAttribute(starPosArray, 3));
+starGeometry.setAttribute('color', new THREE.BufferAttribute(starColorArray, 3));
+
+const starMaterial = new THREE.PointsMaterial({
+    size: 4.5, // 🚀 較大的發光感
+    map: createRealisticStarTexture(),
+    transparent: true,
+    opacity: 0.9,
+    vertexColors: true,
+    blending: THREE.AdditiveBlending, // 🚀 加法混合讓發光更像真實光源
+    depthWrite: false, 
+    sizeAttenuation: true
 });
+
+const stars = new THREE.Points(starGeometry, starMaterial);
+starGroup.add(stars);
 
 // ==========================================
-// 🌟 核心容器宣告 🌟
+// 🌟 模型容器與設定 🌟
 // ==========================================
 const signpostGroup = new THREE.Group(); 
 scene.add(signpostGroup);
 
 const walkmanGroup = new THREE.Group(); 
-walkmanGroup.position.set(0, -25, 0); 
+walkmanGroup.position.set(0, -40, 0); 
 walkmanGroup.visible = false; 
 scene.add(walkmanGroup);
 
@@ -262,198 +205,84 @@ bgGroup.position.z = -30;
 scene.add(bgGroup);
 
 const carouselGroup = new THREE.Group();
+carouselGroup.position.z = -20; 
 carouselGroup.visible = false; 
 scene.add(carouselGroup);
 
 const slideGroup = new THREE.Group();
+slideGroup.position.z = -20; 
 slideGroup.visible = false; 
 scene.add(slideGroup);
 
 const ballGroup = new THREE.Group();
 scene.add(ballGroup);
 
-// ==========================================
-// 🎬 動畫控制 (GSAP + ScrollTrigger)
-// ==========================================
+function updateResponsiveLayout() {
+    const width = window.innerWidth;
+    const isMobile = width <= 768;
 
-const seaTL = gsap.timeline({
-    scrollTrigger: {
-        trigger: ".concept-section", 
-        start: "top bottom",
-        endTrigger: ".music-section", 
-        end: "bottom top",
-        scrub: true
-    }
-});
+    camera.fov = isMobile ? 85 : 75; 
+    camera.position.z = isMobile ? 12 : 10; 
+    camera.updateProjectionMatrix();
 
-seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }) 
-     .to("#sea-overlay", { y: "0%", duration: 2 }) 
-     .to("#sea-overlay", { y: "-100%", ease: "none" }); 
-
-gsap.to(bgGroup.position, {
-    y: 150, 
-    ease: "none",
-    scrollTrigger: { 
-        trigger: "#top", 
-        start: "top top", 
-        end: "bottom top", 
-        scrub: true 
-    }
-});
-
-// 🎯 竿子在最上方區塊 65% 處滑入 (一次性觸發，避免同步速度感不適)
-ScrollTrigger.create({
-    trigger: "#top",
-    start: "65% top", 
-    onEnter: () => { 
-        polePivot.visible = true; 
-        gsap.to(polePivot.position, { y: 5, duration: 1.5, ease: "power2.out" });
-    },
-    onLeaveBack: () => { 
-        gsap.to(polePivot.position, { 
-            y: -40, 
-            duration: 1, 
-            onComplete: () => { polePivot.visible = false; } 
-        });
-    }
-});
-
-gsap.to(polePivot.position, {
-    y: 60, 
-    scrollTrigger: {
-        trigger: ".story-section",
-        start: "top bottom", 
-        end: "top top",      
-        scrub: 0.1
-    }
-});
-
-gsap.fromTo(walkmanGroup.position, 
-    { y: -40 }, 
-    {
-        y: 0,
-        scrollTrigger: {
-            trigger: ".story-section",
-            start: "top bottom",
-            end: "top center",
-            scrub: 0.1,
-            onEnter: () => { walkmanGroup.visible = true; },
-            onLeaveBack: () => { walkmanGroup.visible = false; }
+    if (headPivot) {
+        headPivot.visible = !isMobile;
+        if (!isMobile) {
+            headPivot.position.set(40, 15, 0); 
+            headPivot.scale.set(1.5, 1.5, 1.5); 
         }
     }
-);
 
-gsap.to([walkmanGroup.position, polePivot.position], {
-    y: "+=40", 
-    scrollTrigger: { trigger: ".merch-section", start: "top bottom", end: "top top", scrub: 1 }
-});
-
-ScrollTrigger.create({
-    trigger: ".concept-image",
-    start: "top 80%",
-    onEnter: () => { 
-        carouselGroup.visible = true; 
-        slideGroup.visible = true; 
-        gsap.to(carouselGroup.position, { x: -10, duration: 1.2, ease: "power2.out" }); 
-        gsap.to(slideGroup.position, { x: 10, duration: 1.2, ease: "power2.out" }); 
-    },
-    onLeaveBack: () => { 
-        gsap.to(carouselGroup.position, { x: -30, duration: 1.2, ease: "power2.in" });
-        gsap.to(slideGroup.position, { 
-            x: 30, 
-            duration: 1.2, 
-            ease: "power2.in",
-            onComplete: () => {
-                slideGroup.visible = false; 
-                carouselGroup.visible = false;
-            }
-        });
+    if (carouselGroup) {
+        carouselGroup.visible = isMobile ? false : carouselGroup.visible;
+        if (!isMobile) {
+            carouselGroup.scale.set(2.5, 2.5, 2.5);
+            carouselGroup.position.y = 0; 
+        }
     }
-});
 
-// 滾動球動畫邏輯
-let ballBaseMesh;
-let isBallAnimationActive = false;
+    if (slideGroup) {
+        slideGroup.visible = isMobile ? false : slideGroup.visible;
+        if (!isMobile) {
+            slideGroup.scale.set(6.0, 6.0, 6.0);
+            slideGroup.position.y = 0; 
+        }
+    }
 
-function spawnRollingBall() {
-    if (!ballBaseMesh || !isBallAnimationActive) return;
-
-    const newBall = ballBaseMesh.clone();
-    newBall.visible = true;
-    ballGroup.add(newBall);
-
-    const startX = (Math.random() - 0.5) * 40; 
-    const outDirection = Math.random() > 0.5 ? 1 : -1; 
-    const endX = outDirection * 50;
-
-    newBall.position.set(startX, 25, 0);
-    newBall.rotation.set(0, 0, 0);
-
-    const tl = gsap.timeline({
-        onComplete: () => { ballGroup.remove(newBall); }
-    });
-
-    tl.to(newBall.position, {
-        x: startX + (outDirection * 10),
-        y: -10,
-        duration: 4, 
-        ease: "power1.in"
-    }).to(newBall.position, {
-        x: endX,
-        y: -30,
-        duration: 3, 
-        ease: "power1.out"
-    });
-
-    gsap.to(newBall.rotation, {
-        x: Math.PI * 4,
-        z: Math.PI * 2 * -outDirection,
-        duration: 7, 
-        ease: "none"
-    });
+    if (bgGroup) {
+        bgGroup.scale.set(isMobile ? 0.7 : 1, isMobile ? 0.7 : 1, isMobile ? 0.7 : 1);
+    }
 }
 
-function ballSpawnLoop() {
-    if (!isBallAnimationActive) return;
-    spawnRollingBall();
-    gsap.delayedCall(1.5, ballSpawnLoop); 
-}
+// GSAP Animations
+const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
+seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }).to("#sea-overlay", { y: "0%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
+
+gsap.to(bgGroup.position, { y: 150, ease: "none", scrollTrigger: { trigger: "#top", start: "top top", end: "bottom top", scrub: true }});
+
+const poleTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "top 25%", scrub: 0.7, onEnter: () => { polePivot.visible = true; }, onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }}});
+poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 }).to(polePivot.position, { y: 5, duration: 3 }).to(polePivot.position, { y: 60, duration: 1.0 });
+
+const walkmanTL = gsap.timeline({ scrollTrigger: { trigger: ".story-section", start: "top 80%", endTrigger: ".merch-section", end: "top top", scrub: 1.5, onEnter: () => { walkmanGroup.visible = true; }, onLeaveBack: () => { walkmanGroup.visible = false; }}});
+walkmanTL.fromTo(walkmanGroup.position, { y: -40 }, { y: -5, duration: 1 }).to(walkmanGroup.position, { y: -5, duration: 3 }).to(walkmanGroup.position, { y: 25, duration: 1 });
 
 ScrollTrigger.create({
     trigger: ".concept-section", 
-    start: "top bottom",
-    endTrigger: "html", 
-    end: "bottom top",
+    start: "top 50%",            
     onEnter: () => { 
-        if (!isBallAnimationActive) {
-            isBallAnimationActive = true; 
-            ballSpawnLoop(); 
-        }
-    },
-    onEnterBack: () => { 
-        if (!isBallAnimationActive) {
-            isBallAnimationActive = true; 
-            ballSpawnLoop(); 
+        if (window.innerWidth > 768) {
+            carouselGroup.visible = true; slideGroup.visible = true; 
+            gsap.to(carouselGroup.position, { x: -30, duration: 0.6, ease: "power3.out" }); 
+            gsap.to(slideGroup.position, { x: 30, duration: 0.6, ease: "power3.out" }); 
         }
     },
     onLeaveBack: () => { 
-        isBallAnimationActive = false; 
-        gsap.killDelayedCallsTo(ballSpawnLoop); 
-        ballGroup.clear(); 
+        gsap.to(carouselGroup.position, { x: -70, duration: 0.6, ease: "power2.in" }); 
+        gsap.to(slideGroup.position, { x: 70, duration: 0.6, ease: "power2.in", onComplete: () => { slideGroup.visible = false; carouselGroup.visible = false; }});
     }
 });
 
-// ==========================================
-// 🚀 載入模型 🚀
-// ==========================================
 const loader = new THREE.GLTFLoader(loadingManager);
-
-loader.load('model/ball1.glb', (gltf) => {
-    ballBaseMesh = gltf.scene;
-    ballBaseMesh.visible = false;
-    ballBaseMesh.scale.set(3, 3, 3);
-});
-
 loader.load('model/level404.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -463,27 +292,8 @@ loader.load('model/level404.glb', (gltf) => {
     signpostGroup.add(model);
     const initialScale = 10 / Math.max(size.x, size.y, size.z); 
     signpostGroup.scale.set(initialScale, initialScale, initialScale);
-    
-    // 🎯 告示牌先同步放大、後同步上滑 (保留順序動畫，起始點恢復至 top bottom)
-    const signpostTL = gsap.timeline({
-        scrollTrigger: {
-            trigger: ".concept-section",
-            start: "top bottom",
-            end: "top 20%",
-            scrub: 1,
-            onEnter: () => { signpostGroup.visible = true; },
-            onLeaveBack: () => { signpostGroup.visible = false; }
-        }
-    });
-
-    signpostTL.to(signpostGroup.scale, {
-        x: initialScale * 3, y: initialScale * 3, z: initialScale * 3,
-        ease: "power1.inOut"
-    })
-    .to(signpostGroup.position, {
-        y: 40,
-        ease: "power1.inOut"
-    });
+    const signpostTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", end: "top 20%", scrub: 1 }});
+    signpostTL.to(signpostGroup.scale, { x: initialScale * 3, y: initialScale * 3, z: initialScale * 3, ease: "power1.inOut" }).to(signpostGroup.position, { y: 40, ease: "power1.inOut" });
 });
 
 loader.load('model/walkmancopy.glb', (gltf) => {
@@ -498,25 +308,23 @@ loader.load('model/walkmancopy.glb', (gltf) => {
     walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
 });
 
-loader.load('model/buildingcopy.glb', (gltf) => {
-    const m = gltf.scene;
-    const b = new THREE.Box3().setFromObject(m);
-    const c = b.getCenter(new THREE.Vector3());
-    const size = b.getSize(new THREE.Vector3());
-    m.position.set(-c.x, -c.y, -c.z);
-    bgGroup.add(m);
-    const s = 80 / Math.max(size.x, size.y, size.z);
-    m.scale.set(s, s, s);
+loader.load('model/buildingcopy.glb', (m) => {
+    const model = m.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.set(-center.x, -center.y, -center.z);
+    bgGroup.add(model);
+    const s = 80 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
+    model.scale.set(s, s, s);
 });
 
 loader.load('model/pole.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
     model.position.set(-center.x-6.7, -center.y+5, -center.z+50);
     polePivot.add(model);
-    const s = 24 / Math.max(size.x, size.y, size.z);
+    const s = 24 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
     model.scale.set(s, s, s);
 });
 
@@ -528,60 +336,50 @@ loader.load('model/headcopy.glb', (gltf) => {
     m.rotation.y = -Math.PI/2; 
     m.position.set(-c.x, -c.y, -c.z);
     headPivot.add(m);
-    headPivot.position.set(40, 15, 0); 
-    const s = 10 / Math.max(b.getSize(new THREE.Vector3()).x, b.getSize(new THREE.Vector3()).y, b.getSize(new THREE.Vector3()).z);
-    headPivot.scale.set(s, s, s); 
     bgGroup.add(headPivot);
+    updateResponsiveLayout();
 });
 
 loader.load('model/carouselcopy.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
     model.position.set(-center.x, -center.y, -center.z);
     carouselGroup.add(model);
-    const s = 8 / Math.max(size.x, size.y, size.z);
-    carouselGroup.scale.set(s, s, s);
-    carouselGroup.position.set(-30, 0, 0); 
+    updateResponsiveLayout();
 });
 
 loader.load('model/slidecopy.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
     model.position.set(-center.x, -center.y, -center.z);
     slideGroup.add(model);
-    const s = 6 / Math.max(size.x, size.y, size.z);
-    slideGroup.scale.set(s, s, s);
-    slideGroup.position.set(30, 0, 0); 
+    updateResponsiveLayout();
 });
 
 const dropbtn = document.querySelector('.dropbtn');
 const dropdownContent = document.querySelector('.dropdown-content');
-dropbtn.addEventListener('click', (e) => { e.stopPropagation(); dropdownContent.classList.toggle('show'); });
-const navLinks = document.querySelectorAll('.nav-link');
-navLinks.forEach(link => {
+if (dropbtn) dropbtn.addEventListener('click', (e) => { e.stopPropagation(); dropdownContent.classList.toggle('show'); });
+document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
         const targetId = link.getAttribute('href');
         if (targetId && targetId.startsWith('#')) {
             e.preventDefault();
             const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                lenis.scrollTo(targetElement, { offset: 0, duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-            }
+            if (targetElement) lenis.scrollTo(targetElement, { offset: 0, duration: 1.5 });
         }
-        dropdownContent.classList.remove('show');
+        if (dropdownContent) dropdownContent.classList.remove('show');
     });
 });
-window.addEventListener('click', () => { if (dropdownContent.classList.contains('show')) dropdownContent.classList.remove('show'); });
+window.addEventListener('click', () => { if (dropdownContent && dropdownContent.classList.contains('show')) dropdownContent.classList.remove('show'); });
 
 const storyCards = document.querySelectorAll('.story-card');
 const prevBtn = document.querySelector('.story-nav.prev');
 const nextBtn = document.querySelector('.story-nav.next');
 let currentCardIndex = 0;
 function updateStoryCards() {
+    if(!storyCards.length) return;
     storyCards.forEach((card, index) => {
         card.classList.remove('active', 'prev-card', 'next-card');
         if (index === currentCardIndex) card.classList.add('active');
@@ -589,13 +387,19 @@ function updateStoryCards() {
         else card.classList.add('next-card');
     });
 }
-prevBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length; updateStoryCards(); });
-nextBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex + 1) % storyCards.length; updateStoryCards(); });
+if (prevBtn) prevBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex - 1 + storyCards.length) % storyCards.length; updateStoryCards(); });
+if (nextBtn) nextBtn.addEventListener('click', () => { currentCardIndex = (currentCardIndex + 1) % storyCards.length; updateStoryCards(); });
 updateStoryCards();
 
 function animate() {
     requestAnimationFrame(animate);
-    if (headPivot) {
+    if (starGroup) {
+        starGroup.rotation.y += 0.0003;
+        starGroup.rotation.z += 0.0001;
+        // 🚀 微弱閃爍效果
+        starMaterial.opacity = 0.6 + Math.sin(Date.now() * 0.001) * 0.2;
+    }
+    if (headPivot && headPivot.visible) {
         if (isMouseActive) {
             currentMouse.x += (targetMouse.x - currentMouse.x) * 0.08;
             currentMouse.y += (targetMouse.y - currentMouse.y) * 0.08;
@@ -604,8 +408,6 @@ function animate() {
         } else {
             headPivot.rotation.y += 0.005; 
             headPivot.rotation.x += (0 - headPivot.rotation.x) * 0.05; 
-            currentMouse.x = headPivot.rotation.y / (Math.PI * 0.5);
-            currentMouse.y = 0;
         }
         idleTime += 0.01;
         headPivot.rotation.y += Math.sin(idleTime) * 0.003;
@@ -616,9 +418,9 @@ function animate() {
     renderer.render(scene, camera);
 }
 animate();
-
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    updateResponsiveLayout();
 });

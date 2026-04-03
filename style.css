@@ -202,8 +202,9 @@ body {
     padding: 150px 20px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* 🚀 確保所有區塊置中 */
+    align-items: center;
     justify-content: center;
+    width: 100%;
 }
 
 .mv-block {
@@ -212,9 +213,9 @@ body {
     max-width: 1000px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* 🚀 確保內容置中 */
-    margin-left: auto;   /* 🚀 強制對齊中心 */
-    margin-right: auto;  /* 🚀 強制對齊中心 */
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .mv-embed {
@@ -281,6 +282,7 @@ a.call-to-action {
     align-items: center;
     justify-content: center;
     margin: 40px auto;
+    touch-action: pan-y; /* 🚀 允許垂直捲動但捕捉水平滑動 */
 }
 
 .story-card-wrapper {

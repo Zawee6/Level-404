@@ -20,8 +20,8 @@
                 <a href="#album-section" class="nav-link">ALBUM</a>
                 <a href="#mv-section" class="nav-link">MV</a>
                 <a href="#story-section" class="nav-link">STORY</a>
-                <a href="#music-section" class="nav-link">MUSIC</a>
                 <a href="#item-section" class="nav-link">ITEM</a>
+                <a href="#credits-section" class="nav-link">CREDITS</a>
             </div>
         </div>
     </nav>
@@ -35,27 +35,13 @@
     </div>
 
     <audio id="bg-music" loop>
-        <source src="secretplace.mp3" type="audio/mpeg">
-        您的瀏覽器不支援音訊元素。
+        <source src="bgm.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="mini-control-box">
-        <div id="mini-player" class="mini-player">
-            <div class="mini-top-row">
-                <span id="mini-track-name">READY TO PLAY</span>
-                <div class="mini-btns">
-                    <button id="mini-play-btn" class="mini-icon-btn">▶</button>
-                    <button id="music-toggle" class="mini-icon-btn mute-btn">🔇</button>
-                </div>
-            </div>
-            <div class="mini-progress-container">
-                <input type="range" id="mini-progress-bar" class="mini-range" min="0" max="100" value="0" style="--progress: 0%;">
-            </div>
-        </div>
-    </div>
+    <button id="music-toggle" class="fixed-mute-btn">🔇</button>
 
     <div id="three-container"></div> 
-    <div id="sea-overlay"></div> <!-- 新增：大海背景疊加層 -->
+    <div id="sea-overlay"></div> 
 
     <section id="top" class="section hero-section">
         <h2>MY DEARLY FRAGMENTED</h2>
@@ -85,70 +71,107 @@
                 <a href="https://www.youtube.com/watch?v=bqKh9CmwLug" target="_blank" class="watch-btn">WATCH NOW</a>
             </div>
         </div>
-    </section>
 
-    <section id="story-section" class="section story-section">
-        <h2>STORY</h2>
-        <div class="story-container">
-            <button class="story-nav prev">❮</button>
-            <div class="story-card-wrapper">
-                <div class="story-card active">
-                    <h3>01. 殘缺的起源</h3>
-                    <p>在這個完美的數位世界裡，404 不再是錯誤，而是一種存在的證明。我們都在尋找那些被系統遺忘的片段。</p>
-                </div>
-                <div class="story-card">
-                    <h3>02. 虛擬的邊界</h3>
-                    <p>當現實與虛擬的界線模糊，聲音成為了唯一的導航。穿梭在故障的頻率中，我們聽見了真實的跳動。</p>
-                </div>
-                <div class="story-card">
-                    <h3>03. 最終的歸屬</h3>
-                    <p>不需要被修正，不需要被格式化。在 Level 404，每一個殘缺的靈魂都能找到屬於自己的音軌。</p>
-                </div>
+        <div class="mv-block">
+            <h2>駕訓班</h2>
+            <div class="mv-embed">
+                <iframe src="https://www.youtube.com/embed/sUpsFNGqmT0?si=BGauHeUOCR6KWYZG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <a href="https://www.youtube.com/watch?v=sUpsFNGqmT0" target="_blank" class="watch-btn">WATCH NOW</a>
             </div>
-            <button class="story-nav next">❯</button>
         </div>
     </section>
 
-    <section id="music-section" class="section music-section">
-        <h2>MUSIC</h2>
-        <div class="music-content">
-            
-            <div class="music-player-wrapper">
-                <!-- 播放列表 (左側) -->
-                <div class="playlist-container">
-                    <ul id="playlist">
-                        <li data-src="musictrack/track1.mp3">那裡已經沒有人了</li>
-                        <li data-src="musictrack/track2.mp3">凝視深淵的納西瑟斯</li>
-                        <li data-src="musictrack/track3.mp3">這輩子也就這樣了</li>
-                        <li data-src="musictrack/track4.mp3">閾限空間：小時候想開的診所</li>
-                        <li data-src="musictrack/track5.mp3">22</li>
-                        <li data-src="musictrack/track6.mp3">閾限空間：尼莫點</li>
-                        <li data-src="musictrack/track7.mp3">閾限空間：駕訓班</li>
-                        <li data-src="musictrack/track8.mp3">昨日世界</li>
-                        <li data-src="musictrack/track9.mp3">離邦</li>
-                        <li data-src="musictrack/track10.mp3">閾限空間：負宇宙</li>
-                        <li data-src="musictrack/track11.mp3">風箏</li>
-                        <li data-src="musictrack/track12.mp3">最長的隧道盡頭</li>
-                    </ul>
+    <section id="story-section" class="section story-section">
+        <h2>SONGS & STORIES</h2>
+        <div class="story-container">
+            <button class="story-nav prev">❮</button>
+            <div class="story-card-wrapper">
+                <!-- 01. 那裡已經沒有人了 -->
+                <div class="story-card active">
+                    <h3>01. 那裡已經沒有人了</h3>
+                    <img src="songphoto/1.jpg" alt="那裡已經沒有人了" class="song-card-image">
+                    <p class="song-lyric">「這是屬於我的反叛 / 此生就這樣默默存在」</p>
+                    <p class="song-desc">來自「Level 404」的邀請函，逃避與閾限迷航的虛無世代縮影。</p>
                 </div>
-
-                <!-- 播放器控制 (右側) -->
-                <div class="player-controls">
-                    <div class="player-info">
-                        <span id="current-track-name">請選擇歌曲</span>
-                    </div>
-                    <div class="control-row">
-                        <button id="player-play-btn" class="player-btn">▶ PLAY</button>
-                    </div>
-                    <div class="progress-row">
-                        <input type="range" id="progress-bar" min="0" max="100" value="0">
-                        <div class="time-display">
-                            <span id="current-time">0:00</span> / <span id="duration">0:00</span>
-                        </div>
-                    </div>
-                    <audio id="player-audio"></audio>
+                <!-- 02. 凝視深淵的納西瑟斯 -->
+                <div class="story-card">
+                    <h3>02. 凝視深淵的納西瑟斯</h3>
+                    <img src="songphoto/2.jpg" alt="凝視深淵的納西瑟斯" class="song-card-image">
+                    <p class="song-lyric">「I hate it, but I love it / 自戀又自卑到無可救藥的你」</p>
+                    <p class="song-desc">求學經歷造就了自戀又自卑的矛盾心理狀態，像希臘神話中的納希瑟斯一樣凝視自我的倒影，自棄卻又自由，落寞卻又上癮。</p>
+                </div>
+                <!-- 03. 這輩子也就這樣了 -->
+                <div class="story-card">
+                    <h3>03. 這輩子也就這樣了</h3>
+                    <img src="songphoto/3.jpg" alt="這輩子也就這樣了" class="song-card-image">
+                    <p class="song-lyric">「今天的太陽又要升起 / 對生活的滿腔熱情 / 又船過水無痕地在惺忪睡意中消散殆盡」</p>
+                    <p class="song-desc">描寫每天熬夜的心理狀態：思想的巨人，行動的侏儒；在日復一日的期望與落空中逐漸麻木。</p>
+                </div>
+                <!-- 04. 閾限空間：小時候想開的診所 -->
+                <div class="story-card">
+                    <h3>04. 閾限空間：小時候想開的診所</h3>
+                    <img src="songphoto/4.jpg" alt="閾限空間：小時候想開的診所" class="song-card-image">
+                    <p class="song-lyric">「我的診所裡要有很多玩具 / 我的診所裡要有太空梭」</p>
+                    <p class="song-desc">揠苗助長後的系統過載。用電子碎拍與千禧年遊戲的 8-bit 音色，打造歡快卻壓抑的氛圍，感嘆再也回不去的單純。</p>
+                </div>
+                <!-- 05. 22 -->
+                <div class="story-card">
+                    <h3>05. 22</h3>
+                    <img src="songphoto/5.jpg" alt="22" class="song-card-image">
+                    <p class="song-lyric">「Welcome back to the distant land, Never want you to become Peter Pan」</p>
+                    <p class="song-desc">輸入卡通頻道碼，喚醒兒時的程序。在如今二十二歲的年紀，向拒絕長大的自己發出對話。</p>
+                </div>
+                <!-- 06. 閾限空間：尼莫點 -->
+                <div class="story-card">
+                    <h3>06. 閾限空間：尼莫點</h3>
+                    <img src="songphoto/6.jpg" alt="閾限空間：尼莫點" class="song-card-image">
+                    <p class="song-lyric">「可是人生的前方是一團死結 / 把一切光芒全部吸入的黑」</p>
+                    <p class="song-desc">反芻著來自齊克果的名言。雖然必須向前活，但前路一片黑暗，於是只能沉溺過去。</p>
+                </div>
+                <!-- 07. 閾限空間：駕訓班 -->
+                <div class="story-card">
+                    <h3>07. 閾限空間：駕訓班</h3>
+                    <img src="songphoto/7.jpg" alt="閾限空間：駕訓班" class="song-card-image">
+                    <p class="song-lyric">「沒想過我會坐在這裡 / 已經到了學開車的年紀」</p>
+                    <p class="song-desc">人生就像駕訓班，成長一路總是重複與繞彎不斷；但面對複雜的現實之際，卻又沒有保證通關的答案。</p>
+                </div>
+                <!-- 08. 昨日世界 -->
+                <div class="story-card">
+                    <h3>08. 昨日世界</h3>
+                    <img src="songphoto/8.jpg" alt="昨日世界" class="song-card-image">
+                    <p class="song-lyric">「我們都已經離開了這裡 / 把眼裡閃爍的光芒遺棄」</p>
+                    <p class="song-desc">歌名來自圓山兒童樂園舊址。描繪在廢棄旋轉木馬上繞不出去的暈眩夢境，單純已逝，只能被迫在異化的成人世界裡持續下墜。</p>
+                </div>
+                <!-- 09. 離邦 -->
+                <div class="story-card">
+                    <h3>09. 離邦</h3>
+                    <img src="songphoto/9.jpg" alt="離邦" class="song-card-image">
+                    <p class="song-lyric">「風雨過後一切會恢復原樣 / 今夜就安心睡吧」</p>
+                    <p class="song-desc">寫給大學階段的歌。講述在臣服於命運後，反而遇到了珍視且不想被奪走的事物。</p>
+                </div>
+                <!-- 10. 閾限空間：負宇宙 -->
+                <div class="story-card">
+                    <h3>10. 閾限空間：負宇宙</h3>
+                    <img src="songphoto/10.jpg" alt="閾限空間：負宇宙" class="song-card-image">
+                    <p class="song-lyric">「想告訴你 / 我已不再為逃避找藉口 / 雖然這個殘酷世界它老騙我」</p>
+                    <p class="song-desc">回望瘋狂失控的青少年時期。將所有羞恥的秘密和盤托出，與曾經迷失的自己擁抱和解。</p>
+                </div>
+                <!-- 11. 風箏 -->
+                <div class="story-card">
+                    <h3>11. 風箏</h3>
+                    <img src="songphoto/11.jpg" alt="風箏" class="song-card-image">
+                    <p class="song-lyric">「There are so many stories waiting to unfold」</p>
+                    <p class="song-desc">致敬知名畢業歌曲。在天邊飽受摧殘的風箏得到了愛的滋潤與縫補，也得到了自己的「根」。</p>
+                </div>
+                <!-- 12. 最長的隧道盡頭 -->
+                <div class="story-card">
+                    <h3>12. 最長的隧道盡頭</h3>
+                    <img src="songphoto/12.jpg" alt="最長的隧道盡頭" class="song-card-image">
+                    <p class="song-lyric">「我們緊緊握著這份絕無僅有 / 朝著最長的隧道盡頭」</p>
+                    <p class="song-desc">取樣雪山隧道的廣播音程的Lofi饒舌小品。審視從不停止比較的自我，接受平凡與成長。</p>
                 </div>
             </div>
+            <button class="story-nav next">❯</button>
         </div>
     </section>
 
@@ -163,6 +186,36 @@
                 <p class="price">NT$ 980</p>
                 <a href="https://shopee.tw/Apple-iPhone-17-Pro-256GB-%E6%89%8B%E6%A9%9F-%E7%8F%BE%E8%B2%A8%E3%80%90Apple-%E7%94%A2%E5%93%81%E6%97%97%E8%89%A6%E9%A4%A8%E3%80%91-i.188277742.43968123553?extraParams=%7B%22display_model_id%22%3A296491431377%7D" target="_blank" class="buy-button">立即購買</a>
             </div>
+        </div>
+    </section>
+
+    <!-- 🚀 新增：電影感 Credit 區塊 -->
+    <section id="credits-section" class="section credits-section">
+        <h2 class="credits-title">CREDITS</h2>
+        <div class="credits-container">
+            <div class="credit-row">
+                <span class="role">Executive Producer</span>
+                <span class="name">Zawee Liu</span>
+            </div>
+            <div class="credit-row">
+                <span class="role">Music Production</span>
+                <span class="name">[Vendel]</span>
+            </div>
+            <div class="credit-row">
+                <span class="role">Visual Art & 3D Design</span>
+                <span class="name">Zawee Liu</span>
+            </div>
+            <div class="credit-row">
+                <span class="role">Mixing & Mastering</span>
+                <span class="name">Empty Studio</span>
+            </div>
+            <div class="credit-row">
+                <span class="role">Special Thanks</span>
+                <span class="name">Everyone in Level 404</span>
+            </div>
+        </div>
+        <div class="credits-footer">
+            <p>© 2026 Level 404 Project. All Rights Reserved.</p>
         </div>
     </section>
 

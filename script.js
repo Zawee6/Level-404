@@ -125,7 +125,7 @@ if (musicToggle) {
 // ==========================================
 function createRealisticStarTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 64; // 🚀 縮小貼圖尺寸
+    canvas.width = 64; 
     canvas.height = 64;
     const ctx = canvas.getContext('2d');
     
@@ -144,7 +144,6 @@ const starGroup = new THREE.Group();
 scene.add(starGroup);
 
 const starGeometry = new THREE.BufferGeometry();
-// 🚀 手機端粒子數大砍 75%，大幅提升流暢度
 const starCount = isMobile ? 1500 : 6000; 
 const starPosArray = new Float32Array(starCount * 3);
 const starColorArray = new Float32Array(starCount * 3);
@@ -173,7 +172,7 @@ const starMaterial = new THREE.PointsMaterial({
     transparent: true,
     opacity: 0.8,
     vertexColors: true,
-    blending: isMobile ? THREE.NormalBlending : THREE.AdditiveBlending, // 🚀 手機端改用一般混合
+    blending: isMobile ? THREE.NormalBlending : THREE.AdditiveBlending, 
     depthWrite: false, 
     sizeAttenuation: true
 });
@@ -235,21 +234,21 @@ function updateResponsiveLayout() {
     }
 }
 
-// GSAP Animations (手機端減少過場負擔)
+// GSAP Animations
 const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
 seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }).to("#sea-overlay", { y: "0%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
 
 gsap.to(bgGroup.position, { y: 150, ease: "none", scrollTrigger: { trigger: "#top", start: "top top", end: "bottom top", scrub: true }});
 
-const poleTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "top 25%", scrub: 0.7, onEnter: () => { if(!isMobile) polePivot.visible = true; }, onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }}});
-if (!isMobile) {
-    poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 }).to(polePivot.position, { y: 5, duration: 3 }).to(polePivot.position, { y: 60, duration: 1.0 });
-}
+const poleTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "top 25%", scrub: 0.7, onEnter: () => { polePivot.visible = true; }, onLeaveBack: () => { gsap.set(polePivot.position, { y: -40 }); polePivot.visible = false; }}});
+poleTL.fromTo(polePivot.position, { y: -40 }, { y: 5, duration: 1.0 }).to(polePivot.position, { y: 5, duration: 3 }).to(polePivot.position, { y: 60, duration: 1.0 });
 
 const walkmanTL = gsap.timeline({ scrollTrigger: { trigger: ".story-section", start: "top 80%", endTrigger: ".merch-section", end: "top top", scrub: 1.5, onEnter: () => { walkmanGroup.visible = true; }, onLeaveBack: () => { walkmanGroup.visible = false; }}});
 walkmanTL.fromTo(walkmanGroup.position, { y: -40 }, { y: -5, duration: 1 }).to(walkmanGroup.position, { y: -5, duration: 3 }).to(walkmanGroup.position, { y: 25, duration: 1 });
 
 const loader = new THREE.GLTFLoader(loadingManager);
+
+// 🚀 核心模型 (全端載入)
 loader.load('model/level404.glb', (gltf) => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
@@ -275,28 +274,29 @@ loader.load('model/walkmancopy.glb', (gltf) => {
     walkmanGroup.scale.set(initialScale * 3, initialScale * 3, initialScale * 3); 
 });
 
-// 🚀 手機端不載入非必要的大型背景模型
+// 🚀 背景模型 (現在手機端也會載入)
+loader.load('model/buildingcopy.glb', (m) => {
+    const model = m.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.set(-center.x, -center.y, -center.z);
+    bgGroup.add(model);
+    const s = 80 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
+    model.scale.set(s, s, s);
+});
+
+loader.load('model/pole.glb', (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.set(-center.x-6.7, -center.y+5, -center.z+50);
+    polePivot.add(model);
+    const s = 24 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
+    model.scale.set(s, s, s);
+});
+
+// 🚀 僅桌機端載入的模型
 if (!isMobile) {
-    loader.load('model/buildingcopy.glb', (m) => {
-        const model = m.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        model.position.set(-center.x, -center.y, -center.z);
-        bgGroup.add(model);
-        const s = 80 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
-        model.scale.set(s, s, s);
-    });
-
-    loader.load('model/pole.glb', (gltf) => {
-        const model = gltf.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        model.position.set(-center.x-6.7, -center.y+5, -center.z+50);
-        polePivot.add(model);
-        const s = 24 / Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
-        model.scale.set(s, s, s);
-    });
-
     loader.load('model/headcopy.glb', (gltf) => {
         const m = gltf.scene;
         const b = new THREE.Box3().setFromObject(m);
@@ -400,7 +400,6 @@ function animate() {
     if (starGroup) {
         starGroup.rotation.y += 0.0003;
         starGroup.rotation.z += 0.0001;
-        // 🚀 微弱閃爍效果 (手機端稍微減少計算頻率)
         starMaterial.opacity = 0.6 + Math.sin(Date.now() * 0.001) * 0.2;
     }
     if (headPivot && headPivot.visible) {
@@ -417,10 +416,11 @@ function animate() {
         headPivot.rotation.y += Math.sin(idleTime) * 0.003;
         headPivot.rotation.x += Math.cos(idleTime * 0.5) * 0.003;
     }
-    if (!isMobile) {
-        if (carouselGroup && carouselGroup.visible) carouselGroup.rotation.y += 0.01; 
-        if (slideGroup && slideGroup.visible) slideGroup.rotation.y -= 0.01; 
-    }
+    
+    // 🚀 手機端也會執行的動畫
+    if (carouselGroup && carouselGroup.visible) carouselGroup.rotation.y += 0.01; 
+    if (slideGroup && slideGroup.visible) slideGroup.rotation.y -= 0.01; 
+    
     renderer.render(scene, camera);
 }
 animate();

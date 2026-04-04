@@ -168,7 +168,9 @@ body {
 }
 
 @media (max-width: 768px) {
-    #sea-overlay { display: none !important; } /* 🚀 手機端隱藏大型 GIF 以防記憶體不足 */
+    #sea-overlay { 
+        background-image: url('sea2.gif'); /* 🚀 使用壓縮過的 sea2.gif 以防手機端記憶體不足 */
+    } 
 }
 
 /* 內容區塊基礎 */

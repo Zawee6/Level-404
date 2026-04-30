@@ -429,6 +429,16 @@ a.call-to-action {
     letter-spacing: 0.1rem;
 }
 
+.credit-row .name a {
+    color: #d32f2f;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.credit-row .name a:hover {
+    opacity: 0.8;
+}
+
 .credits-footer {
     margin-top: 150px;
     font-size: 0.9rem;

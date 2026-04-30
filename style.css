@@ -191,6 +191,7 @@ body {
 }
 
 .hero-section { height: 100vh; }
+.hero-section h2 { color: #d32f2f; } /* 🚀 首頁標題改為紅色 */
 
 .concept-section {
     min-height: 100vh; 
@@ -289,8 +290,8 @@ a.call-to-action {
 .story-container {
     position: relative;
     width: 100%;
-    max-width: 900px;
-    min-height: 650px;
+    max-width: 1200px; /* 🚀 從 900px 增加 */
+    min-height: 900px; /* 🚀 增加容器高度以容納大圖 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -309,9 +310,9 @@ a.call-to-action {
 
 .story-card {
     position: absolute;
-    width: 85%;
-    max-width: 550px;
-    padding: 30px;
+    width: 95%; /* 🚀 增加卡片寬度佔比 */
+    max-width: 900px; /* 🚀 從 550px 大幅增加 */
+    padding: 40px;
     background: rgba(20, 20, 20, 0.95);
     border: 1px solid rgba(211, 47, 47, 0.5);
     border-radius: 20px;
@@ -324,7 +325,12 @@ a.call-to-action {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
+}
+
+.story-card h3 {
+    font-size: 2.2rem; /* 🚀 增加歌曲標題大小 */
+    margin-bottom: 10px;
 }
 
 .story-card.active {
@@ -340,14 +346,14 @@ a.call-to-action {
 
 .song-card-image {
     width: 100%;
-    max-width: 350px;
-    max-height: 450px;
+    max-width: 700px; /* 🚀 從 350px 翻倍 */
+    max-height: 800px; /* 🚀 增加高度限制 */
     object-fit: contain;
     border-radius: 10px;
 }
 
-.song-lyric { font-size: 1.1rem; font-style: italic; color: #d32f2f; margin: 10px 0; }
-.song-desc { font-size: 0.95rem; color: #bbb; }
+.song-lyric { font-size: 1.6rem; font-style: italic; color: #d32f2f; margin: 15px 0; } /* 🚀 增加歌詞字體大小 */
+.song-desc { font-size: 1.25rem; color: #bbb; line-height: 1.8; } /* 🚀 增加描述字體大小 */
 
 .story-nav {
     position: absolute;

@@ -302,7 +302,7 @@ if (!isMobile) {
 
 // 🚀 5. Sea Overlay 動畫
 const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
-seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }).to("#sea-overlay", { y: "0%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
+seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "-15%", ease: "none" }).to("#sea-overlay", { y: "-15%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
 
 
 const loader = new THREE.GLTFLoader(loadingManager);

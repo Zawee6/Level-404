@@ -304,6 +304,7 @@ if (!isMobile) {
 const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
 seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "0%", ease: "none" }).to("#sea-overlay", { y: "0%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
 
+
 const loader = new THREE.GLTFLoader(loadingManager);
 loader.load('model/level404.glb', (gltf) => {
     const model = gltf.scene;
@@ -394,7 +395,6 @@ document.querySelectorAll('.nav-link').forEach(link => {
         if (dropdownContent) dropdownContent.classList.remove('show');
     });
 });
-window.addEventListener('click', () => { if (dropdownContent && dropdownContent.classList.contains('show')) dropdownContent.classList.remove('show'); });
 
 const storyCards = document.querySelectorAll('.story-card');
 const storyContainer = document.querySelector('.story-container');
@@ -428,6 +428,70 @@ if (storyContainer) {
 }
 
 updateStoryCards();
+
+const albumCard = document.querySelector('.album-flip-card');
+const albumIframe = albumCard ? albumCard.querySelector('iframe') : null;
+
+if (albumCard && music) {
+    albumCard.addEventListener('click', (e) => {
+        e.stopPropagation(); // 🚀 防止觸發全域點擊事件導致立刻翻回
+        
+        const isFlippingBack = albumCard.classList.contains('flipped');
+        albumCard.classList.toggle('flipped');
+        
+        if (albumCard.classList.contains('flipped')) {
+            // 🚀 翻轉到影片面：暫停背景音樂
+            music.pause();
+            if (musicToggle) musicToggle.innerText = "🔇";
+        } else {
+            // 🚀 翻回到正面：停止影片播放並恢復背景音樂
+            if (albumIframe) {
+                const currentSrc = albumIframe.src;
+                albumIframe.src = ''; // 先清空
+                albumIframe.src = currentSrc; // 再還原，這會強制停止影片
+            }
+            if (!music.muted) {
+                music.play().catch(err => console.log("Music play blocked:", err));
+                if (musicToggle) musicToggle.innerText = "🔊";
+            }
+        }
+    });
+}
+
+// 🚀 全域點擊監聽：處理「點擊外部」邏輯
+window.addEventListener('click', (e) => {
+    // 1. 處理專輯卡片：如果已翻面且點擊卡片以外區域，則翻回正面
+    if (albumCard && albumCard.classList.contains('flipped')) {
+        albumCard.classList.remove('flipped');
+        
+        // 🚀 點擊外部翻回時也要停止影片
+        if (albumIframe) {
+            const currentSrc = albumIframe.src;
+            albumIframe.src = '';
+            albumIframe.src = currentSrc;
+        }
+
+        if (!music.muted) {
+            music.play().catch(err => console.log("Music play blocked:", err));
+            if (musicToggle) musicToggle.innerText = "🔊";
+        }
+    }
+
+    // 2. 處理導航選單：點擊外部時關閉
+    if (dropdownContent && dropdownContent.classList.contains('show')) {
+        dropdownContent.classList.remove('show');
+    }
+});
+
+// 🚀 偵測使用者點擊影片時暫停音樂 (處理所有 YouTube iframe)
+window.addEventListener('blur', () => {
+    if (document.activeElement.tagName === 'IFRAME') {
+        if (music && !music.paused) {
+            music.pause();
+            if (musicToggle) musicToggle.innerText = "🔇";
+        }
+    }
+});
 
 function animate() {
     requestAnimationFrame(animate);

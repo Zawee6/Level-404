@@ -196,15 +196,68 @@ body {
 .concept-section {
     min-height: 100vh; 
     background-color: rgba(30, 30, 30, 0.5);
+    perspective: 1500px; /* 🚀 增加 3D 視角感 */
+}
+
+/* 翻轉卡片容器 */
+.album-flip-card {
+    width: 95%;
+    max-width: 800px; /* 🚀 從 600px 提升到 800px */
+    aspect-ratio: 1 / 1; /* 🚀 強制正方形 */
+    cursor: pointer;
+    margin-bottom: 40px;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+/* 觸發翻轉後的狀態 */
+.album-flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 正面樣式 */
+.flip-card-front {
+    background-color: #111;
 }
 
 .concept-image {
-    width: 90%;
-    max-width: 450px;
-    border-radius: 15px;
-    margin-bottom: 40px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 背面樣式 (影片) */
+.flip-card-back {
+    background-color: #000;
+    transform: rotateY(180deg);
+}
+
+.flip-card-back iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+@media (max-width: 768px) {
+    .album-flip-card { max-width: 90%; }
 }
 
 /* =========================================
@@ -224,7 +277,7 @@ body {
 .mv-block {
     margin-top: 120px;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1400px; /* 🚀 從 1200px 進一步放大 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -234,7 +287,7 @@ body {
 
 .mv-embed {
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px; /* 🚀 從 1000px 進一步放大 */
     margin: 40px auto 0;
     display: flex;
     flex-direction: column;
@@ -427,12 +480,13 @@ a.call-to-action {
 }
 
 .credit-row .name {
-    flex: 1;
+    flex: 1.5; /* 🚀 增加姓名欄位的比例 */
     text-align: left;
     font-size: 1.6rem;
     color: #fff;
     font-weight: 400;
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.05rem; /* 🚀 稍微縮小字距，增加容納空間 */
+    white-space: nowrap; /* 🚀 強制同一個人名不換行 */
 }
 
 .credit-row .name a {

@@ -29,8 +29,14 @@
     <!-- 載入畫面 -->
     <div id="loading-overlay">
         <div class="loader-content">
-            <div class="spinner"></div>
-            <p>Loading Level 404... <span id="loading-progress">0</span>%</p>
+            <div id="loading-status">
+                <div class="spinner"></div>
+                <p>Loading Level 404... <span id="loading-progress">0</span>%</p>
+            </div>
+            <div id="enter-container" style="display: none;">
+                <p class="welcome-text">Welcome to Level 404</p>
+                <button id="enter-btn">ENTER</button>
+            </div>
         </div>
     </div>
 
@@ -41,7 +47,9 @@
     <button id="music-toggle" class="fixed-mute-btn">🔇</button>
 
     <div id="three-container"></div> 
-    <div id="sea-overlay"></div> 
+    <video id="sea-overlay" autoplay loop muted playsinline>
+        <source src="sea.mp4" type="video/mp4">
+    </video> 
 
     <section id="top" class="section hero-section">
         <h2>MY DEARLY FRAGMENTED</h2>
@@ -246,7 +254,7 @@
                 </span>
             </div>        </div>
         <div class="credits-footer">
-            <p>© 2026 Level 404 Project. All Rights Reserved.</p>
+            <p>© <span id="current-year">2026</span> Level 404 Project. All Rights Reserved.</p>
         </div>
     </section>
 

@@ -164,7 +164,7 @@ body {
     opacity: 0.3;
     z-index: 11;
     pointer-events: none;
-    transform: translateY(100%) scale(1); /* 🚀 增加 scale(1.1) 讓 GIF 放大一點點 */
+    transform: translateY(100%); /* 🚀 恢復原始尺寸，移除放大效果 */
 }
 
 @media (max-width: 768px) {

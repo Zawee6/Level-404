@@ -6,6 +6,9 @@
     top: 20px;
     left: 20px;
     z-index: 10000;
+    opacity: 0; /* 🚀 預設隱藏 */
+    pointer-events: none; /* 🚀 預設不可點擊 */
+    transition: opacity 1s ease;
 }
 
 .dropdown {
@@ -95,6 +98,31 @@ body {
     align-items: center;
 }
 
+#enter-btn {
+    background: transparent;
+    color: #fff;
+    border: 1px solid #d32f2f;
+    padding: 15px 50px;
+    font-size: 1.2rem;
+    letter-spacing: 5px;
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+.welcome-text {
+    font-size: 1.5rem;
+    letter-spacing: 8px;
+    color: #d32f2f;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+#enter-btn:hover {
+    background: #d32f2f;
+    box-shadow: 0 0 20px rgba(211, 47, 47, 0.6);
+}
+
 .loader-content {
     text-align: center;
 }
@@ -159,18 +187,12 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
-    background: url('sea.gif') no-repeat center center;
-    background-size: cover;
-    opacity: 0.3;
+    object-fit: cover;
+    opacity: 0;
     z-index: 11;
     pointer-events: none;
-    transform: translateY(100%); /* 🚀 恢復原始尺寸，移除放大效果 */
-}
-
-@media (max-width: 768px) {
-    #sea-overlay { 
-        background-image: url('sea2.gif'); /* 🚀 使用壓縮過的 sea2.gif 以防手機端記憶體不足 */
-    } 
+    transform: translateY(100%);
+    display: none; /* 🚀 徹底隱藏，防止任何預渲染閃現 */
 }
 
 /* 內容區塊基礎 */
@@ -516,6 +538,29 @@ a.call-to-action {
     .credit-row .role, .credit-row .name { text-align: center; flex: none; }
     .credits-title { font-size: 2.2rem; letter-spacing: 0.5rem; }
     .credit-row .name { font-size: 1.4rem; }
+
+    /* 🚀 縮小手機版 Songs 區塊 */
+    .story-container {
+        min-height: 600px; /* 從 900px 縮小 */
+        margin: 20px auto;
+    }
+    .story-card {
+        padding: 20px;
+        gap: 10px;
+    }
+    .story-card h3 {
+        font-size: 1.3rem; /* 從 2.2rem 縮小 */
+    }
+    .song-card-image {
+        max-height: 300px; /* 限制圖片高度 */
+    }
+    .song-lyric {
+        font-size: 1.1rem; /* 從 1.6rem 縮小 */
+    }
+    .song-desc {
+        font-size: 0.95rem; /* 從 1.25rem 縮小 */
+        line-height: 1.5;
+    }
 }
 
 @media (min-width: 769px) {

@@ -135,6 +135,10 @@ if (musicToggle) {
         if (music.muted) {
             music.muted = false;
             musicToggle.innerText = "🔊";
+            // 🚀 如果音樂目前是暫停的（例如剛從影片翻回來），切換靜音時順便播放
+            if (music.paused) {
+                music.play().catch(err => console.log("Music play blocked:", err));
+            }
         } else {
             music.muted = true;
             musicToggle.innerText = "🔇";
@@ -561,26 +565,52 @@ const albumCard = document.querySelector('.album-flip-card');
 const albumIframe = albumCard ? albumCard.querySelector('iframe') : null;
 
 if (albumCard && music) {
+    const transitionOverlay = document.getElementById('transition-overlay');
+
     albumCard.addEventListener('click', (e) => {
-        e.stopPropagation(); // 🚀 防止觸發全域點擊事件導致立刻翻回
+        e.stopPropagation();
         
-        const isFlippingBack = albumCard.classList.contains('flipped');
+        const isFlippingToBack = !albumCard.classList.contains('flipped');
         albumCard.classList.toggle('flipped');
         
         if (albumCard.classList.contains('flipped')) {
-            // 🚀 翻轉到影片面：暫停背景音樂
             music.pause();
-            if (musicToggle) musicToggle.innerText = "🔇";
+            // 不需要切換按鈕文字，因為這只是臨時暫停以觀看影片
+            
+            // 🚀 啟動電影感過渡動畫
+            gsap.set(transitionOverlay, { width: 0, height: 0, opacity: 1 });
+            gsap.to(transitionOverlay, {
+                width: "100vw",
+                height: "100vh",
+                duration: 0.6,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    if (albumIframe) {
+                        let currentSrc = albumIframe.src;
+                        if (!currentSrc.includes('autoplay=1')) {
+                            const separator = currentSrc.includes('?') ? '&' : '?';
+                            albumIframe.src = currentSrc + separator + 'autoplay=1';
+                        }
+                        
+                        // 觸發全螢幕
+                        if (albumIframe.requestFullscreen) albumIframe.requestFullscreen();
+                        else if (albumIframe.webkitRequestFullscreen) albumIframe.webkitRequestFullscreen();
+                    }
+                    // 動畫結束後淡出過渡層
+                    gsap.to(transitionOverlay, { opacity: 0, duration: 0.5, delay: 0.5 });
+                }
+            });
         } else {
-            // 🚀 翻回到正面：停止影片播放並恢復背景音樂
+            // 翻回正面
             if (albumIframe) {
-                const currentSrc = albumIframe.src;
-                albumIframe.src = ''; // 先清空
-                albumIframe.src = currentSrc; // 再還原，這會強制停止影片
+                let currentSrc = albumIframe.src;
+                currentSrc = currentSrc.replace(/[&?]autoplay=1/, '');
+                albumIframe.src = ''; 
+                albumIframe.src = currentSrc; 
             }
-            if (!music.muted) {
+            // 🚀 只有在背景音樂沒被靜音的情況下才恢復播放
+            if (music && !music.muted) {
                 music.play().catch(err => console.log("Music play blocked:", err));
-                if (musicToggle) musicToggle.innerText = "🔊";
             }
         }
     });
@@ -589,19 +619,19 @@ if (albumCard && music) {
 // 🚀 全域點擊監聽：處理「點擊外部」邏輯
 window.addEventListener('click', (e) => {
     // 1. 處理專輯卡片：如果已翻面且點擊卡片以外區域，則翻回正面
-    if (albumCard && albumCard.classList.contains('flipped')) {
+    if (albumCard && albumCard.classList.contains('flipped') && !albumCard.contains(e.target)) {
         albumCard.classList.remove('flipped');
         
         // 🚀 點擊外部翻回時也要停止影片
         if (albumIframe) {
-            const currentSrc = albumIframe.src;
+            let currentSrc = albumIframe.src;
+            currentSrc = currentSrc.replace(/[&?]autoplay=1/, '');
             albumIframe.src = '';
             albumIframe.src = currentSrc;
         }
 
-        if (!music.muted) {
+        if (music && !music.muted) {
             music.play().catch(err => console.log("Music play blocked:", err));
-            if (musicToggle) musicToggle.innerText = "🔊";
         }
     }
 

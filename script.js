@@ -77,6 +77,9 @@ if (!isMobile) {
 // ==========================================
 const loadingProgress = document.getElementById('loading-progress');
 const loadingOverlay = document.getElementById('loading-overlay');
+const loadingStatus = document.getElementById('loading-status');
+const enterContainer = document.getElementById('enter-container');
+const enterBtn = document.getElementById('enter-btn');
 const loadingManager = new THREE.LoadingManager();
 
 loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
@@ -86,13 +89,12 @@ loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
 
 loadingManager.onLoad = () => {
     ScrollTrigger.refresh();
-    gsap.to(loadingOverlay, {
-        opacity: 0,
-        duration: 0.8,
-        onComplete: () => {
-            if (loadingOverlay) loadingOverlay.style.display = 'none';
-        }
-    });
+    // 隱藏載入進度，顯示進入容器
+    if (loadingStatus) loadingStatus.style.display = 'none';
+    if (enterContainer) {
+        enterContainer.style.display = 'block';
+        gsap.from(enterContainer, { opacity: 0, y: 20, duration: 1.5, ease: "power2.out" });
+    }
 };
 
 // ==========================================
@@ -101,12 +103,31 @@ loadingManager.onLoad = () => {
 const music = document.getElementById('bg-music');
 const musicToggle = document.getElementById('music-toggle');
 
-window.addEventListener('click', () => {
-    if (music && music.paused) {
-        music.play().catch(err => console.log("Autoplay blocked:", err));
-        if (musicToggle) musicToggle.innerText = "🔊";
-    }
-}, { once: true });
+if (enterBtn) {
+    enterBtn.addEventListener('click', () => {
+        // 播放音樂
+        if (music) {
+            music.play().catch(err => console.log("Music play blocked:", err));
+            if (musicToggle) musicToggle.innerText = "🔊";
+        }
+
+        // 顯示導覽列
+        const topNav = document.querySelector('.top-nav');
+        if (topNav) {
+            gsap.to(topNav, { opacity: 1, duration: 1, delay: 0.5, onComplete: () => { topNav.style.pointerEvents = 'auto'; } });
+        }
+
+        // 隱藏 Loading 畫面
+        gsap.to(loadingOverlay, {
+            opacity: 0,
+            duration: 1.5,
+            ease: "power2.inOut",
+            onComplete: () => {
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+            }
+        });
+    });
+}
 
 if (musicToggle) {
     musicToggle.addEventListener('click', (e) => {
@@ -301,8 +322,41 @@ if (!isMobile) {
 }
 
 // 🚀 5. Sea Overlay 動畫
-const seaTL = gsap.timeline({ scrollTrigger: { trigger: ".concept-section", start: "top bottom", endTrigger: ".story-section", end: "bottom top", scrub: true }});
-seaTL.fromTo("#sea-overlay", { y: "100%" }, { y: "-15%", ease: "none" }).to("#sea-overlay", { y: "-15%", duration: 2 }).to("#sea-overlay", { y: "-100%", ease: "none" }); 
+// 進入：從 Album 開始上升，同時控制顯示與淡入
+gsap.fromTo("#sea-overlay", 
+    { y: "100%", opacity: 0 }, 
+    { 
+        y: "0%", 
+        opacity: 0.3,
+        ease: "none",
+        scrollTrigger: {
+            trigger: ".concept-section",
+            start: "top bottom",
+            end: "top top",
+            scrub: true,
+            onEnter: () => gsap.set("#sea-overlay", { display: 'block' }), // 進入區域才顯示
+            onLeaveBack: () => gsap.set("#sea-overlay", { display: 'none' }) // 回到 Top 則隱藏
+        }
+    }
+);
+
+// 離開：直到 Songs 區塊滑到接近螢幕頂端 (20%)，才開始從 0% 往上移動至 -100%，同時淡出
+gsap.fromTo("#sea-overlay", 
+    { y: "0%", opacity: 0.3 }, 
+    { 
+        y: "-100%", 
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: {
+            trigger: ".story-section",
+            start: "top 0%",
+            end: "bottom top",
+            scrub: true
+        }
+    }
+);
+
+
 
 
 const loader = new THREE.GLTFLoader(loadingManager);
@@ -379,6 +433,80 @@ if (!isMobile) {
         slideGroup.add(model);
         updateResponsiveLayout();
     });
+}
+
+// 🚀 6. Ball1 掉落動畫
+const ballGroup = new THREE.Group();
+scene.add(ballGroup);
+let canSpawnBalls = false; // 控制是否生成新球
+
+loader.load('model/ball1.glb', (gltf) => {
+    const originalBall = gltf.scene;
+    
+    for (let i = 0; i < (isMobile ? 5 : 12); i++) {
+        const ball = originalBall.clone();
+        const s = isMobile ? 0.5 : 0.8;
+        ball.scale.set(s, s, s);
+        
+        // 初始位置設定在下方並隱藏
+        ball.position.y = -50;
+        ballGroup.add(ball);
+
+        // GSAP 掉落動畫
+        const fallAnim = gsap.to(ball.position, {
+            y: -30, 
+            duration: Math.random() * 3 + 3,
+            repeat: -1,
+            ease: "none",
+            paused: true,
+            onRepeat: () => {
+                if (canSpawnBalls) {
+                    resetBall(ball);
+                } else {
+                    // 如果不允許生成，就讓這顆球在掉完後停在下方並暫停動畫
+                    fallAnim.pause();
+                }
+            }
+        });
+
+        const rotAnim = gsap.to(ball.rotation, {
+            x: Math.PI * 2,
+            z: Math.PI * 2,
+            duration: Math.random() * 3 + 2,
+            repeat: -1,
+            ease: "none",
+            paused: true
+        });
+
+        // 控制區域：從 Album 完全進入開始 (top top) 到 Story 底部離開
+        ScrollTrigger.create({
+            trigger: ".concept-section",
+            start: "top top", // 修改：從 top bottom 改為 top top，表示區塊頂部到達螢幕頂部才開始
+            endTrigger: ".story-section",
+            end: "bottom top",
+            onEnter: () => { 
+                canSpawnBalls = true; 
+                if (ball.position.y < -25) { resetBall(ball); fallAnim.play(0); } 
+                else { fallAnim.play(); } 
+                rotAnim.play(); 
+            },
+            onLeave: () => { canSpawnBalls = false; }, // 進入 Credits 區塊，停止生成
+            onEnterBack: () => { 
+                canSpawnBalls = true; 
+                fallAnim.play(); 
+                rotAnim.play(); 
+            },
+            onLeaveBack: () => { canSpawnBalls = false; } // 回到 Top，停止生成
+        });
+    }
+});
+
+function resetBall(ball) {
+    ball.position.set(
+        (Math.random() - 0.5) * 40, 
+        30 + Math.random() * 20, 
+        (Math.random() - 0.5) * 20
+    );
 }
 
 const dropbtn = document.querySelector('.dropbtn');
@@ -525,3 +653,9 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     updateResponsiveLayout();
 });
+
+// 🚀 動態更新年份
+const yearSpan = document.getElementById('current-year');
+if (yearSpan) {
+    yearSpan.innerText = new Date().getFullYear();
+}

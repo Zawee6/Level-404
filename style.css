@@ -73,13 +73,59 @@ html {
     scroll-behavior: auto; 
 }
 
-/* 🚀 全域鼠標強制設定 */
-* {
-    cursor: url('lolipop/1.png') 32 32, auto !important;
+/* 🚀 文字選取顏色自定義 */
+::selection {
+    background: rgba(255, 255, 255, 0.2); /* 淺灰色背景 */
+    color: #fff; /* 文字保持白色 */
 }
 
-*:active {
-    cursor: url('lolipop/2.png') 32 32, auto !important;
+::-moz-selection {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* 🚀 全域鼠標隱藏，改用 JS 驅動的自定義鼠標 */
+* {
+    cursor: none !important;
+}
+
+#custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 64px;
+    height: 64px;
+    background-image: url('lolipop/1.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 10001;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s ease, height 0.2s ease;
+    display: none; /* 預設隱藏，由 JS 啟動 */
+}
+
+@media (min-width: 769px) {
+    #custom-cursor {
+        display: block;
+    }
+}
+
+#custom-cursor.active {
+    background-image: url('lolipop/2.png');
+}
+
+#custom-cursor.glitch {
+    animation: cursor-glitch 0.15s infinite;
+}
+
+@keyframes cursor-glitch {
+    0% { transform: translate(-50%, -50%) translate(0, 0); filter: none; }
+    20% { transform: translate(-50%, -50%) translate(-8px, 4px); filter: hue-rotate(90deg) brightness(1.5); }
+    40% { transform: translate(-50%, -50%) translate(8px, -4px); filter: hue-rotate(180deg) contrast(2); opacity: 0.8; }
+    60% { transform: translate(-50%, -50%) translate(-4px, -8px); filter: hue-rotate(270deg) brightness(0.8); }
+    80% { transform: translate(-50%, -50%) translate(4px, 8px); filter: hue-rotate(360deg); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) translate(0, 0); filter: none; }
 }
 
 body {
@@ -251,11 +297,20 @@ body {
     max-width: 800px;
     aspect-ratio: 1 / 1;
     margin-bottom: 40px;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
     z-index: 25;
 }
 
+.album-flip-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 25px 60px rgba(181, 58, 32, 0.3);
+}
+
 .album-flip-card.flipped { z-index: 100; }
+
+.album-flip-card.flipped:hover {
+    transform: rotateY(0deg) scale(1.05); /* 保持放大但不要抵消翻轉效果的邏輯需要小心 */
+}
 
 .flip-card-inner {
     position: relative;
@@ -318,7 +373,7 @@ body {
 
 .funding-subtitle {
     font-size: 1.1rem;
-    color: #444; 
+    color: #b53a20; 
     margin-bottom: 120px;
     letter-spacing: 8px;
     text-transform: uppercase;
@@ -332,10 +387,11 @@ body {
 
 .progress-bar-container {
     width: 100%;
-    height: 3px; /* 🚀 極細線條 */
+    height: 8px; /* 🚀 加粗線條 */
     background: rgba(255, 255, 255, 0.1);
     margin-bottom: 60px;
     position: relative;
+    border-radius: 4px; /* 增加一點圓角讓它看起來更精緻 */
 }
 
 .progress-bar-fill {
@@ -344,6 +400,7 @@ body {
     background: #b53a20;
     transition: width 3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
+    border-radius: 4px;
 }
 
 .progress-stats {

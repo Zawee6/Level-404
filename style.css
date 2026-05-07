@@ -22,7 +22,6 @@
     padding: 12px 24px;
     font-size: 14px;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    cursor: pointer;
     border-radius: 0px;
     letter-spacing: 3px;
     /* 🚀 手機端停用 blur 以免 crash */
@@ -75,6 +74,17 @@ html {
     scroll-behavior: auto; 
 }
 
+/* =========================================
+   全域鼠標強制設定
+========================================= */
+* {
+    cursor: url('lolipop/1.png') 32 32, auto !important;
+}
+
+*:active {
+    cursor: url('lolipop/2.png') 32 32, auto !important;
+}
+
 body {
     margin: 0;
     font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -83,20 +93,6 @@ body {
     line-height: 1.6;
     font-size: 16px;
     overflow-x: hidden;
-    cursor: url('lolipop/1.png'), auto; /* 🚀 自定義常駐樣式 */
-}
-
-body:active {
-    cursor: url('lolipop/2.png'), auto; /* 🚀 自定義點擊樣式 */
-}
-
-/* 確保所有可點擊元素也套用樣式，或者維持自定義樣式 */
-a, button, .dropbtn, .nav-link, .story-nav, .album-flip-card {
-    cursor: url('lolipop/1.png'), pointer;
-}
-
-a:active, button:active, .dropbtn:active, .album-flip-card:active {
-    cursor: url('lolipop/2.png'), pointer;
 }
 
 #loading-overlay {
@@ -119,7 +115,6 @@ a:active, button:active, .dropbtn:active, .album-flip-card:active {
     padding: 15px 50px;
     font-size: 1.2rem;
     letter-spacing: 5px;
-    cursor: pointer;
     transition: all 0.5s ease;
 }
 
@@ -172,7 +167,6 @@ a:active, button:active, .dropbtn:active, .album-flip-card:active {
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
@@ -253,7 +247,6 @@ a:active, button:active, .dropbtn:active, .album-flip-card:active {
     width: 95%;
     max-width: 800px; /* 🚀 從 600px 提升到 800px */
     aspect-ratio: 1 / 1; /* 🚀 強制正方形 */
-    cursor: pointer;
     margin-bottom: 40px;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 25;
@@ -471,7 +464,6 @@ a.call-to-action {
     border: none;
     color: #d32f2f;
     font-size: 2rem;
-    cursor: pointer;
     z-index: 10;
     width: 50px;
     height: 50px;

@@ -93,15 +93,15 @@ html {
     position: fixed;
     top: 0;
     left: 0;
-    width: 64px;
-    height: 64px;
+    width: 128px;
+    height: 128px;
     background-image: url('lolipop/1.png');
     background-size: contain;
     background-repeat: no-repeat;
     pointer-events: none;
     z-index: 10001;
     transform: translate(-50%, -50%);
-    transition: width 0.2s ease, height 0.2s ease;
+    transition: transform 0.1s ease-out;
     display: none; /* 預設隱藏，由 JS 啟動 */
 }
 
@@ -115,17 +115,12 @@ html {
     background-image: url('lolipop/2.png');
 }
 
-#custom-cursor.glitch {
-    animation: cursor-glitch 0.15s infinite;
-}
-
-@keyframes cursor-glitch {
-    0% { transform: translate(-50%, -50%) translate(0, 0); filter: none; }
-    20% { transform: translate(-50%, -50%) translate(-8px, 4px); filter: hue-rotate(90deg) brightness(1.5); }
-    40% { transform: translate(-50%, -50%) translate(8px, -4px); filter: hue-rotate(180deg) contrast(2); opacity: 0.8; }
-    60% { transform: translate(-50%, -50%) translate(-4px, -8px); filter: hue-rotate(270deg) brightness(0.8); }
-    80% { transform: translate(-50%, -50%) translate(4px, 8px); filter: hue-rotate(360deg); opacity: 0.9; }
-    100% { transform: translate(-50%, -50%) translate(0, 0); filter: none; }
+.glitch-square {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    background: rgba(181, 58, 32, 0.6);
+    mix-blend-mode: screen;
 }
 
 body {

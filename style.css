@@ -83,6 +83,20 @@ body {
     line-height: 1.6;
     font-size: 16px;
     overflow-x: hidden;
+    cursor: url('lolipop/1.png'), auto; /* 🚀 自定義常駐樣式 */
+}
+
+body:active {
+    cursor: url('lolipop/2.png'), auto; /* 🚀 自定義點擊樣式 */
+}
+
+/* 確保所有可點擊元素也套用樣式，或者維持自定義樣式 */
+a, button, .dropbtn, .nav-link, .story-nav, .album-flip-card {
+    cursor: url('lolipop/1.png'), pointer;
+}
+
+a:active, button:active, .dropbtn:active, .album-flip-card:active {
+    cursor: url('lolipop/2.png'), pointer;
 }
 
 #loading-overlay {

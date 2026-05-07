@@ -62,8 +62,8 @@
 }
 
 .dropdown:hover .dropbtn {
-    background-color: #d32f2f;
-    border-color: #d32f2f;
+    background-color: #b53a20;
+    border-color: #b53a20;
 }
 
 /* =========================================
@@ -108,7 +108,7 @@ body {
 #enter-btn {
     background: transparent;
     color: #fff;
-    border: 1px solid #d32f2f;
+    border: 1px solid #b53a20;
     padding: 15px 50px;
     font-size: 1.2rem;
     letter-spacing: 5px;
@@ -118,15 +118,15 @@ body {
 .welcome-text {
     font-size: 1.5rem;
     letter-spacing: 8px;
-    color: #d32f2f;
+    color: #b53a20;
     margin-bottom: 30px;
     text-transform: uppercase;
     font-weight: 300;
 }
 
 #enter-btn:hover {
-    background: #d32f2f;
-    box-shadow: 0 0 20px rgba(211, 47, 47, 0.6);
+    background: #b53a20;
+    box-shadow: 0 0 20px rgba(181, 58, 32, 0.6);
 }
 
 .loader-content {
@@ -136,8 +136,8 @@ body {
 .spinner {
     width: 50px;
     height: 50px;
-    border: 3px solid rgba(211, 47, 47, 0.3);
-    border-top: 3px solid #d32f2f;
+    border: 3px solid rgba(181, 58, 32, 0.3);
+    border-top: 3px solid #b53a20;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 20px;
@@ -169,8 +169,8 @@ body {
 }
 
 .fixed-mute-btn:hover {
-    border-color: #d32f2f;
-    color: #d32f2f;
+    border-color: #b53a20;
+    color: #b53a20;
     transform: scale(1.1);
 }
 
@@ -341,7 +341,7 @@ body {
 .progress-bar-fill {
     width: 0%; 
     height: 100%;
-    background: #d32f2f;
+    background: #b53a20;
     transition: width 3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
 }
@@ -431,8 +431,8 @@ body {
     display: inline-block;
     margin-top: 40px;       
     padding: 18px 60px;     /* 🚀 增加內距 */
-    border: 2px solid #d32f2f; 
-    color: #d32f2f;                
+    border: 2px solid #b53a20; 
+    color: #b53a20;                
     text-decoration: none;
     font-size: 1.4rem;      /* 🚀 增加字體大小 */
     font-weight: bold;
@@ -442,12 +442,12 @@ body {
     text-transform: uppercase;
 }
 
-.watch-btn:hover { background-color: #d32f2f; color: #fff; transform: translateY(-3px); }
+.watch-btn:hover { background-color: #b53a20; color: #fff; transform: translateY(-3px); }
 
 a.call-to-action {
     display: inline-block;
     padding: 10px 25px;
-    background-color: #d32f2f; 
+    background-color: #b53a20; 
     color: #fff;
     text-decoration: none;
     border-radius: 5px;
@@ -491,7 +491,7 @@ a.call-to-action {
     max-width: 900px;
     padding: 40px;
     background: rgba(20, 20, 20, 0.95);
-    border: 1px solid rgba(211, 47, 47, 0.5);
+    border: 1px solid rgba(181, 58, 32, 0.5);
     border-radius: 20px;
     text-align: center;
     opacity: 0;
@@ -506,12 +506,12 @@ a.call-to-action {
 }
 
 .story-card h3 { font-size: 2.2rem; margin-bottom: 10px; }
-.story-card.active { opacity: 1; transform: scale(1) translateX(0); pointer-events: auto; z-index: 2; border-color: #d32f2f; }
+.story-card.active { opacity: 1; transform: scale(1) translateX(0); pointer-events: auto; z-index: 2; border-color: #b53a20; }
 .story-card.prev-card { transform: scale(0.8) translateX(-100%); }
 .story-card.next-card { transform: scale(0.8) translateX(100%); }
 
 .song-card-image { width: 100%; max-width: 700px; max-height: 800px; object-fit: contain; border-radius: 10px; }
-.song-lyric { font-size: 1.6rem; font-style: italic; color: #d32f2f; margin: 15px 0; }
+.song-lyric { font-size: 1.6rem; font-style: italic; color: #b53a20; margin: 15px 0; }
 .song-desc { font-size: 1.25rem; color: #bbb; line-height: 1.8; }
 
 .story-nav {
@@ -520,7 +520,7 @@ a.call-to-action {
     transform: translateY(-50%);
     background: rgba(0, 0, 0, 0.3);
     border: none;
-    color: #d32f2f;
+    color: #b53a20;
     font-size: 2rem;
     z-index: 10;
     width: 50px;
@@ -536,8 +536,8 @@ a.call-to-action {
 .item-section { background-color: #222; }
 .merch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; }
 .merch-item { background-color: #333; padding: 20px; border-radius: 8px; }
-.merch-item h3 { color: #d32f2f; }
-.buy-button { display: block; padding: 10px; background-color: #d32f2f; color: #fff; text-decoration: none; border-radius: 4px; }
+.merch-item h3 { color: #b53a20; }
+.buy-button { display: block; padding: 10px; background-color: #b53a20; color: #fff; text-decoration: none; border-radius: 4px; }
 
 /* =========================================
    6. CREDITS 區塊 (電影感維持)
@@ -569,7 +569,7 @@ a.call-to-action {
 .credit-row { display: flex; justify-content: center; align-items: baseline; gap: 60px; }
 .credit-row .role { flex: 1; text-align: right; font-size: 1.1rem; text-transform: uppercase; color: #777; letter-spacing: 0.2rem; }
 .credit-row .name { flex: 1.5; text-align: left; font-size: 1.6rem; color: #fff; font-weight: 400; letter-spacing: 0.05rem; white-space: nowrap; }
-.credit-row .name a { color: #d32f2f; text-decoration: none; }
+.credit-row .name a { color: #b53a20; text-decoration: none; }
 
 .credits-footer { margin-top: 150px; font-size: 0.9rem; color: #444; letter-spacing: 0.15rem; }
 

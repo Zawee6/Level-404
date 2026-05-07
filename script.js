@@ -20,18 +20,39 @@ let mouseTimeout;
 let idleTime = 0;
 const CONSTRAINT_RADIUS = 0.5; 
 
+// 自定義鼠標變數
+const customCursor = document.getElementById('custom-cursor');
+let cursorX = 0, cursorY = 0;
+let targetX = 0, targetY = 0;
+
 if (!isMobile) {
     window.addEventListener('mousemove', (event) => {
         isMouseActive = true;
         clearTimeout(mouseTimeout);
         mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1500);
+        
         const nx = (event.clientX / window.innerWidth - 0.5) * 2;
         const ny = -(event.clientY / window.innerHeight - 0.5) * 2;
         const dist = Math.sqrt(nx * nx + ny * ny);
         const scale = dist > CONSTRAINT_RADIUS ? CONSTRAINT_RADIUS / dist : 1.0;
         targetMouse.x = nx * scale;
         targetMouse.y = ny * scale;
+
+        // 更新自定義鼠標目標
+        targetX = event.clientX;
+        targetY = event.clientY;
     });
+
+    window.addEventListener('mousedown', () => {
+        if (customCursor) customCursor.classList.add('active', 'glitch');
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (customCursor) customCursor.classList.remove('active', 'glitch');
+    });
+
+    // 防止預設拖曳行為干擾
+    window.addEventListener('dragstart', (e) => e.preventDefault());
 }
 
 // Lenis 平滑捲動
@@ -653,6 +674,15 @@ window.addEventListener('blur', () => {
 
 function animate() {
     requestAnimationFrame(animate);
+    
+    // 自定義鼠標平滑跟隨
+    if (customCursor && !isMobile) {
+        cursorX += (targetX - cursorX) * 0.15;
+        cursorY += (targetY - cursorY) * 0.15;
+        customCursor.style.left = `${cursorX}px`;
+        customCursor.style.top = `${cursorY}px`;
+    }
+
     if (starGroup) {
         starGroup.rotation.y += 0.0003;
         starGroup.rotation.z += 0.0001;

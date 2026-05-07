@@ -24,6 +24,61 @@ const CONSTRAINT_RADIUS = 0.5;
 const customCursor = document.getElementById('custom-cursor');
 let cursorX = 0, cursorY = 0;
 let targetX = 0, targetY = 0;
+let glitchSquares = [];
+let isMouseDown = false;
+
+class GlitchSquare {
+    constructor(x, y) {
+        this.element = document.createElement('div');
+        this.element.className = 'glitch-square';
+        document.body.appendChild(this.element);
+        
+        const size = Math.random() * 20 + 5;
+        this.element.style.width = `${size}px`;
+        this.element.style.height = `${size}px`;
+        
+        this.offsetX = (Math.random() - 0.5) * 60;
+        this.offsetY = (Math.random() - 0.5) * 60;
+        
+        this.life = 1.0;
+        this.decay = Math.random() * 0.02 + 0.015;
+        this.followSpeed = Math.random() * 0.1 + 0.05;
+        
+        // 初始位置就在鼠標附近
+        this.x = x + this.offsetX;
+        this.y = y + this.offsetY;
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
+    }
+
+    update(mX, mY) {
+        this.life -= this.decay;
+        if (this.life <= 0) {
+            this.element.remove();
+            return false;
+        }
+
+        const targetX = mX + this.offsetX;
+        const targetY = mY + this.offsetY;
+        
+        this.x += (targetX - this.x) * this.followSpeed;
+        this.y += (targetY - this.y) * this.followSpeed;
+
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
+        this.element.style.opacity = this.life;
+        this.element.style.transform = `scale(${this.life * 1.5}) rotate(${Math.random() * 360}deg)`;
+        
+        // 隨機跳色增加 Glitch 感
+        if (Math.random() > 0.9) {
+            this.element.style.background = Math.random() > 0.5 ? '#fff' : '#b53a20';
+        } else {
+            this.element.style.background = 'rgba(181, 58, 32, 0.6)';
+        }
+
+        return true;
+    }
+}
 
 if (!isMobile) {
     window.addEventListener('mousemove', (event) => {
@@ -41,14 +96,19 @@ if (!isMobile) {
         // 更新自定義鼠標目標
         targetX = event.clientX;
         targetY = event.clientY;
+
+        // 產生 Glitch 方塊
+        if (glitchSquares.length < 15 && Math.random() > 0.7) {
+            glitchSquares.push(new GlitchSquare(targetX, targetY));
+        }
     });
 
     window.addEventListener('mousedown', () => {
-        if (customCursor) customCursor.classList.add('active', 'glitch');
+        if (customCursor) customCursor.classList.add('active');
     });
 
     window.addEventListener('mouseup', () => {
-        if (customCursor) customCursor.classList.remove('active', 'glitch');
+        if (customCursor) customCursor.classList.remove('active');
     });
 
     // 防止預設拖曳行為干擾
@@ -681,6 +741,9 @@ function animate() {
         cursorY += (targetY - cursorY) * 0.15;
         customCursor.style.left = `${cursorX}px`;
         customCursor.style.top = `${cursorY}px`;
+
+        // 更新 Glitch 方塊
+        glitchSquares = glitchSquares.filter(square => square.update(cursorX, cursorY));
     }
 
     if (starGroup) {

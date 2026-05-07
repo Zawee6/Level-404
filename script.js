@@ -714,9 +714,9 @@ window.addEventListener('resize', () => {
 // ==========================================
 // 🚀 當募資進度有變動時，只需修改下方數值：
 const FUNDING_CONFIG = {
-    currentPercent: 0,        // 目前百分比 (例如: 45)
-    currentAmount: "0",   // 目前金額文字 (例如: "45,200")
-    goalAmount: "100,000"      // 目標金額文字 (例如: "100,000")
+    currentPercent: 0,        // 目前完成度百分比 (例如: 45)
+    currentAmount: "0",       // 目前贊助人次 (例如: "45")
+    goalAmount: "100"         // 目標 (選填)
 };
 
 function initFundingAnimation() {
@@ -725,8 +725,8 @@ function initFundingAnimation() {
     const currentText = document.getElementById('funding-current');
 
     if (progressBar && percentText && currentText) {
-        // 設定初始值 (金額與目標)
-        currentText.innerText = "NT$ " + FUNDING_CONFIG.currentAmount;
+        // 設定初始值 (贊助人次)
+        currentText.innerText = FUNDING_CONFIG.currentAmount;
 
         ScrollTrigger.create({
             trigger: ".funding-section",
@@ -738,16 +738,20 @@ function initFundingAnimation() {
                 // 2. 百分比數字跳動動畫
                 let displayPercent = 0;
                 const duration = 2000; // 2秒跑完
-                const stepTime = duration / FUNDING_CONFIG.currentPercent;
-
-                const interval = setInterval(() => {
-                    if (displayPercent >= FUNDING_CONFIG.currentPercent) {
-                        clearInterval(interval);
-                    } else {
-                        displayPercent++;
-                        percentText.innerText = displayPercent + "%";
-                    }
-                }, stepTime > 20 ? stepTime : 20);
+                
+                if (FUNDING_CONFIG.currentPercent > 0) {
+                    const stepTime = duration / FUNDING_CONFIG.currentPercent;
+                    const interval = setInterval(() => {
+                        if (displayPercent >= FUNDING_CONFIG.currentPercent) {
+                            clearInterval(interval);
+                        } else {
+                            displayPercent++;
+                            percentText.innerText = displayPercent + "%";
+                        }
+                    }, stepTime > 20 ? stepTime : 20);
+                } else {
+                    percentText.innerText = "0%";
+                }
             }
         });
     }

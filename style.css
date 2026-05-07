@@ -628,6 +628,12 @@ a.call-to-action {
     .song-card-image { max-height: 300px; }
     .song-lyric { font-size: 1.1rem; }
     .song-desc { font-size: 0.95rem; }
-    .funding-title { font-size: 2.5rem; letter-spacing: 0.5rem; }
+    .funding-section { padding: 100px 20px; min-height: 80vh; }
+    .funding-title { font-size: 2.5rem; letter-spacing: 0.5rem; margin-bottom: 20px; }
+    .funding-subtitle { margin-bottom: 60px; letter-spacing: 4px; font-size: 0.9rem; }
+    .progress-wrapper { margin-bottom: 60px; }
+    .progress-bar-container { margin-bottom: 40px; }
     .stat-value { font-size: 2.2rem; }
+    .stat-label { font-size: 0.7rem; letter-spacing: 2px; }
+    .funding-btn { padding: 15px 30px; font-size: 0.9rem; letter-spacing: 4px; }
 }

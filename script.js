@@ -684,8 +684,51 @@ window.addEventListener('resize', () => {
     updateResponsiveLayout();
 });
 
-// 🚀 動態更新年份
-const yearSpan = document.getElementById('current-year');
-if (yearSpan) {
-    yearSpan.innerText = new Date().getFullYear();
+// ==========================================
+// 💰 募資進度設定 (手動更新) 💰
+// ==========================================
+// 🚀 當募資進度有變動時，只需修改下方數值：
+const FUNDING_CONFIG = {
+    currentPercent: 0,        // 目前百分比 (例如: 45)
+    currentAmount: "0",   // 目前金額文字 (例如: "45,200")
+    goalAmount: "100,000"      // 目標金額文字 (例如: "100,000")
+};
+
+function initFundingAnimation() {
+    const progressBar = document.getElementById('funding-progress-bar');
+    const percentText = document.getElementById('funding-percent');
+    const currentText = document.getElementById('funding-current');
+
+    if (progressBar && percentText && currentText) {
+        // 設定初始值 (金額與目標)
+        currentText.innerText = "NT$ " + FUNDING_CONFIG.currentAmount;
+
+        ScrollTrigger.create({
+            trigger: ".funding-section",
+            start: "top 80%",
+            onEnter: () => {
+                // 1. 進度條動畫
+                progressBar.style.width = Math.min(FUNDING_CONFIG.currentPercent, 100) + "%";
+
+                // 2. 百分比數字跳動動畫
+                let displayPercent = 0;
+                const duration = 2000; // 2秒跑完
+                const stepTime = duration / FUNDING_CONFIG.currentPercent;
+
+                const interval = setInterval(() => {
+                    if (displayPercent >= FUNDING_CONFIG.currentPercent) {
+                        clearInterval(interval);
+                    } else {
+                        displayPercent++;
+                        percentText.innerText = displayPercent + "%";
+                    }
+                }, stepTime > 20 ? stepTime : 20);
+            }
+        });
+    }
 }
+
+// 在 DOM 加載後執行
+document.addEventListener('DOMContentLoaded', () => {
+    initFundingAnimation();
+});

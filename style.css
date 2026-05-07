@@ -1,5 +1,5 @@
 /* =========================================
-   0. 頂部導航與下拉選單
+   0. 頂部導覽與下拉選單
 ========================================= */
 .top-nav {
     position: fixed;
@@ -24,7 +24,6 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 0px;
     letter-spacing: 3px;
-    /* 🚀 手機端停用 blur 以免 crash */
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
 }
@@ -43,7 +42,7 @@
 
 @media (max-width: 768px) {
     .dropbtn, .dropdown-content, .fixed-mute-btn {
-        backdrop-filter: none !important; /* 🚀 強制停用昂貴濾鏡 */
+        backdrop-filter: none !important; 
     }
 }
 
@@ -68,15 +67,13 @@
 }
 
 /* =========================================
-   1. 全域設定與 Loading 畫面
+   1. 全域設定與鼠標
 ========================================= */
 html {
     scroll-behavior: auto; 
 }
 
-/* =========================================
-   全域鼠標強制設定
-========================================= */
+/* 🚀 全域鼠標強制設定 */
 * {
     cursor: url('lolipop/1.png') 32 32, auto !important;
 }
@@ -151,7 +148,6 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* 🎵 固定靜音按鈕 🎵 */
 .fixed-mute-btn {
     position: fixed;
     bottom: 30px;
@@ -178,7 +174,6 @@ body {
     transform: scale(1.1);
 }
 
-/* 🌟 3D 主視覺容器 🌟 */
 #three-container {
     position: fixed;
     top: 0;
@@ -213,10 +208,12 @@ body {
     z-index: 11;
     pointer-events: none;
     transform: translateY(100%);
-    display: none; /* 🚀 徹底隱藏，防止任何預渲染閃現 */
+    display: none; 
 }
 
-/* 內容區塊基礎 */
+/* =========================================
+   2. 內容區塊基礎 (Sections)
+========================================= */
 .section {
     padding: 100px 20px;
     box-sizing: border-box;
@@ -234,27 +231,31 @@ body {
 }
 
 .hero-section { height: 100vh; }
-.hero-section h2 { color: #d32f2f; } /* 🚀 首頁標題改為紅色 */
+.hero-section h2 { color: #fff; font-size: 3.5rem; letter-spacing: 1.5rem; }
+
+.concept-section h2, .mv-section h2, .story-section h2 {
+    font-size: 3.5rem;
+    letter-spacing: 1.5rem;
+    margin-bottom: 60px;
+    text-transform: uppercase;
+}
 
 .concept-section {
     min-height: 100vh; 
-    background-color: rgba(30, 30, 30, 0.5);
-    perspective: 1500px; /* 🚀 增加 3D 視角感 */
+    background-color: rgba(30, 30, 30, 0.4); /* 🚀 第一階：最透明 */
+    perspective: 1500px;
 }
 
-/* 翻轉卡片容器 */
 .album-flip-card {
     width: 95%;
-    max-width: 800px; /* 🚀 從 600px 提升到 800px */
-    aspect-ratio: 1 / 1; /* 🚀 強制正方形 */
+    max-width: 800px;
+    aspect-ratio: 1 / 1;
     margin-bottom: 40px;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 25;
 }
 
-.album-flip-card.flipped {
-    z-index: 100;
-}
+.album-flip-card.flipped { z-index: 100; }
 
 .flip-card-inner {
     position: relative;
@@ -265,10 +266,7 @@ body {
     transform-style: preserve-3d;
 }
 
-/* 觸發翻轉後的狀態 */
-.album-flip-card.flipped .flip-card-inner {
-    transform: rotateY(180deg);
-}
+.album-flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
 
 .flip-card-front, .flip-card-back {
     position: absolute;
@@ -281,38 +279,119 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* 正面樣式 */
-.flip-card-front {
-    background-color: #111;
-}
-
-.concept-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* 背面樣式 (影片) */
-.flip-card-back {
-    background-color: #000;
-    transform: rotateY(180deg);
-}
-
-.flip-card-back iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
+.flip-card-front { background-color: #111; }
+.concept-image { width: 100%; height: 100%; object-fit: cover; }
+.flip-card-back { background-color: #000; transform: rotateY(180deg); }
+.flip-card-back iframe { width: 100%; height: 100%; border: none; }
 
 @media (max-width: 768px) {
     .album-flip-card { max-width: 90%; }
 }
 
 /* =========================================
-   2. MV 區塊
+   2.5 募資進度區塊 (Funding) - 電影極簡版
+========================================= */
+.funding-section {
+    background-color: rgba(20, 20, 20, 0.6); /* 🚀 第二階 */
+    padding: 300px 20px; 
+    min-height: 110vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.funding-container {
+    width: 100%;
+    max-width: 1100px;
+}
+
+.funding-title {
+    font-size: 4rem; 
+    letter-spacing: 2.5rem; /* 🚀 超大字距營造史詩感 */
+    font-weight: 100;
+    color: #fff;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    padding-left: 2.5rem; /* 抵消偏移 */
+}
+
+.funding-subtitle {
+    font-size: 1.1rem;
+    color: #444; 
+    margin-bottom: 120px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+.progress-wrapper {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 120px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 3px; /* 🚀 極細線條 */
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 60px;
+    position: relative;
+}
+
+.progress-bar-fill {
+    width: 0%; 
+    height: 100%;
+    background: #d32f2f;
+    transition: width 3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.stat-item:last-child { text-align: right; }
+
+.stat-label { 
+    font-size: 0.8rem; 
+    color: #333; 
+    letter-spacing: 4px; 
+    margin-bottom: 20px; 
+    text-transform: uppercase; 
+}
+
+.stat-value { 
+    font-size: 4rem; 
+    color: #fff; 
+    font-weight: 100; 
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.funding-btn {
+    display: inline-block;
+    padding: 22px 70px;
+    border: 1px solid #333;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    letter-spacing: 12px;
+    transition: all 0.6s ease;
+    background: transparent;
+    text-transform: uppercase;
+}
+
+.funding-btn:hover { 
+    border-color: #fff;
+    letter-spacing: 15px;
+}
+
+/* =========================================
+   3. MV 區塊
 ========================================= */
 .mv-section {
-    background-color: rgba(20, 20, 20, 0.6);
+    background-color: rgba(15, 15, 15, 0.85); /* 🚀 第三階 */
     min-height: 120vh; 
     padding: 150px 20px;
     display: flex;
@@ -325,22 +404,19 @@ body {
 .mv-block {
     margin-top: 120px;
     width: 100%;
-    max-width: 1400px; /* 🚀 從 1200px 進一步放大 */
+    max-width: 1400px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .mv-embed {
     width: 100%;
-    max-width: 1200px; /* 🚀 從 1000px 進一步放大 */
+    max-width: 1200px;
     margin: 40px auto 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
 }
 
 .mv-embed iframe {
@@ -354,15 +430,16 @@ body {
 .watch-btn {
     display: inline-block;
     margin-top: 40px;       
-    padding: 14px 45px;     
+    padding: 18px 60px;     /* 🚀 增加內距 */
     border: 2px solid #d32f2f; 
     color: #d32f2f;                
     text-decoration: none;
+    font-size: 1.4rem;      /* 🚀 增加字體大小 */
     font-weight: bold;
-    letter-spacing: 2px;    
+    letter-spacing: 4px;    /* 🚀 增加字距 */
     transition: all 0.4s ease;
     background: transparent;
-    text-align: center;
+    text-transform: uppercase;
 }
 
 .watch-btn:hover { background-color: #d32f2f; color: #fff; transform: translateY(-3px); }
@@ -377,10 +454,10 @@ a.call-to-action {
 }
 
 /* =========================================
-   3. STORY 區塊
+   4. STORY 區塊
 ========================================= */
 .story-section {
-    background-color: rgba(25, 25, 25, 0.8);
+    background-color: rgba(10, 10, 10, 0.95); /* 🚀 第四階 */
     min-height: 100vh;
     overflow: hidden;
     display: flex;
@@ -391,13 +468,12 @@ a.call-to-action {
 .story-container {
     position: relative;
     width: 100%;
-    max-width: 1200px; /* 🚀 從 900px 增加 */
-    min-height: 900px; /* 🚀 增加容器高度以容納大圖 */
+    max-width: 1200px;
+    min-height: 900px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 40px auto;
-    touch-action: pan-y; /* 🚀 允許垂直捲動但捕捉水平滑動 */
 }
 
 .story-card-wrapper {
@@ -411,8 +487,8 @@ a.call-to-action {
 
 .story-card {
     position: absolute;
-    width: 95%; /* 🚀 增加卡片寬度佔比 */
-    max-width: 900px; /* 🚀 從 550px 大幅增加 */
+    width: 95%;
+    max-width: 900px;
     padding: 40px;
     background: rgba(20, 20, 20, 0.95);
     border: 1px solid rgba(211, 47, 47, 0.5);
@@ -429,32 +505,14 @@ a.call-to-action {
     gap: 20px;
 }
 
-.story-card h3 {
-    font-size: 2.2rem; /* 🚀 增加歌曲標題大小 */
-    margin-bottom: 10px;
-}
-
-.story-card.active {
-    opacity: 1;
-    transform: scale(1) translateX(0);
-    pointer-events: auto;
-    z-index: 2;
-    border-color: #d32f2f;
-}
-
+.story-card h3 { font-size: 2.2rem; margin-bottom: 10px; }
+.story-card.active { opacity: 1; transform: scale(1) translateX(0); pointer-events: auto; z-index: 2; border-color: #d32f2f; }
 .story-card.prev-card { transform: scale(0.8) translateX(-100%); }
 .story-card.next-card { transform: scale(0.8) translateX(100%); }
 
-.song-card-image {
-    width: 100%;
-    max-width: 700px; /* 🚀 從 350px 翻倍 */
-    max-height: 800px; /* 🚀 增加高度限制 */
-    object-fit: contain;
-    border-radius: 10px;
-}
-
-.song-lyric { font-size: 1.6rem; font-style: italic; color: #d32f2f; margin: 15px 0; } /* 🚀 增加歌詞字體大小 */
-.song-desc { font-size: 1.25rem; color: #bbb; line-height: 1.8; } /* 🚀 增加描述字體大小 */
+.song-card-image { width: 100%; max-width: 700px; max-height: 800px; object-fit: contain; border-radius: 10px; }
+.song-lyric { font-size: 1.6rem; font-style: italic; color: #d32f2f; margin: 15px 0; }
+.song-desc { font-size: 1.25rem; color: #bbb; line-height: 1.8; }
 
 .story-nav {
     position: absolute;
@@ -469,12 +527,11 @@ a.call-to-action {
     height: 50px;
     border-radius: 50%;
 }
-
 .story-nav.prev { left: 5px; }
 .story-nav.next { right: 5px; }
 
 /* =========================================
-   4. ITEM 區塊
+   5. ITEM 區塊
 ========================================= */
 .item-section { background-color: #222; }
 .merch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; }
@@ -483,23 +540,22 @@ a.call-to-action {
 .buy-button { display: block; padding: 10px; background-color: #d32f2f; color: #fff; text-decoration: none; border-radius: 4px; }
 
 /* =========================================
-   5. CREDITS 區塊 (電影感修復)
+   6. CREDITS 區塊 (電影感維持)
 ========================================= */
 .credits-section {
     background-color: #000;
     color: #fff;
     padding: 150px 20px;
     text-align: center;
-    font-family: "Times New Roman", Georgia, serif; /* 🚀 使用經典電影襯線體 */
+    font-family: "Times New Roman", Georgia, serif; 
 }
 
 .credits-title {
     font-size: 3.5rem;
-    letter-spacing: 1.2rem; /* 🚀 加大字距，營造史詩感 */
+    letter-spacing: 1.2rem;
     margin-bottom: 100px;
     font-weight: 300;
     text-transform: uppercase;
-    color: #fff;
 }
 
 .credits-container {
@@ -510,86 +566,23 @@ a.call-to-action {
     gap: 45px;
 }
 
-.credit-row {
-    display: flex;
-    justify-content: center;
-    align-items: baseline;
-    gap: 60px; /* 🚀 對稱排版的中間空隙 */
-}
+.credit-row { display: flex; justify-content: center; align-items: baseline; gap: 60px; }
+.credit-row .role { flex: 1; text-align: right; font-size: 1.1rem; text-transform: uppercase; color: #777; letter-spacing: 0.2rem; }
+.credit-row .name { flex: 1.5; text-align: left; font-size: 1.6rem; color: #fff; font-weight: 400; letter-spacing: 0.05rem; white-space: nowrap; }
+.credit-row .name a { color: #d32f2f; text-decoration: none; }
 
-.credit-row .role {
-    flex: 1;
-    text-align: right;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    color: #777; /* 🚀 職位使用較暗顏色，層次分明 */
-    letter-spacing: 0.2rem;
-}
+.credits-footer { margin-top: 150px; font-size: 0.9rem; color: #444; letter-spacing: 0.15rem; }
 
-.credit-row .name {
-    flex: 1.5; /* 🚀 增加姓名欄位的比例 */
-    text-align: left;
-    font-size: 1.6rem;
-    color: #fff;
-    font-weight: 400;
-    letter-spacing: 0.05rem; /* 🚀 稍微縮小字距，增加容納空間 */
-    white-space: nowrap; /* 🚀 強制同一個人名不換行 */
-}
-
-.credit-row .name a {
-    color: #d32f2f;
-    text-decoration: none;
-    transition: opacity 0.3s ease;
-}
-
-.credit-row .name a:hover {
-    opacity: 0.8;
-}
-
-.credits-footer {
-    margin-top: 150px;
-    font-size: 0.9rem;
-    color: #444;
-    letter-spacing: 0.15rem;
-}
-
-/* 📱 手機版調整 */
 @media (max-width: 768px) {
-    .credit-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
+    .credit-row { flex-direction: column; align-items: center; gap: 10px; }
     .credit-row .role, .credit-row .name { text-align: center; flex: none; }
     .credits-title { font-size: 2.2rem; letter-spacing: 0.5rem; }
     .credit-row .name { font-size: 1.4rem; }
-
-    /* 🚀 縮小手機版 Songs 區塊 */
-    .story-container {
-        min-height: 600px; /* 從 900px 縮小 */
-        margin: 20px auto;
-    }
-    .story-card {
-        padding: 20px;
-        gap: 10px;
-    }
-    .story-card h3 {
-        font-size: 1.3rem; /* 從 2.2rem 縮小 */
-    }
-    .song-card-image {
-        max-height: 300px; /* 限制圖片高度 */
-    }
-    .song-lyric {
-        font-size: 1.1rem; /* 從 1.6rem 縮小 */
-    }
-    .song-desc {
-        font-size: 0.95rem; /* 從 1.25rem 縮小 */
-        line-height: 1.5;
-    }
-}
-
-@media (min-width: 769px) {
-    body { font-size: 18px; }
-    h2 { font-size: 3.5rem; } 
-    .merch-grid { grid-template-columns: repeat(3, 1fr); }
+    .story-container { min-height: 600px; }
+    .story-card h3 { font-size: 1.3rem; }
+    .song-card-image { max-height: 300px; }
+    .song-lyric { font-size: 1.1rem; }
+    .song-desc { font-size: 0.95rem; }
+    .funding-title { font-size: 2.5rem; letter-spacing: 0.5rem; }
+    .stat-value { font-size: 2.2rem; }
 }

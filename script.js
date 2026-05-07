@@ -464,77 +464,79 @@ if (!isMobile) {
 }
 
 // 🚀 6. Ball1 掉落動畫
-const ballGroup = new THREE.Group();
-scene.add(ballGroup);
-let canSpawnBalls = false; // 控制是否生成新球
+if (!isMobile) {
+    const ballGroup = new THREE.Group();
+    scene.add(ballGroup);
+    let canSpawnBalls = false; // 控制是否生成新球
 
-loader.load('model/ball1.glb', (gltf) => {
-    const originalBall = gltf.scene;
-    
-    for (let i = 0; i < (isMobile ? 5 : 12); i++) {
-        const ball = originalBall.clone();
-        const s = isMobile ? 0.5 : 0.8;
-        ball.scale.set(s, s, s);
+    loader.load('model/ball1.glb', (gltf) => {
+        const originalBall = gltf.scene;
         
-        // 初始位置設定在下方並隱藏
-        ball.position.y = -50;
-        ballGroup.add(ball);
+        for (let i = 0; i < 12; i++) {
+            const ball = originalBall.clone();
+            const s = 0.8;
+            ball.scale.set(s, s, s);
+            
+            // 初始位置設定在下方並隱藏
+            ball.position.y = -50;
+            ballGroup.add(ball);
 
-        // GSAP 掉落動畫
-        const fallAnim = gsap.to(ball.position, {
-            y: -30, 
-            duration: Math.random() * 3 + 3,
-            repeat: -1,
-            ease: "none",
-            paused: true,
-            onRepeat: () => {
-                if (canSpawnBalls) {
-                    resetBall(ball);
-                } else {
-                    // 如果不允許生成，就讓這顆球在掉完後停在下方並暫停動畫
-                    fallAnim.pause();
+            // GSAP 掉落動畫
+            const fallAnim = gsap.to(ball.position, {
+                y: -30, 
+                duration: Math.random() * 3 + 3,
+                repeat: -1,
+                ease: "none",
+                paused: true,
+                onRepeat: () => {
+                    if (canSpawnBalls) {
+                        resetBall(ball);
+                    } else {
+                        // 如果不允許生成，就讓這顆球在掉完後停在下方並暫停動畫
+                        fallAnim.pause();
+                    }
                 }
-            }
-        });
+            });
 
-        const rotAnim = gsap.to(ball.rotation, {
-            x: Math.PI * 2,
-            z: Math.PI * 2,
-            duration: Math.random() * 3 + 2,
-            repeat: -1,
-            ease: "none",
-            paused: true
-        });
+            const rotAnim = gsap.to(ball.rotation, {
+                x: Math.PI * 2,
+                z: Math.PI * 2,
+                duration: Math.random() * 3 + 2,
+                repeat: -1,
+                ease: "none",
+                paused: true
+            });
 
-        // 控制區域：從 Album 完全進入開始 (top top) 到 Story 底部離開
-        ScrollTrigger.create({
-            trigger: ".concept-section",
-            start: "top top", // 修改：從 top bottom 改為 top top，表示區塊頂部到達螢幕頂部才開始
-            endTrigger: ".story-section",
-            end: "bottom top",
-            onEnter: () => { 
-                canSpawnBalls = true; 
-                if (ball.position.y < -25) { resetBall(ball); fallAnim.play(0); } 
-                else { fallAnim.play(); } 
-                rotAnim.play(); 
-            },
-            onLeave: () => { canSpawnBalls = false; }, // 進入 Credits 區塊，停止生成
-            onEnterBack: () => { 
-                canSpawnBalls = true; 
-                fallAnim.play(); 
-                rotAnim.play(); 
-            },
-            onLeaveBack: () => { canSpawnBalls = false; } // 回到 Top，停止生成
-        });
+            // 控制區域：從 Album 完全進入開始 (top top) 到 Story 底部離開
+            ScrollTrigger.create({
+                trigger: ".concept-section",
+                start: "top top", 
+                endTrigger: ".story-section",
+                end: "bottom top",
+                onEnter: () => { 
+                    canSpawnBalls = true; 
+                    if (ball.position.y < -25) { resetBall(ball); fallAnim.play(0); } 
+                    else { fallAnim.play(); } 
+                    rotAnim.play(); 
+                },
+                onLeave: () => { canSpawnBalls = false; }, 
+                onEnterBack: () => { 
+                    canSpawnBalls = true; 
+                    fallAnim.play(); 
+                    rotAnim.play(); 
+                },
+                onLeaveBack: () => { canSpawnBalls = false; } 
+            });
+        }
+    });
+
+    function resetBall(ball) {
+        ball.position.set(
+            (Math.random() - 0.5) * 40, 
+            30 + Math.random() * 20, 
+            (Math.random() - 0.5) * 20
+        );
     }
-});
-
-function resetBall(ball) {
-    ball.position.set(
-        (Math.random() - 0.5) * 40, 
-        30 + Math.random() * 20, 
-        (Math.random() - 0.5) * 20
-    );
 }
 
 const dropbtn = document.querySelector('.dropbtn');

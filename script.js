@@ -26,8 +26,12 @@ let cursorX = 0, cursorY = 0;
 let targetX = 0, targetY = 0;
 let isMouseDown = false;
 
-if (!isMobile) {
-    window.addEventListener('mousemove', (event) => {
+// ==========================================
+// 🚀 鼠標事件監聽 (精確偵測實體滑鼠) 🚀
+// ==========================================
+window.addEventListener('pointermove', (event) => {
+    // 💡 只有當指標類型為滑鼠時才啟動自定義鼠標
+    if (event.pointerType === 'mouse') {
         isMouseActive = true;
         clearTimeout(mouseTimeout);
         mouseTimeout = setTimeout(() => { isMouseActive = false; }, 1500);
@@ -39,24 +43,48 @@ if (!isMobile) {
         targetMouse.x = nx * scale;
         targetMouse.y = ny * scale;
 
-        // 🚀 直接取代鼠標：更新自定義鼠標位置
+        // 🚀 第一次偵測到滑鼠時，顯示棒棒糖並隱藏原生鼠標
         if (customCursor) {
+            if (customCursor.style.display !== 'block') {
+                customCursor.style.display = 'block';
+                document.documentElement.classList.add('has-mouse');
+            }
             customCursor.style.left = `${event.clientX}px`;
             customCursor.style.top = `${event.clientY}px`;
         }
-    });
+    }
+});
 
-    window.addEventListener('mousedown', () => {
-        if (customCursor) customCursor.classList.add('active');
-    });
+// 🚀 當滑鼠離開視窗時隱藏棒棒糖
+window.addEventListener('pointerleave', (event) => {
+    if (event.pointerType === 'mouse' && customCursor) {
+        customCursor.style.display = 'none';
+        document.documentElement.classList.remove('has-mouse');
+    }
+});
 
-    window.addEventListener('mouseup', () => {
-        if (customCursor) customCursor.classList.remove('active');
-    });
+// 🚀 當滑鼠重新進入視窗時顯示棒棒糖
+window.addEventListener('pointerenter', (event) => {
+    if (event.pointerType === 'mouse' && customCursor) {
+        customCursor.style.display = 'block';
+        document.documentElement.classList.add('has-mouse');
+    }
+});
 
-    // 防止預設拖曳行為干擾
-    window.addEventListener('dragstart', (e) => e.preventDefault());
-}
+window.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && customCursor) {
+        customCursor.classList.add('active');
+    }
+});
+
+window.addEventListener('pointerup', (event) => {
+    if (event.pointerType === 'mouse' && customCursor) {
+        customCursor.classList.remove('active');
+    }
+});
+
+// 防止預設拖曳行為干擾
+window.addEventListener('dragstart', (e) => e.preventDefault());
 
 // Lenis 平滑捲動
 const lenis = new Lenis();

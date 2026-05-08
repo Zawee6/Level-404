@@ -84,11 +84,7 @@ html {
     color: #fff;
 }
 
-/* 🚀 全域鼠標隱藏，改用 JS 驅動的自定義鼠標 */
-* {
-    cursor: none !important;
-}
-
+/* 🚀 預設隱藏自定義鼠標，只有在 JS 偵測到實體滑鼠時才會顯示 */
 #custom-cursor {
     position: fixed;
     top: 0;
@@ -100,14 +96,13 @@ html {
     background-repeat: no-repeat;
     pointer-events: none;
     z-index: 10001;
-    transform: translate(-50%, -50%);
-    display: none; /* 預設隱藏，由 JS 啟動 */
+    transform: translate(-35%, -35%); /* 🚀 水平從 -50% 改為 -45%，讓圖片往右微調 */
+    display: none; /* 🚀 預設完全隱藏 */
 }
 
-@media (min-width: 769px) {
-    #custom-cursor {
-        display: block;
-    }
+/* 當 JS 偵測到滑鼠時會加入此類別 */
+.has-mouse * {
+    cursor: none !important;
 }
 
 #custom-cursor.active {
@@ -641,11 +636,20 @@ a.call-to-action {
     .funding-title { margin-bottom: 20px; }
     .credits-title { margin-bottom: 60px; }
 
-    .story-container { min-height: 600px; }
+    .story-container { min-height: 650px; }
+    .story-card { 
+        width: 88%; 
+        padding: 25px 20px; 
+        gap: 15px;
+    }
     .story-card h3 { font-size: 1.3rem; }
-    .song-card-image { max-height: 300px; }
-    .song-lyric { font-size: 1.1rem; }
-    .song-desc { font-size: 0.95rem; }
+    .song-card-image { max-height: 280px; }
+    .song-lyric { font-size: 1.05rem; margin: 10px 0; }
+    .song-desc { font-size: 0.9rem; line-height: 1.6; }
+    
+    .story-nav { width: 40px; height: 40px; font-size: 1.5rem; }
+    .story-nav.prev { left: 0px; }
+    .story-nav.next { right: 0px; }
     
     .funding-section { padding: 80px 15px; min-height: 80vh; }
     .funding-subtitle { margin-bottom: 40px; letter-spacing: 3px; font-size: 0.85rem; padding: 0 10px; }

@@ -335,13 +335,14 @@ body {
    2.5 募資進度區塊 (Funding) - 電影極簡版
 ========================================= */
 .funding-section {
-    background-color: rgba(20, 20, 20, 0.6); /* 🚀 第二階 */
+    background-color: rgba(10, 10, 10, 0.9); /* 🚀 加深背景，確保不被背景 3D 干擾 */
     padding: 300px 20px; 
     min-height: 110vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    z-index: 30; /* 🚀 提高 z-index 確保在所有 Overlay 之上 */
 }
 
 .funding-container {
@@ -621,19 +622,46 @@ a.call-to-action {
 @media (max-width: 768px) {
     .credit-row { flex-direction: column; align-items: center; gap: 10px; }
     .credit-row .role, .credit-row .name { text-align: center; flex: none; }
-    .credits-title { font-size: 2.2rem; letter-spacing: 0.5rem; }
-    .credit-row .name { font-size: 1.4rem; }
+    
+    /* 🚀 統一修正所有標題：縮小尺寸並重置偏位 */
+    .hero-section h2, 
+    .concept-section h2, 
+    .mv-section h2, 
+    .story-section h2,
+    .funding-title,
+    .credits-title {
+        font-size: 2.2rem !important;
+        letter-spacing: 0.5rem !important;
+        padding-left: 0.5rem !important; /* 抵消最後一個字的字距，達成真正的置中 */
+        margin-left: 0 !important;
+        width: 100%;
+        text-align: center;
+    }
+
+    .funding-title { margin-bottom: 20px; }
+    .credits-title { margin-bottom: 60px; }
+
     .story-container { min-height: 600px; }
     .story-card h3 { font-size: 1.3rem; }
     .song-card-image { max-height: 300px; }
     .song-lyric { font-size: 1.1rem; }
     .song-desc { font-size: 0.95rem; }
-    .funding-section { padding: 100px 20px; min-height: 80vh; }
-    .funding-title { font-size: 2.5rem; letter-spacing: 0.5rem; margin-bottom: 20px; }
-    .funding-subtitle { margin-bottom: 60px; letter-spacing: 4px; font-size: 0.9rem; }
-    .progress-wrapper { margin-bottom: 60px; }
-    .progress-bar-container { margin-bottom: 40px; }
-    .stat-value { font-size: 2.2rem; }
-    .stat-label { font-size: 0.7rem; letter-spacing: 2px; }
-    .funding-btn { padding: 15px 30px; font-size: 0.9rem; letter-spacing: 4px; }
+    
+    .funding-section { padding: 80px 15px; min-height: 80vh; }
+    .funding-subtitle { margin-bottom: 40px; letter-spacing: 3px; font-size: 0.85rem; padding: 0 10px; }
+    
+    .progress-wrapper { margin-bottom: 50px; }
+    .progress-bar-container { margin-bottom: 30px; }
+    .stat-value { font-size: 2rem; }
+    .stat-label { font-size: 0.65rem; letter-spacing: 2px; }
+    
+    .funding-btn { 
+        padding: 15px 25px; 
+        font-size: 0.85rem; 
+        letter-spacing: 3px; 
+        width: 90%; /* 讓按鈕在手機上寬一點比較好按 */
+        box-sizing: border-box;
+    }
+
+    .credit-row .name { font-size: 1.4rem; }
 }

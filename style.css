@@ -667,5 +667,57 @@ a.call-to-action {
         box-sizing: border-box;
     }
 
-    .credit-row .name { font-size: 1.4rem; }
+/* =========================================
+   7. 特效：Glitch & Audio Feedback
+========================================= */
+
+/* 🚀 黑白 Glitch 文字特效 */
+.glitch-title {
+    position: relative;
+    color: white;
+}
+
+.glitch-title::before,
+.glitch-title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    clip: rect(0, 0, 0, 0); 
+}
+
+.glitch-title:hover::before {
+    left: 2px;
+    text-shadow: -2px 0 #fff;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch-title:hover::after {
+    left: -2px;
+    text-shadow: -2px 0 #000;
+    background: rgba(255,255,255,0.1);
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% { clip: rect(31px, 9999px, 94px, 0); }
+    20% { clip: rect(62px, 9999px, 42px, 0); }
+    40% { clip: rect(16px, 9999px, 78px, 0); }
+    60% { clip: rect(87px, 9999px, 11px, 0); }
+    80% { clip: rect(54px, 9999px, 33px, 0); }
+    100% { clip: rect(2px, 9999px, 90px, 0); }
+}
+
+@keyframes glitch-anim2 {
+    0% { clip: rect(65px, 9999px, 100px, 0); }
+    20% { clip: rect(15px, 9999px, 30px, 0); }
+    40% { clip: rect(40px, 9999px, 80px, 0); }
+    60% { clip: rect(5px, 9999px, 45px, 0); }
+    80% { clip: rect(90px, 9999px, 10px, 0); }
+    100% { clip: rect(25px, 9999px, 60px, 0); }
 }

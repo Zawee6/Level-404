@@ -705,6 +705,40 @@ window.addEventListener('blur', () => {
     }
 });
 
+// ==========================================
+// 🔊 程序化敲擊音效 (Web Audio API)
+// ==========================================
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTapSound() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    // 💡 模擬糖果/木頭敲擊聲：高頻 + 快速衰減
+    osc.type = 'sine'; 
+    osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.05);
+    
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime); // 音量調小避免刺耳
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+}
+
+// 綁定全域點擊，與棒棒糖動畫同步
+window.addEventListener('mousedown', (e) => {
+    // 如果點擊的是 YouTube 或特定排除區域則不發聲
+    if (e.target.tagName !== 'IFRAME') {
+        playTapSound();
+    }
+});
+
 function animate() {
     requestAnimationFrame(animate);
     

@@ -187,13 +187,27 @@ if (musicToggle) {
         if (music.muted) {
             music.muted = false;
             musicToggle.innerText = "🔊";
-            // 🚀 如果音樂目前是暫停的（例如剛從影片翻回來），切換靜音時順便播放
-            if (music.paused) {
-                music.play().catch(err => console.log("Music play blocked:", err));
-            }
+            if (music.paused) music.play().catch(err => console.log("Music play blocked:", err));
         } else {
             music.muted = true;
             musicToggle.innerText = "🔇";
+        }
+    });
+}
+
+// 🚀 音量滑桿控制
+const volumeSlider = document.getElementById('volume-slider');
+if (volumeSlider && music) {
+    volumeSlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        music.volume = val;
+        
+        // 💡 如果使用者手動調音量，自動解除靜音
+        if (val > 0 && music.muted) {
+            music.muted = false;
+            if (musicToggle) musicToggle.innerText = "🔊";
+        } else if (val == 0) {
+            if (musicToggle) musicToggle.innerText = "🔇";
         }
     });
 }

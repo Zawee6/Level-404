@@ -27,7 +27,6 @@
         </div>
     </nav>
 
-    <!-- 載入畫面 -->
     <div id="loading-overlay">
         <div class="loader-content">
             <div id="loading-status">
@@ -45,7 +44,12 @@
         <source src="bgm.mp3" type="audio/mpeg">
     </audio>
 
-    <button id="music-toggle" class="fixed-mute-btn">🔇</button>
+    <div class="music-controls-container">
+        <div class="volume-slider-wrapper">
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">
+        </div>
+        <button id="music-toggle" class="fixed-mute-btn">🔇</button>
+    </div>
 
     <div id="three-container"></div> 
     <div id="transition-overlay"></div>
@@ -73,7 +77,6 @@
         </div>
     </section>
 
-    <!-- 🚀 新增：募資進度區塊 -->
     <section id="funding-section" class="section funding-section">
         <div class="funding-container">
             <h2 class="funding-title glitch-title" data-text="CROWDFUNDING">CROWDFUNDING</h2>
@@ -249,7 +252,6 @@
         </div>
     </section>
 
-    <!-- 🚀 新增：電影感 Credit 區塊 -->
     <section id="credits-section" class="section credits-section">
         <h2 class="credits-title glitch-title" data-text="CREDITS">CREDITS</h2>
         <div class="credits-container">
@@ -275,7 +277,10 @@
             </div>
             <div class="credit-row">
                 <span class="role">Special Thanks</span>
-                <span class="name">紀昱名 Watorest<br>Flowstrong<br>Soundtrick 音樂工作室<br>吳政龍<br>張時健<br>蔡崇隆<br>林惠荃<br>簡妙如<br>沈智傑<br>簡佳慧<br>金聲駕訓班<br>池丞昊<br>艾俊希<br>洪雨群<br>洪藝庭<br>林裕恩<br>普通人阿京<br>陳佳宣<br>曾彥喬<br>久聚 9eorge<br>江慧晶<br>劉智良<br>劉哲睿<br>ABR<br>CB7<br>Ditto<br>Wish<br>Master LIN<br>NP太高</span>
+                <span class="name">紀昱名 Watorest<br>Flowstrong<br>Soundtrick 音樂工作室<br>吳政龍<br>張時健<br>蔡崇隆
+                    <br>林惠荃<br>簡妙如<br>沈智傑<br>簡佳慧<br>金聲駕訓班<br>池丞昊<br>艾俊希<br>洪雨群<br>洪藝庭<br>林裕恩
+                    <br>普通人阿京<br>陳佳宣<br>曾彥喬<br>久聚 9eorge<br>江慧晶<br>劉智良<br>劉哲睿<br>ABR<br>CB7<br>Ditto
+                    <br>Wish<br>Master LIN<br>NP太高</span>
             </div>
             <div class="credit-row">
                 <span class="role">共同製作工作室</span>
@@ -291,7 +296,6 @@
         </div>
     </section>
 
-    <!-- 外部函式庫 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

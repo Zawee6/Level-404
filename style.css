@@ -178,11 +178,58 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-.fixed-mute-btn {
+.music-controls-container {
     position: fixed;
     bottom: 30px;
     right: 30px;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.volume-slider-wrapper {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+    transition: all 0.4s ease;
+}
+
+.music-controls-container:hover .volume-slider-wrapper {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* 自定義滑桿外觀 */
+#volume-slider {
+    -webkit-appearance: none;
+    width: 100px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #b53a20;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(181, 58, 32, 0.5);
+}
+
+.fixed-mute-btn {
+    position: static; /* 🚀 從 fixed 改為由容器控制位置 */
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
@@ -196,6 +243,16 @@ body {
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+    .volume-slider-wrapper {
+        display: none; /* 🚀 手機端隱藏音量調節，保持簡潔 */
+    }
+    .music-controls-container {
+        right: 20px;
+        bottom: 20px;
+    }
 }
 
 .fixed-mute-btn:hover {

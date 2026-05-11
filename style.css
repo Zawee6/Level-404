@@ -101,6 +101,7 @@ html {
 }
 
 /* 當 JS 偵測到滑鼠時會加入此類別 */
+.has-mouse, 
 .has-mouse * {
     cursor: none !important;
 }

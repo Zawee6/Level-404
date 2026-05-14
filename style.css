@@ -188,6 +188,11 @@ body {
     gap: 15px;
 }
 
+.music-controls-container,
+.music-controls-container * {
+    cursor: auto !important; /* 🚀 恢復系統預設鼠標，方便精確調節音量 */
+}
+
 .volume-slider-wrapper {
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.2);

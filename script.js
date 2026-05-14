@@ -197,6 +197,19 @@ if (musicToggle) {
 
 // 🚀 音量滑桿控制
 const volumeSlider = document.getElementById('volume-slider');
+const musicControls = document.querySelector('.music-controls-container');
+
+if (musicControls) {
+    // 💡 移入音量調節區時，隱藏棒棒糖，改顯示系統鼠標
+    musicControls.addEventListener('mouseenter', () => {
+        if (customCursor) customCursor.style.opacity = '0';
+    });
+    // 💡 移出時，恢復棒棒糖
+    musicControls.addEventListener('mouseleave', () => {
+        if (customCursor) customCursor.style.opacity = '1';
+    });
+}
+
 if (volumeSlider && music) {
     volumeSlider.addEventListener('input', (e) => {
         const val = e.target.value;

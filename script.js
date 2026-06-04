@@ -805,9 +805,9 @@ window.addEventListener('resize', () => {
 // ==========================================
 // 🚀 當募資進度有變動時，只需修改下方數值：
 const FUNDING_CONFIG = {
-    currentPercent: 0,        // 目前完成度百分比 (例如: 45)
-    currentAmount: "0",       // 目前贊助人次 (例如: "45")
-    goalAmount: "100"         // 目標 (選填)
+    currentPercent: 2.94,     // 目前完成度百分比 (例如: 45)
+    currentAmount: "1",       // 目前贊助人次 (例如: "45")
+    goalAmount: "100000"      // 目標 (選填)
 };
 
 function initFundingAnimation() {
@@ -831,15 +831,21 @@ function initFundingAnimation() {
                 const duration = 2000; // 2秒跑完
                 
                 if (FUNDING_CONFIG.currentPercent > 0) {
-                    const stepTime = duration / FUNDING_CONFIG.currentPercent;
+                    const steps = 100; // 分成 100 步
+                    const stepValue = FUNDING_CONFIG.currentPercent / steps;
+                    const stepTime = duration / steps;
+                    let currentStep = 0;
+
                     const interval = setInterval(() => {
-                        if (displayPercent >= FUNDING_CONFIG.currentPercent) {
+                        if (currentStep >= steps) {
+                            percentText.innerText = FUNDING_CONFIG.currentPercent + "%";
                             clearInterval(interval);
                         } else {
-                            displayPercent++;
-                            percentText.innerText = displayPercent + "%";
+                            currentStep++;
+                            displayPercent += stepValue;
+                            percentText.innerText = displayPercent.toFixed(2) + "%";
                         }
-                    }, stepTime > 20 ? stepTime : 20);
+                    }, stepTime);
                 } else {
                     percentText.innerText = "0%";
                 }

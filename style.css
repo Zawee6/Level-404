@@ -354,8 +354,8 @@ body {
 
 .album-flip-card.flipped { z-index: 100; }
 
-.album-flip-card.flipped:hover {
-    transform: rotateY(0deg) scale(1.05); /* 保持放大但不要抵消翻轉效果的邏輯需要小心 */
+.album-flip-card.flipped:hover .flip-card-inner {
+    transform: rotateY(180deg) scale(1.05);
 }
 
 .flip-card-inner {
@@ -729,6 +729,7 @@ a.call-to-action {
         width: 90%; /* 讓按鈕在手機上寬一點比較好按 */
         box-sizing: border-box;
     }
+}
 
 /* =========================================
    7. 特效：Glitch & Audio Feedback

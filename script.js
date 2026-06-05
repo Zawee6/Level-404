@@ -805,19 +805,33 @@ window.addEventListener('resize', () => {
 // ==========================================
 // 🚀 當募資進度有變動時，只需修改下方數值：
 const FUNDING_CONFIG = {
-    currentPercent: 2.94,     // 目前完成度百分比 (例如: 45)
-    currentAmount: "1",       // 目前贊助人次 (例如: "45")
-    goalAmount: "100000"      // 目標 (選填)
+    currentPercent: 2.94,     // 目前完成度百分比
+    raisedAmount: 2940,       // 目前募得金額 (數字)
+    currentSupporters: "1",   // 目前贊助人次
+    goalAmount: "100000",     // 目標金額
+    deadline: "2026-08-02T12:00:00" // 截止時間
 };
 
 function initFundingAnimation() {
     const progressBar = document.getElementById('funding-progress-bar');
     const percentText = document.getElementById('funding-percent');
-    const currentText = document.getElementById('funding-current');
+    const raisedText = document.getElementById('funding-raised');
+    const supportersText = document.getElementById('funding-current');
+    const daysText = document.getElementById('funding-days');
 
-    if (progressBar && percentText && currentText) {
-        // 設定初始值 (贊助人次)
-        currentText.innerText = FUNDING_CONFIG.currentAmount;
+    if (progressBar && percentText && raisedText && supportersText && daysText) {
+        // 1. 設定贊助人次
+        supportersText.innerText = FUNDING_CONFIG.currentSupporters;
+
+        // 2. 計算剩餘天數
+        const calculateRemainingDays = () => {
+            const now = new Date();
+            const deadlineDate = new Date(FUNDING_CONFIG.deadline);
+            const diffTime = deadlineDate - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays > 0 ? diffDays : 0;
+        };
+        daysText.innerText = calculateRemainingDays();
 
         ScrollTrigger.create({
             trigger: ".funding-section",
@@ -826,35 +840,38 @@ function initFundingAnimation() {
                 // 1. 進度條動畫
                 progressBar.style.width = Math.min(FUNDING_CONFIG.currentPercent, 100) + "%";
 
-                // 2. 百分比數字跳動動畫
-                let displayPercent = 0;
-                const duration = 2000; // 2秒跑完
+                // 2. 數字跳動動畫
+                const duration = 2000;
+                const steps = 100;
+                const stepTime = duration / steps;
                 
-                if (FUNDING_CONFIG.currentPercent > 0) {
-                    const steps = 100; // 分成 100 步
-                    const stepValue = FUNDING_CONFIG.currentPercent / steps;
-                    const stepTime = duration / steps;
-                    let currentStep = 0;
+                // 百分比
+                let displayPercent = 0;
+                const percentStep = FUNDING_CONFIG.currentPercent / steps;
+                
+                // 金額
+                let displayRaised = 0;
+                const raisedStep = FUNDING_CONFIG.raisedAmount / steps;
 
-                    const interval = setInterval(() => {
-                        if (currentStep >= steps) {
-                            percentText.innerText = FUNDING_CONFIG.currentPercent + "%";
-                            clearInterval(interval);
-                        } else {
-                            currentStep++;
-                            displayPercent += stepValue;
-                            percentText.innerText = displayPercent.toFixed(2) + "%";
-                        }
-                    }, stepTime);
-                } else {
-                    percentText.innerText = "0%";
-                }
+                let currentStep = 0;
+                const interval = setInterval(() => {
+                    currentStep++;
+                    if (currentStep >= steps) {
+                        percentText.innerText = FUNDING_CONFIG.currentPercent + "%";
+                        raisedText.innerText = FUNDING_CONFIG.raisedAmount.toLocaleString();
+                        clearInterval(interval);
+                    } else {
+                        displayPercent += percentStep;
+                        displayRaised += raisedStep;
+                        percentText.innerText = displayPercent.toFixed(2) + "%";
+                        raisedText.innerText = Math.floor(displayRaised).toLocaleString();
+                    }
+                }, stepTime);
             }
         });
     }
 }
 
-// 在 DOM 加載後執行
 document.addEventListener('DOMContentLoaded', () => {
     initFundingAnimation();
 });

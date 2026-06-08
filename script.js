@@ -806,7 +806,6 @@ window.addEventListener('resize', () => {
 // 🚀 當募資進度有變動時，只需修改下方數值：
 const FUNDING_CONFIG = {
     currentPercent: 2.94,     // 目前完成度百分比
-    raisedAmount: 2940,       // 目前募得金額 (數字)
     currentSupporters: "1",   // 目前贊助人次
     goalAmount: "100000",     // 目標金額
     deadline: "2026-08-02T12:00:00" // 截止時間
@@ -815,11 +814,10 @@ const FUNDING_CONFIG = {
 function initFundingAnimation() {
     const progressBar = document.getElementById('funding-progress-bar');
     const percentText = document.getElementById('funding-percent');
-    const raisedText = document.getElementById('funding-raised');
     const supportersText = document.getElementById('funding-current');
     const daysText = document.getElementById('funding-days');
 
-    if (progressBar && percentText && raisedText && supportersText && daysText) {
+    if (progressBar && percentText && supportersText && daysText) {
         // 1. 設定贊助人次
         supportersText.innerText = FUNDING_CONFIG.currentSupporters;
 
@@ -848,23 +846,16 @@ function initFundingAnimation() {
                 // 百分比
                 let displayPercent = 0;
                 const percentStep = FUNDING_CONFIG.currentPercent / steps;
-                
-                // 金額
-                let displayRaised = 0;
-                const raisedStep = FUNDING_CONFIG.raisedAmount / steps;
 
                 let currentStep = 0;
                 const interval = setInterval(() => {
                     currentStep++;
                     if (currentStep >= steps) {
                         percentText.innerText = FUNDING_CONFIG.currentPercent + "%";
-                        raisedText.innerText = FUNDING_CONFIG.raisedAmount.toLocaleString();
                         clearInterval(interval);
                     } else {
                         displayPercent += percentStep;
-                        displayRaised += raisedStep;
                         percentText.innerText = displayPercent.toFixed(2) + "%";
-                        raisedText.innerText = Math.floor(displayRaised).toLocaleString();
                     }
                 }, stepTime);
             }
